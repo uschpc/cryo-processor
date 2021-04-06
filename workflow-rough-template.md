@@ -1,3 +1,4 @@
+```mermaid
 graph TD
     A[Movies] -->|MotionCor2| B[Motioncorrected movies]
     B --> C{split to web}
