@@ -7,6 +7,6 @@ graph TD
     D --> F{split to web}
     F -->|image classification| G[good images]
     F -->|convert 10 images to jpeg| H[web gallery with ctf images]
-    B --> I[image classification]
-    G --> I[image classification]
+    B --> I[discard bad images]
+    G --> I[discard bad images]
     I -->|particle picking| J[2D image classification]
