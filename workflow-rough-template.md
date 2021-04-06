@@ -17,6 +17,6 @@ graph TD
     N --> O[Particle extraction]
     O --> P[2D particle classification]
     P --> Q[selection of best classes]
-    P -->|if 2D classes are better and there is a need to improve the quality| M[Template-based auto particle picking]
     Q --> R[3D reconstruction]
+    Q -->|if 2D classes are better and there is a need to improve the quality| M[Template-based auto particle picking]
     R --> S[Post-processing]
