@@ -5,7 +5,7 @@ graph TD
     B -->|convert 10 images to jpeg| C(web gallery with<br> motioncorrected images)
     D -->|convert 10 images to jpeg| E(web gallery with<br> ctf images)
     D -->|image classification| F[good images]
-    B -->|use Dose Weeighted images| I[exposure curation]
+    B -->|use Dose Weighted images| I[exposure curation]
     F --> I[exposure curation]
     I --> J(manual particle picking)
     J --> K[2D particle classification]
