@@ -1,11 +1,10 @@
 ```mermaid
 graph TD
     A[Movies] -->|MotionCor2| B{motion corrected movies}
-    C -->|gctf| D[ctf corrected]
-    C -->|convert 10 images to jpeg| E[web gallery with motioncorrected images]
-    D --> F{split to web}
-    F -->|image classification| G[good images]
-    F -->|convert 10 images to jpeg| H[web gallery with ctf images]
+    B -->|gctf| D{ctf estimates}
+    B -->|convert 10 images to jpeg| C[web gallery with motioncorrected images]
+    D -->|convert 10 images to jpeg| E[web gallery with ctf images]
+    D -->|image classification| F[good images]
     B --> I[exposure curation]
     G --> I[exposure curation]
     I --> J(manual particle picking)
