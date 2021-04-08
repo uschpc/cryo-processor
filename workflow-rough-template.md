@@ -19,6 +19,6 @@ graph TD
     Q -->|if 2D classes are better and there is a need to improve the quality| M[Template-based auto particle picking]
     R --> S[Post-processing]
     
-    style A fill:#dff,stroke:#333,stroke-width:3px
+    style A fill:#t96,stroke:#333,stroke-width:3px
     style C fill:#bbf,stroke:#f66,stroke-width:2px,color:#fff,stroke-dasharray: 5 5
     style E fill:#bbf,stroke:#f66,stroke-width:2px,color:#fff,stroke-dasharray: 5 5
