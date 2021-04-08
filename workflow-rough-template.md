@@ -2,8 +2,8 @@
 graph TD
     A[Movies] -->|MotionCor2| B(motion corrected movies)
     B -->|gctf on non-Dose Weighted images| D(ctf estimates)
-    B -->|convert 10 images to jpeg| C{web gallery with motioncorrected images}
-    D -->|convert 10 images to jpeg| E{web gallery with ctf images}
+    B -->|convert 10 images to jpeg| C(web gallery with motioncorrected images)
+    D -->|convert 10 images to jpeg| E(web gallery with ctf images)
     D -->|image classification| F[good images]
     B -->|use Dose Weeighted images| I[exposure curation]
     F --> I[exposure curation]
@@ -18,3 +18,7 @@ graph TD
     Q --> R[3D reconstruction]
     Q -->|if 2D classes are better and there is a need to improve the quality| M[Template-based auto particle picking]
     R --> S[Post-processing]
+    
+    style A fill:#dff,stroke:#333,stroke-width:3px
+    style C fill:#bbf,stroke:#f66,stroke-width:2px,color:#fff,stroke-dasharray: 5 5
+    style E fill:#bbf,stroke:#f66,stroke-width:2px,color:#fff,stroke-dasharray: 5 5
