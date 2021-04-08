@@ -1,7 +1,6 @@
 ```mermaid
 graph TD
-    A[Movies] -->|MotionCor2| B[Motioncorrected movies]
-    B --> C{split to web}
+    A[Movies] -->|MotionCor2| B{motion corrected movies}
     C -->|gctf| D[ctf corrected]
     C -->|convert 10 images to jpeg| E[web gallery with motioncorrected images]
     D --> F{split to web}
