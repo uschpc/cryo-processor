@@ -6,7 +6,7 @@ graph TD
     D -->|convert 10 images to jpeg| E[web gallery with ctf images]
     D -->|image classification| F[good images]
     B --> I[exposure curation]
-    D --> I[exposure curation]
+    F --> I[exposure curation]
     I --> J(manual particle picking)
     J --> K[2D particle classification]
     K --> L[select 2D classes]
