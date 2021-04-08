@@ -2,8 +2,8 @@
 graph TD
     A[Movies] -->|MotionCor2| B(motion corrected movies)
     B -->|gctf on non-Dose Weighted images| D(ctf estimates)
-    B -->|convert 10 images to jpeg| C[web gallery with motioncorrected images]
-    D -->|convert 10 images to jpeg| E[web gallery with ctf images]
+    B -->|convert 10 images to jpeg| C{web gallery with motioncorrected images}
+    D -->|convert 10 images to jpeg| E{web gallery with ctf images}
     D -->|image classification| F[good images]
     B -->|use Dose Weeighted images| I[exposure curation]
     F --> I[exposure curation]
