@@ -1,6 +1,6 @@
 ```mermaid
 graph TD
-    subgraph pegasus1
+    subgraph pegasus1[Pegasus]
     A[Movies] -->|MotionCor2| B(motion corrected movies)
     B -->|gctf on non-Dose Weighted images| D(ctf estimates)
     B -->|convert 10 images to jpeg| C(web gallery with<br> motioncorrected images)
@@ -9,7 +9,7 @@ graph TD
     B -->|use Dose Weighted images| I[exposure curation]
     F --> I[exposure curation]
     end
-    subgraph cryosparc
+    subgraph cryosparc[Cryosparc]
     I --> J(manual particle picking)
     J --> K[2D particle classification]
     K --> L[select 2D classes]
@@ -21,7 +21,7 @@ graph TD
     Q --> R[3D reconstruction]
     Q -->|if 2D classes are better and <br>there is a need to improve the quality| M[Template-based <br>auto particle picking]
     end
-    subgraph pegasus2
+    subgraph pegasus2[Pegasus]
     R --> S(Post-processing)
     end
     
