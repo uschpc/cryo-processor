@@ -1,5 +1,6 @@
 ```mermaid
 graph TD
+subgraph Pegasus
     A[Movies] -->|MotionCor2| B(motion corrected movies)
     B -->|gctf on non-Dose Weighted images| D(ctf estimates)
     B -->|convert 10 images to jpeg| C(web gallery with<br> motioncorrected images)
@@ -7,6 +8,8 @@ graph TD
     D -->|image classification<br>discard bad images| F(good images)
     B -->|use Dose Weighted images| I[exposure curation]
     F --> I[exposure curation]
+end
+subgraph Cryosparc
     I --> J(manual particle picking)
     J --> K[2D particle classification]
     K --> L[select 2D classes]
@@ -16,31 +19,11 @@ graph TD
     O --> P[2D particle classification]
     P --> Q[selection of best classes]
     Q --> R[3D reconstruction]
-    Q -->|if 2D classes are better and <br>there is a need to improve the quality| M[Template-based <br>auto particle picking]
+    Q -->|if 2D classes are better and <br>there is a need to improve the quality| M[Template-based <br>auto particle picking] 
+end
+subgraph Pegasus2
     R --> S(Post-processing)
-    subgraph pegasus1[Pegasus]
-        A
-        B
-        C
-        D
-        E
-        F
-        I
-    end
-    subgraph cryosparc[Cryosparc]
-        J
-        K
-        L
-        M
-        N
-        O
-        P
-        Q
-        R
-    end
-    subgraph pegasus2[Pegasus]
-        S
-    end
+end
     
     
     style A fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
@@ -60,6 +43,6 @@ graph TD
     style Q fill:#fff4dd,stroke:#ffc457,stroke-width:2px,color:#fff,stroke-dasharray: 5 3
     style R fill:#fff4dd,stroke:#ffc457,stroke-width:2px,color:#fff,stroke-dasharray: 5 3
     style S fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
-    style pegasus1 fill:#fffceb,stroke:#fff7cc,stroke-width:2px
-    style cryosparc fill:#d4f6ff,stroke:#91e8ff,stroke-width:2px
-    style pegasus2 fill:#fffceb,stroke:#fff7cc,stroke-width:2px
+    style Pegasus fill:#fffceb,stroke:#fff7cc,stroke-width:2px
+    style Cryosparc fill:#d4f6ff,stroke:#91e8ff,stroke-width:2px
+    style Pegasus2 fill:#fffceb,stroke:#fff7cc,stroke-width:2px
