@@ -4,10 +4,10 @@ Below is a WIP graph representing the CryoEM workflow
 graph TD
     subgraph Pegasus
         A[Movies] -->|MotionCor2| B(motion corrected movies)
-        B -->|gctf on non-Dose Weighted images| D(ctf estimates)
-        B -->|convert 10 images to jpeg| C(web gallery with<br> motioncorrected images)
-        D -->|convert 10 images to jpeg| E(web gallery with<br> ctf images)
+        B -->|convert 20 images to jpeg| C(web gallery with<br> motioncorrected images)
+        D -->|convert 20 images to jpeg| E(web gallery with<br> ctf images)
         D -->|image classification<br>discard bad images| F(good images)
+        E -->|gctf on non-Dose Weighted images| D(ctf estimates)
         B -->|use Dose Weighted images| I[exposure curation]
         F --> I[exposure curation]
     end
