@@ -12,7 +12,7 @@ graph TD
         F --> I[exposure curation]
     end
     subgraph Cryosparc
-        I --> J(manual particle picking)
+        I -->|import to Cryosparc| J(manual particle picking)
         J --> K[2D particle classification]
         K --> L[select 2D classes]
         L --> M[Template-based auto particle picking]
