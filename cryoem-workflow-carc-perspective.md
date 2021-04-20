@@ -10,7 +10,7 @@ graph TD
         D -- Yes --> E[Apply motion correction the rest of the images]
         D -- No --> F[End]
         E --> G[Get the CTF estimations for the images]
-        G -->|optionally| H[Update the web gallery for the initial images with CTF estimates for these images]
+        G -->|optionally| H[Update the web gallery for the initial images with jpg views of the CTF estimates for these images]
         G -->|pass the CTF estimates to the endpoint| I[export data for interactive processing]
         E -->|pass Dose-Weighted images to the endpoint| I[export data and notify the user to start interactive processing]
     end
