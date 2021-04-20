@@ -7,7 +7,7 @@ graph TD
         B -->|Apply motion correction and convert 20 images to jpeg| C[Present the images to the user<br> in a web gallery]
         C --> D{Do the sample and images look good?}
         D -- Yes --> E[Motion corrected images]
-        D -- No ----> F[End]
+        D -- No --> F[End]
         E -->|Compute CTF estimations for the images| G[CTF estimates]
         G -->|image classification<br>discard bad images| I[exposure curation]
         B -->|pass Dose-Weighted images to the endpoint| I[exposure curation]
