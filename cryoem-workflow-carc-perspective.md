@@ -33,6 +33,6 @@ graph TD
     style F fill:red,stroke:#6dc293,stroke-width:2px
     style G fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style H fill:#d4ffd8,stroke:#6dc293,stroke-width:2px,stroke-dasharray: 5 3
-    style I fill:#d4ffd8,stroke:#6dc293,stroke-width:2px,stroke-dasharray: 5 5
+    style I fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style J fill:#fff4dd,stroke:#ffc457,stroke-width:2px
     style S fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
