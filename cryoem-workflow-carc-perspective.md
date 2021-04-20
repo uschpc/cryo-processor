@@ -33,12 +33,4 @@ graph TD
     style F fill:red,stroke:#6dc293,stroke-width:2px
     style I fill:#d4ffd8,stroke:#6dc293,stroke-width:2px,stroke-dasharray: 5 5
     style J fill:#fff4dd,stroke:#ffc457,stroke-width:2px,stroke-dasharray: 5 3
-    style K fill:#fff4dd,stroke:#ffc457,stroke-width:2px,stroke-dasharray: 5 3
-    style L fill:#fff4dd,stroke:#ffc457,stroke-width:2px,stroke-dasharray: 5 3
-    style M fill:#fff4dd,stroke:#ffc457,stroke-width:2px,stroke-dasharray: 5 3
-    style N fill:#fff4dd,stroke:#ffc457,stroke-width:2px,stroke-dasharray: 5 3
-    style O fill:#fff4dd,stroke:#ffc457,stroke-width:2px,stroke-dasharray: 5 3
-    style P fill:#fff4dd,stroke:#ffc457,stroke-width:2px,stroke-dasharray: 5 3
-    style Q fill:#fff4dd,stroke:#ffc457,stroke-width:2px,stroke-dasharray: 5 3
-    style R fill:#fff4dd,stroke:#ffc457,stroke-width:2px,stroke-dasharray: 5 3
     style S fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
