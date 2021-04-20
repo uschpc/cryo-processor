@@ -4,13 +4,13 @@ Below is a WIP graph representing the CryoEM workflow
 graph TD
     A[Image processing initiated by user] -->|process first 20 images| B[Motioncor2];
     subgraph Pegasus
-        B -->|Apply motion correction and convert 20 images to jpeg| C[Present the images to the user<br> in a web gallery];
-        C --> D{Do the sample and images look good?};
-        D -- Yes -->|Apply motion correction the rest of the images| E[Motion corrected images];
-        D -- No ----> F[End];
+        B -->|Apply motion correction and convert 20 images to jpeg| C[Present the images to the user<br> in a web gallery]
+        C --> D{Do the sample and images look good?}
+        D -- Yes -->|Apply motion correction the rest of the images| E[Motion corrected images]
+        D -- No ----> F[End]
         E -->|Compute CTF estimations for the images| G[CTF estimates]
-        G -->|image classification<br>discard bad images| I[exposure curation];
-        B -->|pass Dose-Weighted images to the endpoint| I[exposure curation];
+        G -->|image classification<br>discard bad images| I[exposure curation]
+        B -->|pass Dose-Weighted images to the endpoint| I[exposure curation]
     end
     subgraph Cryosparc
         I -->|import to Cryosparc| J(3D reconstruction in Cryosparc)
