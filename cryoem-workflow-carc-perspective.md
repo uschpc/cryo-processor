@@ -4,7 +4,8 @@ Below is a WIP graph representing the CryoEM workflow
 graph TD
     A[Image processing initiated by user] --> B[Apply the motion correction to the first 20 images];
     subgraph Pegasus
-        B -->|Convert the first 20 images to jpeg| C[Present the images to the user<br> in a web gallery]
+        B --> K[Convert the first 20 images to jpeg]
+        K --> C[Present the images to the user<br> in a web gallery]
         C --> D{Does the sample<br> and images look good?}
         D -- Yes --> E[Apply motion correction the rest of the images]
         D -- No --> F[End]
@@ -28,6 +29,7 @@ graph TD
     style A fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style B fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style C fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
+    style K fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style D fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style E fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style F fill:red,stroke:#6dc293,stroke-width:2px
