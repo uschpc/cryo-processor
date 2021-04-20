@@ -2,7 +2,7 @@ Below is a WIP graph representing the CryoEM workflow
 
 ```mermaid
 graph TD
-    A[Image processing initiated by user] --> B[Start the data transfer from the microscope];
+    A[Data processing initiated by user] --> B[Start the data transfer from the microscope];
     subgraph Pegasus Workflow
         B --> K[Apply the motion correction to the first 20 images]
         K --> L[Convert the first 20 images to jpeg]
