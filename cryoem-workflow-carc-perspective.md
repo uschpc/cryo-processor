@@ -12,32 +12,14 @@ graph TD
         F --> I[exposure curation]
     end
     subgraph Cryosparc
-        I -->|import to Cryosparc| J(manual particle picking)
-        J --> K[2D particle classification]
-        K --> L[select 2D classes]
-        L --> M[Template-based auto particle picking]
-        M --> N[Particle inspection]
-        N --> O[Particle extraction]
-        O --> P[2D particle classification]
-        P --> Q[selection of best classes]
-        Q --> R[3D reconstruction]
-        Q -->|if 2D classes are better and <br>there is a need to improve the quality| M[Template-based <br>auto particle picking] 
+        I -->|import to Cryosparc| J(3D reconstruction in Cryosparc)
     end
     subgraph Relion
-        I -->|import to Relion| AA(manual particle picking)
-        AA --> AB[2D particle classification]
-        AB --> AC[select 2D classes]
-        AC --> AD[Template-based auto particle picking]
-        AD --> AE[Particle inspection]
-        AE --> AF[Particle extraction]
-        AF --> AG[2D particle classification]
-        AG --> AH[selection of best classes]
-        AH --> AI[3D reconstruction]
-        AI -->|if 2D classes are better and <br>there is a need to improve the quality| AD[Template-based <br>auto particle picking] 
+        I -->|import to Relion| AA(3D reconstruction in Relion)
     end
     subgraph Pegasus2
-        R --> S(Post-processing)
-        AD --> S(Post-processing)
+        J --> S(Post-processing)
+        AA --> S(Post-processing)
     end
     
     
