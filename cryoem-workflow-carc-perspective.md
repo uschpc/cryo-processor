@@ -11,13 +11,13 @@ graph TD
         E --> G[Get the CTF estimations for the images]
         G -->|optionally| H[Update the web gallery for the initial images with CTF estimates for these images]
         G -->|pass the CTF estimates to the endpoint| I[export data for interactive processing]
-        B -->|pass Dose-Weighted images to the endpoint| I[export data for interactive processing]
+        B -->|pass Dose-Weighted images to the endpoint| I[export data and notify the user to start interactive processing]
     end
     subgraph Cryosparc
-        I -->|import to Cryosparc| J(3D reconstruction in Cryosparc)
+        I -->|User imports data to Cryosparc| J(3D reconstruction in Cryosparc)
     end
     subgraph Relion
-        I -->|import to Relion| AA(3D reconstruction in Relion)
+        I -->|User imports data to Relion| AA(3D reconstruction in Relion)
     end
     subgraph Post-processing in Pegasus
         J --> S(Post-processing)
