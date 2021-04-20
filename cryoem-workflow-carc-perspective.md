@@ -28,13 +28,13 @@ graph TD
     
     
     style A fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
-    style B fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
+    style B fill:#FFDCB0,stroke:#6dc293,stroke-width:2px
     style C fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style K fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style L fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style D fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style E fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
-    style F fill:red,stroke:white,stroke-width:2px
+    style F fill:red,stroke:#6dc293,stroke-width:2px
     style G fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style H fill:#d4ffd8,stroke:#6dc293,stroke-width:2px,stroke-dasharray: 5 3
     style I fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
