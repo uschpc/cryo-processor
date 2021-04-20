@@ -17,7 +17,7 @@ graph TD
     subgraph Relion
         I -->|import to Relion| AA(3D reconstruction in Relion)
     end
-    subgraph Pegasus2
+    subgraph Post-processing in Pegasus
         J --> S(Post-processing)
         AA --> S(Post-processing)
     end
