@@ -9,7 +9,7 @@ graph TD
         L --> C[Present the jpg images to a user<br> in a web gallery]
         C --> D{Does the Cryo-EM sample<br>and images look good?}
         D -- Yes --> E[Apply motion correction the rest of the images]
-        D -- No --> F[End]
+        D -- No --> F[End the processing]
         E -->|Non Dose-Weighted images| G[Get the CTF estimations for the images]
         G -->|optional<br>might not be needed| H[Update the web gallery for the initial images with jpg views of the CTF estimates for these images]
         G -->|pass the CTF estimates to the endpoint| I[export data for interactive processing]
@@ -34,7 +34,7 @@ graph TD
     style L fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style D fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style E fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
-    style F fill:red,stroke:#6dc293,stroke-width:2px
+    style F fill:orange,stroke:#6dc293,stroke-width:2px
     style G fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style H fill:#d4ffd8,stroke:#6dc293,stroke-width:2px,stroke-dasharray: 5 3
     style I fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
