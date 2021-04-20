@@ -9,8 +9,8 @@ graph TD
         D -- Yes --> E[Apply motion correction the rest of the images]
         D -- No --> F[End]
         E --> G[Get the CTF estimations for the images]
-        G -->|image classification<br>discard bad images| I[exposure curation]
-        B -->|pass Dose-Weighted images to the endpoint| I[exposure curation]
+        G -->|pass the CTF estimates| I[export data for interactive processing]
+        B -->|pass Dose-Weighted images to the endpoint| I[export data for interactive processing]
     end
     subgraph Cryosparc
         I -->|import to Cryosparc| J(3D reconstruction in Cryosparc)
