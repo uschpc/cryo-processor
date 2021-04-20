@@ -6,8 +6,8 @@ graph TD
     subgraph Pegasus
         B --> K[Apply the motion correction to the first 20 images]
         K --> L[Convert the first 20 images to jpeg]
-        L --> C[Present the images to the user<br> in a web gallery]
-        C --> D{   Does the sample<br>and images look good?}
+        L --> C[Present the jpg images to the user<br> in a web gallery]
+        C --> D{Does the sample<br>and images look good?}
         D -- Yes --> E[Apply motion correction the rest of the images]
         D -- No --> F[End]
         E --> G[Get the CTF estimations for the images]
@@ -31,6 +31,7 @@ graph TD
     style B fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style C fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style K fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
+    style L fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style D fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style E fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style F fill:red,stroke:#6dc293,stroke-width:2px
