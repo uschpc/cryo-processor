@@ -8,7 +8,7 @@ graph TD
         C --> D{Do the sample<br> and images look good?}
         D -- Yes --> E[Apply motion correction the rest of the images]
         D -- No --> F[End]
-        E -->|Compute CTF estimations for the images| G[CTF estimates]
+        E --> G[Get the CTF estimations for the images]
         G -->|image classification<br>discard bad images| I[exposure curation]
         B -->|pass Dose-Weighted images to the endpoint| I[exposure curation]
     end
