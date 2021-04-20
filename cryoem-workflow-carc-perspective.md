@@ -2,7 +2,7 @@ Below is a WIP graph representing the CryoEM workflow
 
 ```mermaid
 graph TD
-    A[Image processing initiated by user] -->|process first 20 images| B[Motioncor2];
+    A[Image processing initiated by user] -->|process first 20 images| B[Apply the motion correction with Motioncor2];
     subgraph Pegasus
         B -->|Apply motion correction and convert 20 images to jpeg| C[Present the images to the user<br> in a web gallery]
         C --> D{Do the sample<br> and images look good?}
