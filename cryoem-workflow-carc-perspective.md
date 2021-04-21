@@ -11,7 +11,6 @@ graph TD
         D -- Yes --> E[Apply motion correction the rest of the images]
         D -- No --> F[End the processing]
         E -->|Non Dose-Weighted images| G[Get the CTF estimations for the images]
-        G -->|optional<br>might not be needed| H[Update the web gallery for the initial images with jpg views of the CTF estimates for these images]
         G -->|pass the CTF estimates to the endpoint| I[export data for interactive processing]
         E -->|pass Dose-Weighted images to the endpoint| I[export data and notify the user to start interactive processing]
     end
@@ -36,7 +35,6 @@ graph TD
     style E fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style F fill:#FF6B6B,stroke:#6dc293,stroke-width:2px
     style G fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
-    style H fill:#d4ffd8,stroke:#6dc293,stroke-width:2px,stroke-dasharray: 5 3
     style I fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style J fill:#fff4dd,stroke:#ffc457,stroke-width:2px
     style S fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
