@@ -32,8 +32,8 @@ graph TD
     style D fill:#ffad99,stroke:#ffad99,stroke-width:2px
     style E fill:#FFDCB0,stroke:#6dc293,stroke-width:2px
     style F fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
-    style G fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
-    style H fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
+    style G fill:#ccffcc,stroke:#6dc293,stroke-width:2px
+    style H fill:#ccffcc,stroke:#6dc293,stroke-width:2px
     style I fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style K fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style L fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
