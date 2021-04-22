@@ -11,8 +11,8 @@ graph TD
         F --> G[Apply the motion correction to the dataset]
         G -->|Show the progress to the user| H[Convert the first 20 images to jpeg]
         H --> I[Present the jpg images to a user<br> in a web gallery]
-        F -->|Non Dose-Weighted images| J[Get the CTF estimations for the images]
-        F -->|pass Dose-Weighted images to the endpoint| K[export data and notify the user to start interactive processing]
+        G -->|Non Dose-Weighted images| J[Get the CTF estimations for the images]
+        G -->|pass Dose-Weighted images to the endpoint| K[export data and notify the user to start interactive processing]
         J -->|pass the CTF estimates to the endpoint| K[export data and notify the user to start interactive processing]
     end
     subgraph Cryosparc
