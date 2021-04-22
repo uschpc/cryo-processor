@@ -8,7 +8,7 @@ graph TD
     C -- Yes --> E[Initiate the data transfer to the central storage]
     subgraph Pegasus Workflow
         E --> F[Apply the motion correction to the dataset]
-        F --> G[Convert the first 20 images to jpeg]
+        F -->|Show the progress to the user| G[Convert the first 20 images to jpeg]
         G --> H[Present the jpg images to a user<br> in a web gallery]
         F -->|Non Dose-Weighted images| I[Get the CTF estimations for the images]
         F -->|pass Dose-Weighted images to the endpoint| K[export data and notify the user to start interactive processing]
