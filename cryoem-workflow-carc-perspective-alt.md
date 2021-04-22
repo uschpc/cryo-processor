@@ -6,7 +6,7 @@ graph TD
     B[User inspects the sample in the EPU data collection software] -->C{Does the Cryo-EM sample<br>and images look good?}
     C -- No --> D[End the data collection]
     C -- Yes --> E[Initiate the data transfer to the central storage]
-    E --> F[Initiate the workflow]
+    E --> F[Initiate the workflow on discovery1]
     subgraph Pegasus Workflow
         F --> G[Apply the motion correction to the dataset]
         G -->|Show the progress to the user| H[Convert the first 20 images to jpeg]
