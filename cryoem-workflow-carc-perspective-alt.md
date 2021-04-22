@@ -38,10 +38,4 @@ graph TD
     style K fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style L fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style S fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
-    EPU[EPU Data collection software from TF]
-    style EPU fill:#b3e6ff,stroke:#66ccff,stroke-width:2px
-    
-    style CC fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
-    style DD fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
-    style EE fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     
