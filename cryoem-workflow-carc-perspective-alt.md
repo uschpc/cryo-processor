@@ -38,5 +38,6 @@ graph TD
     style I fill:#e6ffe6,stroke:#6dc293,stroke-width:2px
     style J fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style K fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
-    style L fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
+    style L fill:#e6e6ff,stroke:#6dc293,stroke-width:2px
+    style AA fill:#e6e6ff,stroke:#6dc293,stroke-width:2px
     style S fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
