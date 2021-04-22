@@ -32,11 +32,11 @@ graph TD
     style C fill:#b3e6ff,stroke:#66ccff,stroke-width:2px
     style D fill:#ffad99,stroke:#ffad99,stroke-width:2px
     style E fill:#FFDCB0,stroke:#6dc293,stroke-width:2px
-    style F fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
-    style G fill:#e6ffe6,stroke:#6dc293,stroke-width:2px
+    style F fill:#FFDCB0,stroke:#6dc293,stroke-width:2px
+    style G fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style H fill:#e6ffe6,stroke:#6dc293,stroke-width:2px
-    style I fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
+    style I fill:#e6ffe6,stroke:#6dc293,stroke-width:2px
+    style J fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style K fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style L fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
     style S fill:#d4ffd8,stroke:#6dc293,stroke-width:2px
-    
