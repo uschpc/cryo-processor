@@ -6,13 +6,14 @@ graph TD
     B[User inspects the sample in the EPU data collection software] -->C{Does the Cryo-EM sample<br>and images look good?}
     C -- No --> D[End the data collection]
     C -- Yes --> E[Initiate the data transfer to the central storage]
+    E --> F[Initiate the workflow]
     subgraph Pegasus Workflow
-        E --> F[Apply the motion correction to the dataset]
-        F -->|Show the progress to the user| G[Convert the first 20 images to jpeg]
-        G --> H[Present the jpg images to a user<br> in a web gallery]
-        F -->|Non Dose-Weighted images| I[Get the CTF estimations for the images]
+        F --> G[Apply the motion correction to the dataset]
+        G -->|Show the progress to the user| H[Convert the first 20 images to jpeg]
+        H --> I[Present the jpg images to a user<br> in a web gallery]
+        F -->|Non Dose-Weighted images| J[Get the CTF estimations for the images]
         F -->|pass Dose-Weighted images to the endpoint| K[export data and notify the user to start interactive processing]
-        I -->|pass the CTF estimates to the endpoint| K[export data and notify the user to start interactive processing]
+        J -->|pass the CTF estimates to the endpoint| K[export data and notify the user to start interactive processing]
     end
     subgraph Cryosparc
         K -->|User imports data to Cryosparc| L(3D reconstruction in Cryosparc)
