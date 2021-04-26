@@ -7,7 +7,7 @@ graph TD
     C -- No --> D[End the data collection]
     C -- Yes --> CA{Who is the owner of the dataset?}
     CA -- Amgen --> CB[Start the data transfer to the Amgen storage]
-    CA -- USC --> E[Start the data transfer to the central storage]
+    CA -- USC --> E[Start the data transfer to the central storage<br>Associate the data acquisition session id with the USC user id<br>Associate the USC user to a group]
     E --> F[Initiate the workflow on discovery1]
     E -->|Send notification to the users that the Slack channel was created| BB[Create a data collection slack channel<br> with the members of the group that collects the data]
     subgraph Pegasus Workflow
@@ -43,6 +43,8 @@ graph TD
     style A fill:#b3e6ff,stroke:#66ccff,stroke-width:2px
     style B fill:#b3e6ff,stroke:#66ccff,stroke-width:2px
     style C fill:#b3e6ff,stroke:#66ccff,stroke-width:2px
+    style CA fill:#b3e6ff,stroke:#66ccff,stroke-width:2px
+    style CB fill:#b3e6ff,stroke:#66ccff,stroke-width:2px
     style D fill:#ffad99,stroke:#ffad99,stroke-width:2px
     style E fill:#FFDCB0,stroke:#6dc293,stroke-width:2px
     style F fill:#FFDCB0,stroke:#6dc293,stroke-width:2px
