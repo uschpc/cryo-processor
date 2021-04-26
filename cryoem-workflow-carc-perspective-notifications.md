@@ -5,7 +5,9 @@ graph TD
     A[Data Collection initiated by user on the microscope] --> B
     B[User inspects the sample in the EPU data collection software] -->C{Does the Cryo-EM sample<br>and images look good?}
     C -- No --> D[End the data collection]
-    C -- Yes --> E[Initiate the data transfer to the central storage]
+    C -- Yes --> CA{Who is the owner of the dataset?}
+    CA -- Amgen --> CB[Start the data transfer to the Amgen storage]
+    CA -- USC --> E[Start the data transfer to the central storage]
     E --> F[Initiate the workflow on discovery1]
     E -->|Send notification to the users that the Slack channel was created| BB[Create a data collection slack channel<br> with the members of the group that collects the data]
     subgraph Pegasus Workflow
