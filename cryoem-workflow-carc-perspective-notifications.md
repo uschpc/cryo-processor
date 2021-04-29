@@ -7,9 +7,11 @@ graph TD
     C -- No --> D[End the data collection]
     C -- Yes --> CA{Who is the owner of the dataset?}
     CA -- Amgen --> CB[Start the data transfer to the Amgen storage]
-    CA -- USC --> E[Start the data transfer to the central storage<br>Associate the data acquisition session id with the USC user id<br>Associate the USC user to a group]
+    CA -- USC --> CD[obtain user_id, group_id,session_id, dataset_name<br>Automatic start of the transfer to central storage]
+    CD --> E[Show user the web interface<br>get the necessary data from the user]
     E --> F[Initiate the workflow on discovery1]
     E -->|Send notification to the users that the Slack channel was created| BB[Create a data collection slack channel<br> with the members of the group that collects the data]
+    E -->|Send notification to the users via email| BBB[inform user where the website is and send url and/or login info]
     subgraph Pegasus Workflow
         F --> G[Apply the motion correction to the dataset]
         G -->|Show the progress to the user| H[Convert the motion corrected images to jpeg]
@@ -29,6 +31,10 @@ graph TD
         I ---|Send thumbnails to the channel| FF
         FF --> GG[Notify the user that data is ready]
         K ---|Send notification| GG
+    end
+    subgraph Email notifications
+        BBB --> GGG[Notify the user that data is ready]
+        K ---|Send notification| GGG
     end
     subgraph User-interactive 3D reconstruction
         K -->|User imports data to Cryosparc| L(3D reconstruction in Cryosparc)
