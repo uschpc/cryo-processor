@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
+
 import os
+import configparser
 import logging
 from pathlib import Path
 from argparse import ArgumentParser
 
-logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger('cryoem')
 
 # --- Import Pegasus API ------------------------------------------------------
 from Pegasus.api import *
@@ -21,10 +23,10 @@ class PipelineWorkflow:
     wf_dir = None
 
     # --- Init ----------------------------------------------------------------
-    def __init__(self, dagfile="workflow.yml"):
+    def __init__(self, wf_dir, dagfile="workflow.yml"):
         self.dagfile = dagfile
         self.wf_name = "motioncor2"
-        self.wf_dir = str(Path(__file__).parent.resolve())
+        self.wf_dir = wf_dir
 
     # --- Write files in directory --------------------------------------------
     def write(self):
@@ -37,16 +39,15 @@ class PipelineWorkflow:
     # --- Configuration (Pegasus Properties) ----------------------------------
     def create_pegasus_properties(self):
         self.props = Properties()
-
-        # props["pegasus.monitord.encoding"] = "json"
-        # self.properties["pegasus.integrity.checking"] = "none"
+        self.props["pegasus.metrics.app"] = self.wf_name
+        self.props["pegasus.data.configuration"] = "sharedfs"
         return
 
     # --- Site Catalog --------------------------------------------------------
-    def create_sites_catalog(self, exec_site_name="condorpool"):
+    def create_sites_catalog(self, exec_site_name="slurm"):
         self.sc = SiteCatalog()
 
-        shared_scratch_dir = os.path.join(self.wf_dir, "scratch")
+        shared_scratch_dir = os.path.join(self.wf_dir, "local-scratch")
         local_storage_dir = os.path.join(self.wf_dir, "output")
 
         local = Site("local").add_directories(
@@ -58,17 +59,25 @@ class PipelineWorkflow:
             ),
         )
 
+        shared_scratch_dir = os.path.join(self.wf_dir, "scratch")
         exec_site = (
             Site(exec_site_name)
-            .add_pegasus_profile(style="condor",queue="main")
-            .add_condor_profile(universe="vanilla")
-            .add_profiles(Namespace.PEGASUS, key="data.configuration", value="condorio")
+            .add_profiles(Namespace.CONDOR, key="grid_resource", value="batch slurm")
+            .add_profiles(Namespace.PEGASUS, key="style", value="glite")
+            .add_profiles(Namespace.PEGASUS, key="queue", value="debug")
+            .add_profiles(Namespace.PEGASUS, key="project-name", value="hpcroot")
+            .add_profiles(Namespace.ENV, key="PEGASUS_HOME", value=os.environ["PEGASUS_HOME"])
+            .add_directories(
+                Directory(Directory.SHARED_SCRATCH, shared_scratch_dir).add_file_servers(
+                    FileServer("file://" + shared_scratch_dir, Operation.ALL)
+                )
+            )
         )
 
         self.sc.add_sites(local, exec_site)
 
     # --- Transformation Catalog (Executables and Containers) -----------------
-    def create_transformation_catalog(self, exec_site_name="condorpool"):
+    def create_transformation_catalog(self, exec_site_name="slurm"):
         self.tc = TransformationCatalog()
 
         motionCor2 = Transformation(
@@ -96,7 +105,7 @@ class PipelineWorkflow:
         self.tc.add_transformations(gctf)
         self.tc.add_transformations(e2proc2d)
     # --- Replica Catalog ------------------------------------------------------
-    def create_replica_catalog(self,exec_site_name="condorpool"):
+    def create_replica_catalog(self,exec_site_name="slurm"):
         self.rc = ReplicaCatalog()
 
         sample_dataset_dir="/project/cryoem/sample-datasets"
@@ -191,51 +200,39 @@ class PipelineWorkflow:
         self.wf.add_jobs(e2proc2d_job2)
         self.wf.add_jobs(e2proc2d_job3)
 
-
-if __name__ == "__main__":
-    parser = ArgumentParser(description="Motion Correction 2 test")
-
-    parser.add_argument(
-        "-s",
-        "--skip_sites_catalog",
-        action="store_true",
-        help="Skip site catalog creation",
-    )
-    parser.add_argument(
-        "-e",
-        "--execution_site_name",
-        metavar="STR",
-        type=str,
-        default="condorpool",
-        help="Execution site name (default: condorpool)",
-    )
-    parser.add_argument(
-        "-o",
-        "--output",
-        metavar="STR",
-        type=str,
-        default="workflow.yml",
-        help="Output file (default: workflow.yml)",
-    )
-
-    args = parser.parse_args()
-
-    workflow = PipelineWorkflow(args.output)
-
-    if not args.skip_sites_catalog:
-        print("Creating execution sites...")
-        workflow.create_sites_catalog(args.execution_site_name)
-
-    print("Creating workflow properties...")
-    workflow.create_pegasus_properties()
+    # --- Submit Workflow -----------------------------------------------------
+    def submit_workflow(self):
     
-    print("Creating transformation catalog...")
-    workflow.create_transformation_catalog(args.execution_site_name)
+        #workflow = PipelineWorkflow(args.output)
+        
+        logger.info("Starting a new workflow in {} ...".format(self.wf_dir))
+        
+        os.mkdir(self.wf_dir)
+        os.chdir(self.wf_dir)
+    
+        logger.info("Creating workflow properties...")
+        self.create_pegasus_properties()
+    
+        logger.info("Creating execution sites...")
+        self.create_sites_catalog()
+        
+        logger.info("Creating transformation catalog...")
+        self.create_transformation_catalog()
+    
+        logger.info("Creating replica catalog...")
+        self.create_replica_catalog()
+    
+        logger.info("Creating pipeline workflow dag...")
+        self.create_workflow()
+    
+        self.write()
 
-    print("Creating replica catalog...")
-    workflow.create_replica_catalog(args.execution_site_name)
+        self.wf.plan(submit=True,
+                     sites=["slurm"],
+                     output_sites=["local"],
+                     dir=os.getcwd(),
+                     relative_dir=self.wf_name
+                    )
 
-    print("Creating pipeline workflow dag...")
-    workflow.create_workflow()
 
-    workflow.write()
+
