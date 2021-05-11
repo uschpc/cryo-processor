@@ -57,13 +57,29 @@ Then simply start the service on discovery1 by running
 
 The endpoints available are:
 
- * `/list-sessions`
- * `/start-processing`
- * `/stop-processing`
- * `/status`
+ * `/{user}/sessions` (gives a list of sessions)
+ * `/{user}/session/{session_id}` (gives status of a session)
+ * `/{user}/session/{session_id}/start-processing`
+ * `/{user}/session/{session_id}/stop-processing`
 
 For example, to start a new workflow:
 
-    curl 'localhost:8112/start-processing?user=rynge&session=K3_2-20210322121212&access_token=somesecret'
+    $ curl 'localhost:8112/rynge/session/K3_2-2021032212121/start-processing?access_token=somesecret'
+
+To get status:
+
+    $ curl 'localhost:8112/rynge/session/K3_2-20210322121212?access_token=somesecret' | python -m json.tool
+    {
+        "dagname": "motioncor2-0.dag",
+        "failed": 1,
+        "percent_done": 11.1,
+        "post": 0,
+        "pre": 0,
+        "queued": 0,
+        "ready": 0,
+        "state": "Failure",
+        "succeeded": 2,
+        "unready": 15
+    }
 
 
