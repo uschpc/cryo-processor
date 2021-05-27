@@ -13,7 +13,10 @@ import uvicorn
 
 from Pegasus.api import *
 
+import asyncio
+import concurrent.futures
 import contextlib
+import json
 import logging
 import os
 import pprint
@@ -22,7 +25,7 @@ import time
 from logging.config import dictConfig
 
 from Config import Config
-from PipelineWorkflow import PipelineWorkflow
+from Session import Session
 
 
 log_config = {
@@ -45,13 +48,12 @@ log_config = {
     },
     "loggers": {
         "cryoem": {"handlers": ["default"], "level": "DEBUG"},
-        "pegasus.client": {"handlers": ["default"], "level": "INFO"},
     },
 }
 
 dictConfig(log_config)
 
-logger = logging.getLogger('cryoem')
+log = logging.getLogger('cryoem')
 
 config = Config()
 
@@ -60,29 +62,51 @@ API_KEY_NAME = "access_token"
 api_key_query = APIKeyQuery(name=API_KEY_NAME, auto_error=False)
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
-#app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 app = FastAPI()
 
+app.state.keep_running = True
+app.state.sessions = {}
 
-class Server(uvicorn.Server):
-    '''
-    see https://github.com/encode/uvicorn/issues/742
-    '''
 
-    def install_signal_handlers(self):
-        pass
+def main_loop():
 
-    @contextlib.contextmanager
-    def run_in_thread(self):
-        thread = threading.Thread(target=self.run)
-        thread.start()
-        try:
-            while not self.started:
-                time.sleep(1e-3)
-            yield
-        finally:
-            self.should_exit = True
-            thread.join()
+    log.info("In main(), id is {}".format(id(app.state.sessions)))
+    
+    load_state()
+
+    # this is the main event loop for general use
+    while app.state.keep_running:
+        log.info("Waking up main thread")
+
+        # check on all the tracked sessions
+        for sid, session in app.state.sessions.items():
+            log.info("Checking on session {}".format(sid))
+            session.update()
+            log.info(pprint.pformat(session.get_status()))
+             
+            # save periodically?   
+            #save_state()
+
+        time.sleep(60)
+
+    save_state()
+
+
+def load_state():
+    sfilename = os.path.join(os.environ['HOME'], '.cryoem.state')
+    if os.path.exists(sfilename):
+        with open(sfilename) as f:
+            j = json.load(open(sfilename))
+            for sid, session in j.items():
+                app.state.sessions[sid] = Session(config, session["user"], session["session_id"])
+
+
+def save_state():
+    j = {}
+    for sid, session in app.state.sessions.items():
+        j[sid] = session.get_state()
+    with open(os.path.join(os.environ['HOME'], '.cryoem.state'), 'w') as f:
+        json.dump(j, f)
 
 
 async def get_api_key(
@@ -100,6 +124,19 @@ async def get_api_key(
         )
 
 
+@app.on_event("startup")
+async def startup():
+    loop = asyncio.get_event_loop()
+    loop.run_in_executor(None, main_loop)
+    #with concurrent.futures.ThreadPoolExecutor() as pool:
+    #    loop.run_in_executor(pool, main_loop)
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    app.state.keep_running = False
+
+
 @app.get("/{user}/sessions",
     responses={
         200: {
@@ -115,9 +152,12 @@ async def get_api_key(
     }
 )
 async def sessions(user: str, api_key: APIKey = Depends(get_api_key)):
+    
+    log.info("In sessions(), id is {}".format(id(app.state.sessions)))
+
     response = {"sessions": []}
 
-    for d in os.listdir(os.path.join(config.get('data', 'session_dir'), user)):
+    for d in os.listdir(os.path.join(config.get('general', 'session_dir'), user)):
         response["sessions"].append({"session_id", d})
 
     return response
@@ -125,79 +165,68 @@ async def sessions(user: str, api_key: APIKey = Depends(get_api_key)):
 
 @app.get("/{user}/session/{session_id}")
 async def session_status(user: str, session_id: str, api_key: APIKey = Depends(get_api_key)):
-    # we should have some kind of state map here
-    response = {}
-    session_dir = os.path.join(config.get('data', 'session_dir'), user, session_id)
-    wf_dir = os.path.join(session_dir, 'workflow', 'motioncor2')
-
-    if not os.path.exists(wf_dir):
-        return {"state": "not_submitted"}
-
-    logger.info("Checking {} ...".format(wf_dir))
-
-    # this needs some work....
-    wf = Workflow("motioncor2")
-    wf._submit_dir = wf_dir
-    state = wf.get_status()
-    #logger.info(pprint.pformat(response))
     
-    if state is None or "totals" not in state:
-        return {"state": "unknown"}
+    key = "{}/{}".format(user, session_id)
+    if key in app.state.sessions:
+        s = app.state.sessions[key]
+    else:
+        s = Session(config, user, session_id)
+        if not s.is_valid():
+            # should this be a 404?
+            return {"state": "no_such_session"}
+        app.state.sessions[key] = s
 
-    response = state['dags']['root']
-
-    return response
+    return s.get_status()
 
 
-@app.get("/{user}/session/{session_id}/start-processing")
-async def start_processing(user: str, session_id: str, api_key: APIKey = Depends(get_api_key)):
-    response = {}
-    session_dir = os.path.join(config.get('data', 'session_dir'), user, session_id)
-    wf_dir = os.path.join(session_dir, 'workflow')
+@app.post("/{user}/session/{session_id}/start-processing")
+async def start_processing(user: str,
+                           session_id: str, 
+                           api_key: APIKey = Depends(get_api_key)):
+    key = "{}/{}".format(user, session_id)
+    if key in app.state.sessions:
+        s = app.state.sessions[key]
+    else:
+        s = Session(config, user, session_id)
+        if not s.is_valid():
+            # should this be a 404?
+            return {"results": "no_such_session"}
+        app.state.sessions[key] = s
 
-    if os.path.exists(wf_dir):
-        # do we want the API do this, or should it be a human only step?
-        for root, dirs, files in os.walk(wf_dir, topdown=False):
-            for name in files:
-                os.remove(os.path.join(root, name))
-            for name in dirs:
-                os.rmdir(os.path.join(root, name))
-        os.rmdir(wf_dir)
-
-    wf = PipelineWorkflow(wf_dir)
-    try:
-        wf.submit_workflow()
-    except Exception as e:
-        logger.error(e)
-        return {"error": "Unable to submit workfork"}
+    if not s.is_processing():
+        s.start_processing()
 
     return {"result": "ok"}
 
 
-@app.get("/{user}/session/{session_id}/stop-processing")
-async def stop_processing(user: str, session_id: str, api_key: APIKey = Depends(get_api_key)):
-    response = {}
-    return response
+@app.post("/{user}/session/{session_id}/stop-processing")
+async def stop_processing(user: str,
+                          session_id: str,
+                          api_key: APIKey = Depends(get_api_key)):
+    key = "{}/{}".format(user, session_id)
+    if key in app.state.sessions:
+        s = app.state.sessions[key]
+    else:
+        s = Session(config, user, session_id)
+        if not s.is_valid():
+            # should this be a 404?
+            return {"results": "no_such_session"}
+        app.state.sessions[key] = s
 
+    s.stop_processing()
 
-def main():
-
-    server_config = uvicorn.Config(
-                "main:app",
-                host = '0.0.0.0',
-                port = config.getint('api', 'port', fallback=8112),
-                reload = True,
-                log_level = "info",
-                loop = "asyncio")
-    server = Server(config=server_config)
-
-    with server.run_in_thread():
-        # this is the main event loop for general use
-        while True:
-            time.sleep(10)
-
+    return {"result": "ok"}
 
 
 if __name__ == '__main__':
-    main()
+    uvicorn.run(
+            "main:app",
+            host = '0.0.0.0',
+            port = config.getint('api', 'port', fallback=8112),
+            reload = False,
+            log_level = "info",
+            loop = "asyncio",
+            workers = 1
+    )
+
 

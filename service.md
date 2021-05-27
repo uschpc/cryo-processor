@@ -37,14 +37,15 @@ The session names, such as `K3_2-20210427113000` are just made up. The
 
 Create a config file under `~/.cryoem.conf` with the contents like:
 
+    [general]
+    
+    debug = False
+    session_dir = /project/cryoem/sessions
+    
     [api]
     
     port = 8112
     token = somesecret
-    
-    [data]
-    
-    session_dir = /project/cryoem/sessions
 
 
 Then simply start the service on discovery1 by running
