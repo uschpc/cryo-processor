@@ -201,7 +201,7 @@ class PipelineWorkflow:
             star_file = File("{}.star".format(basename))
             gctf_job = (
                 Job("gctf").add_args("--apix", "1.08", "--kV", "300", "--Cs", "2.7", "--ac", "0.1",
-                                     "--Do_phase_flip", "--ctfstar", star_file, "--boxsize", "1024")
+                                     "--Do_phase_flip", "--ctfstar", star_file, "--boxsize", "512")
             )
 
             gctf_job.add_inputs(mrc_file, dws_file)
