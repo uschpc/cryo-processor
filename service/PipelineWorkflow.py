@@ -268,32 +268,34 @@ class PipelineWorkflow:
         #convert Superres dm4 file to mrc
         #dm2mrc usage: dm2mrc infile outfile
         dm2mrc_gainref_sr_job = Job("dm2mrc_gainref")
+        dm2mrc_gainref_sr_job.add_args(Raw_Gain_Ref_SR, Gain_Ref_SR)
         dm2mrc_gainref_sr_job.add_inputs(Raw_Gain_Ref_SR)
-        dm2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR)
+        dm2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR, stage_out=True)
         #create standard resolution gain ref file from superres gain ref file
         #newstack usage here (decrease the size of Super resolution image by factor of 2): newstack -bin 2 infile outfile
         newstack_gainref_job = Job("newstack_gainref")
-        newstack_gainref_job.add_args("-bin", "2")
+        newstack_gainref_job.add_args("-bin", "2", Gain_Ref_SR, Gain_Ref)
         newstack_gainref_job.add_inputs(Gain_Ref_SR)
-        newstack_gainref_job.add_outputs(Gain_Ref)
+        newstack_gainref_job.add_outputs(Gain_Ref, stage_out=True)
         #flip both gain reference files on y axis
         #clip usage here (flip img on Y axis): clip flipy infile outfile
         #std resolution
         clip_gainref_job = Job("clip_gainref")
-        clip_gainref_job.add_args("flipy")
+        clip_gainref_job.add_args("flipy", Gain_Ref, FlipY)
         clip_gainref_job.add_inputs(Gain_Ref)
-        clip_gainref_job.add_outputs(FlipY)
+        clip_gainref_job.add_outputs(FlipY, stage_out=True)
         #super resolution
         clip_gainref_superres_job = Job("clip_gainref_superres")
-        clip_gainref_superres_job.add_args("flipy")
+        clip_gainref_superres_job.add_args("flipy", Gain_Ref_SR, FlipY_SR)
         clip_gainref_superres_job.add_inputs(Gain_Ref_SR)
-        clip_gainref_superres_job.add_outputs(FlipY_SR)
+        clip_gainref_superres_job.add_outputs(FlipY_SR, stage_out=True)
         #we do this, but if it impacts the processing speed to much it can be disabled for now
         #create defect map file
         #dm2mrc usage: dm2mrc infile outfile
         dm2mrc_defect_map_job = Job("dm2mrc_defect_map")
+        dm2mrc_defect_map_job.add_args(Raw_Defect_Map, Defect_Map)
         dm2mrc_defect_map_job.add_inputs(Raw_Defect_Map)
-        dm2mrc_defect_map_job.add_outputs(Defect_Map)
+        dm2mrc_defect_map_job.add_outputs(Defect_Map, stage_out=True)
         
         self.wf.add_jobs(dm2mrc_gainref_sr_job)
         self.wf.add_jobs(newstack_gainref_job)
@@ -330,11 +332,11 @@ class PipelineWorkflow:
 
             # MotionCor2
             motionCor_job = Job("MotionCor2").add_args("-InTiff", "./{}".format(fraction_file_name), "-OutMrc",
-                mrc_file, "-Gain", Gain_Ref,"-Iter 7 -Tol 0.5 -RotGain 2",
+                mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5 -RotGain 2",
                 "-PixSize 1.08 -FmDose 1.275 -Throw 1 -Trunc 23 -Gpu 0 -Serial 1",
                 "-OutStack 0")
 
-            motionCor_job.add_inputs(fraction_file, Gain_Ref)
+            motionCor_job.add_inputs(fraction_file, FlipY)
             motionCor_job.add_outputs(mrc_file, dws_file, stage_out=True, register_replica=False)
             self.wf.add_jobs(motionCor_job)
 
