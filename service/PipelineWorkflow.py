@@ -226,7 +226,7 @@ class PipelineWorkflow:
         
         #define Gain reference Super resolution input and output filename
         #Raw_Gain_Ref_SR_path = self.find_files(self.inputs_dir, "x1.m1.dm4$")[0]
-        Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, "*x1.m1.dm4")[0]
+        Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, "gain-ref/*x1.m1.dm4")[0]
         Raw_Gain_Ref_SR_name = os.path.basename(Raw_Gain_Ref_SR_path)
         Raw_Gain_Ref_SR = File(Raw_Gain_Ref_SR_name)
         Gain_Ref_SR_path = Raw_Gain_Ref_SR_path.replace('x1.m1.dm4','_SuperRes.x1.m1.mrc')
