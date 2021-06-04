@@ -233,25 +233,25 @@ class PipelineWorkflow:
         Gain_Ref_SR_name = os.path.basename(Gain_Ref_SR_path)
         Gain_Ref_SR = File(Gain_Ref_SR_name)
         self.rc.add_replica("slurm", Raw_Gain_Ref_SR_name, "file://{}".format(Raw_Gain_Ref_SR_path))
-        self.rc.add_replica("slurm", Gain_Ref_SR_name, "file://{}".format(Gain_Ref_SR_path))
+        #self.rc.add_replica("slurm", Gain_Ref_SR_name, "file://{}".format(Gain_Ref_SR_path))
         
         #define Gain reference output filename
         Gain_Ref_path = Gain_Ref_SR_path.replace('_SuperRes.x1.m1.mrc','_std.x1.m1.mrc')
         Gain_Ref_name = os.path.basename(Gain_Ref_path)
         Gain_Ref = File(Gain_Ref_name)
-        self.rc.add_replica("slurm", Gain_Ref_name, "file://{}".format(Gain_Ref_path))
+        #self.rc.add_replica("slurm", Gain_Ref_name, "file://{}".format(Gain_Ref_path))
         
         #define flip Y Super resolution output filename
-        FlipY_SR_path = Gain_Ref_SR_path.replace('_SuperRes.x1.m1.mrc','_std.flipy.x1.m1.mrc')
+        FlipY_SR_path = Gain_Ref_SR_path.replace('_SuperRes.x1.m1.mrc','_sr.flipy.x1.m1.mrc')
         FlipY_SR_name = os.path.basename(FlipY_SR_path)
         FlipY_SR = File(Gain_Ref_SR_name)
-        self.rc.add_replica("slurm", FlipY_SR_name, "file://{}".format(FlipY_SR_path))
+        #self.rc.add_replica("slurm", FlipY_SR_name, "file://{}".format(FlipY_SR_path))
         
         #define flip Y std resolution output filename
         FlipY_path = Gain_Ref_path.replace('_std.x1.m1.mrc','_std.flipy.x1.m1.mrc')
         FlipY_name = os.path.basename(FlipY_path)
         FlipY = File(FlipY_name)
-        self.rc.add_replica("slurm", FlipY_name, "file://{}".format(FlipY_path))
+        #self.rc.add_replica("slurm", FlipY_name, "file://{}".format(FlipY_path))
         
         #define Defect Map input and output filename
         #Raw_Defect_Map_path = self.find_files(self.inputs_dir, "Map.m1.dm4$")[0]
@@ -262,7 +262,7 @@ class PipelineWorkflow:
         Defect_Map_name = os.path.basename(Defect_Map_path)
         Defect_Map = File(Defect_Map_name)
         self.rc.add_replica("slurm", Raw_Defect_Map_name, "file://{}".format(Raw_Defect_Map_path))
-        self.rc.add_replica("slurm", Defect_Map_name, "file://{}".format(Defect_Map_path))
+        #self.rc.add_replica("slurm", Defect_Map_name, "file://{}".format(Defect_Map_path))
         
         #convert Superres dm4 file to mrc
         #dm2mrc usage: dm2mrc infile outfile
