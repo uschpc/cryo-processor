@@ -255,7 +255,7 @@ class PipelineWorkflow:
         
         #define Defect Map input and output filename
         #Raw_Defect_Map_path = self.find_files(self.inputs_dir, "Map.m1.dm4$")[0]
-        Raw_Defect_Map_path = self.find_files2(self.inputs_dir, "*Map.m1.dm4")[0]
+        Raw_Defect_Map_path = self.find_files2(self.inputs_dir, "gain-ref/*Map.m1.dm4")[0]
         Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
         Raw_Defect_Map = File(Raw_Defect_Map_name)
         Defect_Map_path = Raw_Defect_Map_path.replace('.dm4','.mrc')
