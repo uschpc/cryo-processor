@@ -7,6 +7,7 @@ import pprint
 import random
 import re
 import sys
+import glob
 from pathlib import Path
 from argparse import ArgumentParser
 
@@ -98,14 +99,72 @@ class PipelineWorkflow:
         self.sc.add_sites(local, exec_site)
 
     # --- Transformation Catalog (Executables and Containers) -----------------
+    # Obligatory args for input:
+    # [-a|--apix FLOAT]            use specified pixel size
+    # [-d|--fmdose FLOAT]          use specified fmdose in calculations
+    # Optional args for input:
+    # [-g|--gainref GAINREF_FILE]  use specificed gain reference file
+    # [-b|--basename STR]          output files names with specified STR as prefix
+    # [-k|--kev INT]               input micrograph was taken with INT keV microscope
+    # [-s|--superres]              input micrograph was taken in super-resolution mode (so we should half the number of pixels)
+    # [-P|--patch STRING]          use STRING patch settings for motioncor2 alignment
+    # [-e|--particle-size INT]     pick particles with size INT
+    # [-t|--task sum|align|pick|all] what to process; sum the stack, align the stack; just particle pick or all
     def create_transformation_catalog(self, exec_site_name="slurm"):
         self.tc = TransformationCatalog()
-
+        # first - let's try to get the Gain reference file:
+        dm2mrc_gainref = Transformation(
+            "dm2mrc_gainref",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/imod_dm2mrc_wrapper_wrapper.sh"),
+            is_stageable=False
+        )
+        dm2mrc_gainref.add_pegasus_profile( cores="4",
+                                        runtime="180"
+        )
+        newstack_gainref = Transformation(
+            "newstack_gainref",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/imod_newstack_wrapper.sh"),
+            is_stageable=False
+        )
+        newstack_gainref.add_pegasus_profile( cores="4",
+                                        runtime="180"
+        )
+        clip_gainref = Transformation(
+            "clip_gainref",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/imod_clip_wrapper.sh"),
+            is_stageable=False
+        )
+        clip_gainref.add_pegasus_profile( cores="4",
+                                        runtime="180",
+        )
+        clip_gainref_superres = Transformation(
+            "clip_gainref_superres",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/imod_clip_wrapper.sh"),
+            is_stageable=False
+        )
+        clip_gainref_superres.add_pegasus_profile( cores="4",
+                                        runtime="180",
+        )
+        # second - let's try to get the Defect map file:
+        dm2mrc_defect_map = Transformation(
+            "dm2mrc_defect_map",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/imod_dm2mrc_wrapper_wrapper.sh"),
+            is_stageable=False
+        )
+        dm2mrc_defect_map.add_pegasus_profile( cores="4",
+                                        runtime="180"
+        )
         if self.debug:
             cluster_size = 5
         else:
             cluster_size = 100
 
+        # third - let's do the Motioncor2
         # these are fast jobs - cluster to improve performance
         motionCor2 = Transformation(
             "MotionCor2",
@@ -113,7 +172,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/motioncor2_wrapper.sh"),
             is_stageable=False
         )
-        motionCor2.add_pegasus_profile( cores="8",
+        motionCor2.add_pegasus_profile( cores="4",
                                         runtime="180",
                                         glite_arguments="--gres=gpu:p100:2"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
@@ -141,6 +200,11 @@ class PipelineWorkflow:
                                      memory="2048"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
 
+        self.tc.add_transformations(dm2mrc_gainref)
+        self.tc.add_transformations(newstack_gainref)
+        self.tc.add_transformations(clip_gainref)
+        self.tc.add_transformations(clip_gainref_superres)
+        self.tc.add_transformations(dm2mrc_defect_map)
         self.tc.add_transformations(motionCor2)
         self.tc.add_transformations(gctf)
         self.tc.add_transformations(e2proc2d)
@@ -157,17 +221,93 @@ class PipelineWorkflow:
 
         raw_prefix="raw_"
         mc_prefix = "mc_"
-        K3_Gain_Ref = File("K3_Gain_Ref_20200530_CL1g4_1x.m1.mrc")
-
-        K3_Gain_Ref_path = self.find_files(self.inputs_dir, "_1x.m1.mrc$")[0]
-        K3_Gain_Ref_name = os.path.basename(K3_Gain_Ref_path)
-        K3_Gain_Ref = File(K3_Gain_Ref_name)
-        self.rc.add_replica("slurm", K3_Gain_Ref_name, "file://{}".format(K3_Gain_Ref_path))
-
+        
+        
+        
+        #define Gain reference Super resolution input and output filename
+        #Raw_Gain_Ref_SR_path = self.find_files(self.inputs_dir, "x1.m1.dm4$")[0]
+        Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, "*x1.m1.dm4")[0]
+        Raw_Gain_Ref_SR_name = os.path.basename(Raw_Gain_Ref_SR_path)
+        Raw_Gain_Ref_SR = File(Raw_Gain_Ref_SR_name)
+        Gain_Ref_SR_path = Raw_Gain_Ref_SR_path.replace('x1.m1.dm4','_SuperRes.x1.m1.mrc')
+        Gain_Ref_SR_name = os.path.basename(Gain_Ref_SR_path)
+        Gain_Ref_SR = File(Gain_Ref_SR_name)
+        self.rc.add_replica("slurm", Raw_Gain_Ref_SR_name, "file://{}".format(Raw_Gain_Ref_SR_path))
+        self.rc.add_replica("slurm", Gain_Ref_SR_name, "file://{}".format(Gain_Ref_SR_path))
+        
+        #define Gain reference output filename
+        Gain_Ref_path = Gain_Ref_SR_path.replace('_SuperRes.x1.m1.mrc','_std.x1.m1.mrc')
+        Gain_Ref_name = os.path.basename(Gain_Ref_path)
+        Gain_Ref = File(Gain_Ref_name)
+        self.rc.add_replica("slurm", Gain_Ref_name, "file://{}".format(Gain_Ref_path))
+        
+        #define flip Y Super resolution output filename
+        FlipY_SR_path = Gain_Ref_SR_path.replace('_SuperRes.x1.m1.mrc','_std.flipy.x1.m1.mrc')
+        FlipY_SR_name = os.path.basename(FlipY_SR_path)
+        FlipY_SR = File(Gain_Ref_SR_name)
+        self.rc.add_replica("slurm", FlipY_SR_name, "file://{}".format(FlipY_SR_path))
+        
+        #define flip Y std resolution output filename
+        FlipY_path = Gain_Ref_path.replace('_std.x1.m1.mrc','_std.flipy.x1.m1.mrc')
+        FlipY_name = os.path.basename(FlipY_path)
+        FlipY = File(FlipY_name)
+        self.rc.add_replica("slurm", FlipY_name, "file://{}".format(FlipY_path))
+        
+        #define Defect Map input and output filename
+        #Raw_Defect_Map_path = self.find_files(self.inputs_dir, "Map.m1.dm4$")[0]
+        Raw_Defect_Map_path = self.find_files2(self.inputs_dir, "*Map.m1.dm4")[0]
+        Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
+        Raw_Defect_Map = File(Raw_Defect_Map_name)
+        Defect_Map_path = Raw_Defect_Map_path.replace('.dm4','.mrc')
+        Defect_Map_name = os.path.basename(Defect_Map_path)
+        Defect_Map = File(Defect_Map_name)
+        self.rc.add_replica("slurm", Raw_Defect_Map_name, "file://{}".format(Raw_Defect_Map_path))
+        self.rc.add_replica("slurm", Defect_Map_name, "file://{}".format(Defect_Map_path))
+        
+        #convert Superres dm4 file to mrc
+        #dm2mrc usage: dm2mrc infile outfile
+        dm2mrc_gainref_sr_job = Job("dm2mrc_gainref")
+        dm2mrc_gainref_sr_job.add_inputs(Raw_Gain_Ref_SR)
+        dm2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR)
+        #create standard resolution gain ref file from superres gain ref file
+        #newstack usage here (decrease the size of Super resolution image by factor of 2): newstack -bin 2 infile outfile
+        newstack_gainref_job = Job("newstack_gainref")
+        newstack_gainref_job.add_args("-bin", "2")
+        newstack_gainref_job.add_inputs(Gain_Ref_SR)
+        newstack_gainref_job.add_outputs(Gain_Ref)
+        #flip both gain reference files on y axis
+        #clip usage here (flip img on Y axis): clip flipy infile outfile
+        #std resolution
+        clip_gainref_job = Job("clip_gainref")
+        clip_gainref_job.add_args("flipy")
+        clip_gainref_job.add_inputs(Gain_Ref)
+        clip_gainref_job.add_outputs(FlipY)
+        #super resolution
+        clip_gainref_superres_job = Job("clip_gainref_superres")
+        clip_gainref_superres_job.add_args("flipy")
+        clip_gainref_superres_job.add_inputs(Gain_Ref_SR)
+        clip_gainref_superres_job.add_outputs(FlipY_SR)
+        #we do this, but if it impacts the processing speed to much it can be disabled for now
+        #create defect map file
+        #dm2mrc usage: dm2mrc infile outfile
+        dm2mrc_defect_map_job = Job("dm2mrc_defect_map")
+        dm2mrc_defect_map_job.add_inputs(Raw_Defect_Map)
+        dm2mrc_defect_map_job.add_outputs(Defect_Map)
+        
+        self.wf.add_jobs(dm2mrc_gainref_sr_job)
+        self.wf.add_jobs(newstack_gainref_job)
+        self.wf.add_jobs(clip_gainref_job)
+        self.wf.add_jobs(clip_gainref_superres_job)
+        self.wf.add_jobs(dm2mrc_defect_map_job)
+        
+        
         # for each _fractions.tiff in the Images-Disc1 dir - is this correct?
-        file_list = self.find_files(
-                            os.path.join(self.inputs_dir, "Images-Disc1"),
-                            "_fractions.tiff$")
+        #file_list = self.find_files(
+        #                    os.path.join(self.inputs_dir, "Images-Disc1"),
+        #                    "_fractions.tiff$")
+        file_list = self.find_files2(
+                            os.path.join(self.inputs_dir, "Images-Disc1","*","Data"),
+                            "*_fractions.tiff")
         if self.debug:
             # when debugging, only do a fraction of the files
             file_list = random.sample(file_list, 10)
@@ -201,7 +341,7 @@ class PipelineWorkflow:
             star_file = File("{}.star".format(basename))
             gctf_job = (
                 Job("gctf").add_args("--apix", "1.08", "--kV", "300", "--Cs", "2.7", "--ac", "0.1",
-                                     "--Do_phase_flip", "--ctfstar", star_file, "--boxsize", "1024")
+                                     "--Do_phase_flip", "--ctfstar", star_file, "--boxsize", "500")
             )
 
             gctf_job.add_inputs(mrc_file, dws_file)
@@ -302,6 +442,16 @@ class PipelineWorkflow:
                     found_files.append(os.path.join(root, name))
                     count += 1
         logger.info(" ... found {} files matching {}".format(count, regex))
+        return found_files
+        
+    def find_files2(self, root_dir, regex):
+        '''
+        Returns sorted list of files matching regex = root_dir+/+regex (similar to ls)
+        Much faster than find_files
+        '''
+        search_path=os.path.join(root_dir,regex)
+        found_files=glob.glob(search_path, recursive=True)
+        logger.info(" ... found {} files matching {}".format(len(found_files), regex))
         return found_files
 
 
