@@ -243,8 +243,9 @@ class PipelineWorkflow:
         
         #define flip Y Super resolution output filename
         FlipY_SR_path = Gain_Ref_SR_path.replace('_SuperRes.x1.m1.mrc','_sr.flipy.x1.m1.mrc')
+        #logger.info(" ... found {} ".format(FlipY_SR_path))
         FlipY_SR_name = os.path.basename(FlipY_SR_path)
-        FlipY_SR = File(Gain_Ref_SR_name)
+        FlipY_SR = File(FlipY_SR_name)
         #self.rc.add_replica("slurm", FlipY_SR_name, "file://{}".format(FlipY_SR_path))
         
         #define flip Y std resolution output filename
