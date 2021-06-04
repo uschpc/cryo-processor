@@ -448,6 +448,7 @@ class PipelineWorkflow:
         '''
         Returns sorted list of files matching regex = root_dir+/+regex (similar to ls)
         Much faster than find_files
+        eg. f=find_files2("/project/cryoem/K3_sample_dataset/20210205_mutant/Images-Disc1", "*/Data/*_fractions.tiff") to get all files
         '''
         search_path=os.path.join(root_dir,regex)
         found_files=glob.glob(search_path, recursive=True)
