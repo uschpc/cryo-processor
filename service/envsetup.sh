@@ -24,5 +24,5 @@ export PATH=$PEGASUS_HOME/bin:$PATH
 export PYTHONPATH=$(pegasus-config --python)
 export LANG=en_US.UTF-8
 #uvicorn main:app --reload --host 0.0.0.0 --port 8111
-python3 main.py
+#python3 main.py
 
