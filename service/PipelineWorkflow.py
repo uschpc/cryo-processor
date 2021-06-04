@@ -116,7 +116,7 @@ class PipelineWorkflow:
         dm2mrc_gainref = Transformation(
             "dm2mrc_gainref",
             site=exec_site_name,
-            pfn=os.path.join(self.base_dir, "workflow/scripts/imod_dm2mrc_wrapper_wrapper.sh"),
+            pfn=os.path.join(self.base_dir, "workflow/scripts/imod_dm2mrc_wrapper.sh"),
             is_stageable=False
         )
         dm2mrc_gainref.add_pegasus_profile( cores="4",
@@ -153,7 +153,7 @@ class PipelineWorkflow:
         dm2mrc_defect_map = Transformation(
             "dm2mrc_defect_map",
             site=exec_site_name,
-            pfn=os.path.join(self.base_dir, "workflow/scripts/imod_dm2mrc_wrapper_wrapper.sh"),
+            pfn=os.path.join(self.base_dir, "workflow/scripts/imod_dm2mrc_wrapper.sh"),
             is_stageable=False
         )
         dm2mrc_defect_map.add_pegasus_profile( cores="4",
