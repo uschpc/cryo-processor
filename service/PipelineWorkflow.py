@@ -330,11 +330,11 @@ class PipelineWorkflow:
 
             # MotionCor2
             motionCor_job = Job("MotionCor2").add_args("-InTiff", "./{}".format(fraction_file_name), "-OutMrc",
-                mrc_file, "-Gain", K3_Gain_Ref,"-Iter 7 -Tol 0.5 -RotGain 2",
+                mrc_file, "-Gain", Gain_Ref,"-Iter 7 -Tol 0.5 -RotGain 2",
                 "-PixSize 1.08 -FmDose 1.275 -Throw 1 -Trunc 23 -Gpu 0 -Serial 1",
                 "-OutStack 0")
 
-            motionCor_job.add_inputs(fraction_file, K3_Gain_Ref)
+            motionCor_job.add_inputs(fraction_file, Gain_Ref)
             motionCor_job.add_outputs(mrc_file, dws_file, stage_out=True, register_replica=False)
             self.wf.add_jobs(motionCor_job)
 
