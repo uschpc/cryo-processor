@@ -175,14 +175,35 @@ class Session:
             shutil.rmtree(self._scratch_dir)
         except:
             pass
- 
         self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
-                                   self._wf_dir,
-                                   os.path.join(self._session_dir, "raw"),
-                                   os.path.join(self._session_dir, "processed"),
-                                   debug=self._config.getboolean("general", "debug"))
+                                    self._wf_dir,
+                                    os.path.join(self._session_dir, "raw"),
+                                    os.path.join(self._session_dir, "processed"),
+                                    debug=self._config.getboolean("general", "debug"))
         try:
-            self.wf.submit_workflow()
+            #trying to add params. in order:
+            #apix, pixel size
+            #fmdose, dose in e-/A^2 per frame
+            #kev, voltage
+            #particle_size, <-- future; stage 2
+            #rawgainref, ls like regex to pickup raw gain ref file
+            #basename_prefix, ls like regex to pickup basename prefix
+            #basename_suffix, ls like regex to pickup basename suffix (no underscores)
+            #basename_extension, ls like regex to pickup basename extension
+            #throw, how many frames discard from the top
+            #trunc, how many frames keep
+            #superresolution,
+            self.wf.submit_workflow(apix=1.08,
+                                    fmdose=1.250,
+                                    kev=300,
+                                    rawgainref="gain-ref/*x1.m1.dm4",
+                                    rawdefectsmap="gain-ref/*Map.m1.dm4",
+                                    basename_prefix="FoilHole",
+                                    basename_suffix="fractions",
+                                    basename_extension="tiff",
+                                    throw=1,
+                                    trunc=23,
+                                    superresolution=False)
         except Exception as e:
             log.exception(e)
 

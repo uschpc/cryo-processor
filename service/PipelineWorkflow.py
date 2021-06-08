@@ -218,52 +218,50 @@ class PipelineWorkflow:
     # --- Create Workflow -----------------------------------------------------
     def create_workflow(self):
         self.wf = Workflow(self.wf_name, infer_dependencies=True)
-
+        
+        #tho lines below can probably be removed - TO will check for it
         raw_prefix="raw_"
         mc_prefix = "mc_"
         
         
         
         #define Gain reference Super resolution input and output filename
-        #Raw_Gain_Ref_SR_path = self.find_files(self.inputs_dir, "x1.m1.dm4$")[0]
-        Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, "gain-ref/*x1.m1.dm4")[0]
+        Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, self.rawgainref)[0]
         Raw_Gain_Ref_SR_name = os.path.basename(Raw_Gain_Ref_SR_path)
         Raw_Gain_Ref_SR = File(Raw_Gain_Ref_SR_name)
+        #TODO: improve lines below
         Gain_Ref_SR_path = Raw_Gain_Ref_SR_path.replace('x1.m1.dm4','_SuperRes.x1.m1.mrc')
         Gain_Ref_SR_name = os.path.basename(Gain_Ref_SR_path)
         Gain_Ref_SR = File(Gain_Ref_SR_name)
         self.rc.add_replica("slurm", Raw_Gain_Ref_SR_name, "file://{}".format(Raw_Gain_Ref_SR_path))
-        #self.rc.add_replica("slurm", Gain_Ref_SR_name, "file://{}".format(Gain_Ref_SR_path))
         
         #define Gain reference output filename
+        #TODO: improve lines below
         Gain_Ref_path = Gain_Ref_SR_path.replace('_SuperRes.x1.m1.mrc','_std.x1.m1.mrc')
         Gain_Ref_name = os.path.basename(Gain_Ref_path)
         Gain_Ref = File(Gain_Ref_name)
-        #self.rc.add_replica("slurm", Gain_Ref_name, "file://{}".format(Gain_Ref_path))
         
         #define flip Y Super resolution output filename
+        #TODO: improve lines below
         FlipY_SR_path = Gain_Ref_SR_path.replace('_SuperRes.x1.m1.mrc','_sr.flipy.x1.m1.mrc')
         #logger.info(" ... found {} ".format(FlipY_SR_path))
         FlipY_SR_name = os.path.basename(FlipY_SR_path)
         FlipY_SR = File(FlipY_SR_name)
-        #self.rc.add_replica("slurm", FlipY_SR_name, "file://{}".format(FlipY_SR_path))
         
         #define flip Y std resolution output filename
+        #TODO: improve lines below
         FlipY_path = Gain_Ref_path.replace('_std.x1.m1.mrc','_std.flipy.x1.m1.mrc')
         FlipY_name = os.path.basename(FlipY_path)
         FlipY = File(FlipY_name)
-        #self.rc.add_replica("slurm", FlipY_name, "file://{}".format(FlipY_path))
         
         #define Defect Map input and output filename
-        #Raw_Defect_Map_path = self.find_files(self.inputs_dir, "Map.m1.dm4$")[0]
-        Raw_Defect_Map_path = self.find_files2(self.inputs_dir, "gain-ref/*Map.m1.dm4")[0]
+        Raw_Defect_Map_path = self.find_files2(self.inputs_dir, self.rawdefectsmap)[0]
         Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
         Raw_Defect_Map = File(Raw_Defect_Map_name)
         Defect_Map_path = Raw_Defect_Map_path.replace('.dm4','.mrc')
         Defect_Map_name = os.path.basename(Defect_Map_path)
         Defect_Map = File(Defect_Map_name)
         self.rc.add_replica("slurm", Raw_Defect_Map_name, "file://{}".format(Raw_Defect_Map_path))
-        #self.rc.add_replica("slurm", Defect_Map_name, "file://{}".format(Defect_Map_path))
         
         #convert Superres dm4 file to mrc
         #dm2mrc usage: dm2mrc infile outfile
@@ -304,13 +302,13 @@ class PipelineWorkflow:
         self.wf.add_jobs(dm2mrc_defect_map_job)
         
         
-        # for each _fractions.tiff in the Images-Disc1 dir - is this correct?
+        # for each _fractions.(tiff|mrc) in the Images-Disc1 dir 
         #file_list = self.find_files(
         #                    os.path.join(self.inputs_dir, "Images-Disc1"),
         #                    "_fractions.tiff$")
         file_list = self.find_files2(
                             os.path.join(self.inputs_dir, "Images-Disc1","*","Data"),
-                            "*_fractions.tiff")
+                            "*%s.%s"%(self.basename_prefix,self.basename_extension))
         if self.debug:
             # when debugging, only do a fraction of the files
             file_list = random.sample(file_list, 10)
@@ -325,30 +323,39 @@ class PipelineWorkflow:
             self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))
 
             # generated files will be named based on the input
-            basename = re.sub("_fractions.tiff$", "", fraction_file_name)
+            basename = re.sub("_%s.%s$"%(self.basename_prefix,self.basename_extension), "", fraction_file_name)
 
             mrc_file = File("{}.mrc".format(basename))
             dws_file = File("{}_DWS.mrc".format(basename))
 
+            
+            
+
             # MotionCor2
             motionCor_job = Job("MotionCor2").add_args("-InTiff", "./{}".format(fraction_file_name), "-OutMrc",
                 mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5 -RotGain 2",
-                "-PixSize 1.08 -FmDose 1.275 -Throw 1 -Trunc 23 -Gpu 0 -Serial 1",
+                "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 1",
                 "-OutStack 0")
 
             motionCor_job.add_inputs(fraction_file, FlipY)
-            motionCor_job.add_outputs(mrc_file, dws_file, stage_out=True, register_replica=False)
+            motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
+            motionCor_job.add_outputs(dws_file, stage_out=True, register_replica=False)
             self.wf.add_jobs(motionCor_job)
 
             # gctf
             star_file = File("{}.star".format(basename))
+
+
+                        
+            
             gctf_job = (
-                Job("gctf").add_args("--apix", "1.08", "--kV", "300", "--Cs", "2.7", "--ac", "0.1",
+                Job("gctf").add_args("--apix", self.apix, "--kV", self.kev, "--Cs", "2.7", "--ac", "0.1",
                                      "--Do_phase_flip", "--ctfstar", star_file, "--boxsize", "512")
             )
 
-            gctf_job.add_inputs(mrc_file, dws_file)
-            gctf_job.add_args(mrc_file, dws_file)
+            gctf_job.add_inputs(mrc_file)
+            gctf_job.add_args(mrc_file)
+            gctf_job.add_outputs(star_file, stage_out=True, register_replica=True)
             gctf_job.add_outputs(star_file, stage_out=True, register_replica=True)
 
             # e2proc2d            
@@ -396,7 +403,20 @@ class PipelineWorkflow:
 
 
     # --- Submit Workflow -----------------------------------------------------
-    def submit_workflow(self):
+    def submit_workflow(self, apix, fmdose, kev, rawgainref, rawdefectsmap, 
+                        basename_prefix, basename_suffix, basename_extension, 
+                        throw, trunc, superresolution):
+
+        self.apix = apix
+        self.fmdose = fmdose
+        self.kev = kev
+        self.particle_size = particle_size
+        self.rawgainref = rawgainref
+        self.rawdefectsmap = rawdefectsmap
+        self.basename_prefix = basename_prefix
+        self.throw=throw
+        self.trunc=trunc
+        self.superresolution = superresolution
         
         logger.info("Starting a new workflow in {} ...".format(self.wf_dir))
        
