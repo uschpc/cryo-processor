@@ -158,7 +158,7 @@ async def sessions(user: str, api_key: APIKey = Depends(get_api_key)):
     response = {"sessions": []}
 
     for d in os.listdir(os.path.join(config.get('general', 'session_dir'), user)):
-        response["sessions"].append({"session_id", d})
+        response["sessions"].append({"session_id": d})
 
     return response
 
@@ -182,7 +182,18 @@ async def session_status(user: str, session_id: str, api_key: APIKey = Depends(g
 @app.post("/{user}/session/{session_id}/start-processing")
 async def start_processing(user: str,
                            session_id: str, 
-                           api_key: APIKey = Depends(get_api_key)):
+                           apix: float = 1.08,
+                           fmdose: float = 1.250,
+                           kev: int = 300,
+                           rawgainref: str = "gain-ref/*x1.m1.dm4",
+                           rawdefectsmap: str = "gain-ref/*Map.m1.dm4",
+                           basename_prefix: str = "FoilHole",
+                           basename_suffix: str = "fractions",
+                           basename_extension: str = "tiff",
+                           throw: int = 1,
+                           trunc: int = 23,
+                           superresolution: bool = False,
+                           api_key: APIKey = Depends(get_api_key) ):
     key = "{}/{}".format(user, session_id)
     if key in app.state.sessions:
         s = app.state.sessions[key]
@@ -194,7 +205,18 @@ async def start_processing(user: str,
         app.state.sessions[key] = s
 
     if not s.is_processing():
-        s.start_processing()
+        s.start_processing(
+            apix = apix,
+            fmdose = fmdose,
+            kev = kev,
+            rawgainref = rawgainref,
+            rawdefectsmap = rawdefectsmap,
+            basename_prefix = basename_prefix,
+            basename_suffix = basename_suffix,
+            basename_extension = basename_extension,
+            throw = throw,
+            trunc = trunc,
+            superresolution = superresolution )
 
     return {"result": "ok"}
 
