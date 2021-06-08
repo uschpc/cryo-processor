@@ -73,8 +73,30 @@ class Session:
     
         return response
 
-
-    def start_processing(self):
+    #trying to add params. in order:
+    #apix, pixel size
+    #fmdose, dose in e-/A^2 per frame
+    #kev, voltage
+    #particle_size, <-- future; stage 2
+    #rawgainref, ls like regex to pickup raw gain ref file
+    #basename_prefix, ls like regex to pickup basename prefix
+    #basename_suffix, ls like regex to pickup basename suffix (no underscores)
+    #basename_extension, ls like regex to pickup basename extension
+    #throw, how many frames discard from the top
+    #trunc, how many frames keep
+    #superresolution,
+    def start_processing(self,
+                            apix=1.08,
+                            fmdose=1.250,
+                            kev=300,
+                            rawgainref="gain-ref/*x1.m1.dm4",
+                            rawdefectsmap="gain-ref/*Map.m1.dm4",
+                            basename_prefix="FoilHole",
+                            basename_suffix="fractions",
+                            basename_extension="tiff",
+                            throw=1,
+                            trunc=23,
+                            superresolution=False):
         self._state = self._STATE_PROCESSING
         self._next_processing_time = time.time()
     
@@ -181,30 +203,7 @@ class Session:
                                     os.path.join(self._session_dir, "processed"),
                                     debug=self._config.getboolean("general", "debug"))
         try:
-            #trying to add params. in order:
-            #apix, pixel size
-            #fmdose, dose in e-/A^2 per frame
-            #kev, voltage
-            #particle_size, <-- future; stage 2
-            #rawgainref, ls like regex to pickup raw gain ref file
-            #basename_prefix, ls like regex to pickup basename prefix
-            #basename_suffix, ls like regex to pickup basename suffix (no underscores)
-            #basename_extension, ls like regex to pickup basename extension
-            #throw, how many frames discard from the top
-            #trunc, how many frames keep
-            #superresolution,
-            self.wf.submit_workflow(self,
-                                    apix=1.08,
-                                    fmdose=1.250,
-                                    kev=300,
-                                    rawgainref="gain-ref/*x1.m1.dm4",
-                                    rawdefectsmap="gain-ref/*Map.m1.dm4",
-                                    basename_prefix="FoilHole",
-                                    basename_suffix="fractions",
-                                    basename_extension="tiff",
-                                    throw=1,
-                                    trunc=23,
-                                    superresolution=False)
+            self.wf.submit_workflow(self)
         except Exception as e:
             log.exception(e)
 
