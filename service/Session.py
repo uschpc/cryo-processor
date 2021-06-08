@@ -193,7 +193,8 @@ class Session:
             #throw, how many frames discard from the top
             #trunc, how many frames keep
             #superresolution,
-            self.wf.submit_workflow(apix=1.08,
+            self.wf.submit_workflow(self,
+                                    apix=1.08,
                                     fmdose=1.250,
                                     kev=300,
                                     rawgainref="gain-ref/*x1.m1.dm4",

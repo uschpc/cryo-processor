@@ -326,7 +326,7 @@ class PipelineWorkflow:
             basename = re.sub("_%s.%s$"%(self.basename_prefix,self.basename_extension), "", fraction_file_name)
 
             mrc_file = File("{}.mrc".format(basename))
-            dws_file = File("{}_DWS.mrc".format(basename))
+            dw_file = File("{}_DW.mrc".format(basename))
 
             
             
@@ -334,18 +334,19 @@ class PipelineWorkflow:
             # MotionCor2
             motionCor_job = Job("MotionCor2").add_args("-InTiff", "./{}".format(fraction_file_name), "-OutMrc",
                 mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5 -RotGain 2",
-                "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 1",
-                "-OutStack 0")
+                "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
+                "-OutStack 0", "-SumRange 0 0")
 
             motionCor_job.add_inputs(fraction_file, FlipY)
             motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
-            motionCor_job.add_outputs(dws_file, stage_out=True, register_replica=False)
+            motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
             self.wf.add_jobs(motionCor_job)
 
             # gctf
-            star_file = File("{}.star".format(basename))
-
-
+            ctf_star_file = File(mrc_file.replace(".mrc",".star"))
+            ctf_pf_file = File(mrc_file.replace(".mrc","_pf.mrc"))
+            ctf_file = File(mrc_file.replace(".mrc",".ctf"))
+            gctf_log_file = File(mrc_file.replace(".mrc","_gctf.log"))
                         
             
             gctf_job = (
@@ -356,50 +357,53 @@ class PipelineWorkflow:
             gctf_job.add_inputs(mrc_file)
             gctf_job.add_args(mrc_file)
             gctf_job.add_outputs(star_file, stage_out=True, register_replica=True)
-            gctf_job.add_outputs(star_file, stage_out=True, register_replica=True)
+            gctf_job.add_outputs(ctf_pf_file, stage_out=True, register_replica=True)
+            gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=True)
+            gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=True)
 
             # e2proc2d            
-            jpg_motionCor_file = File("{}.jpg".format(basename))
+            jpg_ctf_file = File(mrc_file.replace(".mrc","_ctf.jpg"))
             e2proc2d_job1 = Job("e2proc2d")            
-            e2proc2d_job1.add_inputs(mrc_file)
-            e2proc2d_job1.add_outputs(jpg_motionCor_file, stage_out=True)
-            e2proc2d_job1.add_args("--scale 0.25", mrc_file, jpg_motionCor_file)
+            e2proc2d_job1.add_inputs(ctf_file)
+            e2proc2d_job1.add_outputs(jpg_ctf_file, stage_out=True)
+            e2proc2d_job1.add_args(ctf_file, jpg_ctf_file)
             
-            for suffix in ['','_DWS']:
-                POW_file = File("{}{}.pow".format(basename, suffix))
-                gctf_job.add_outputs(POW_file, stage_out=False, register_replica=True)
+            
+            # for suffix in ['','_DWS']:
+                # POW_file = File("{}{}.pow".format(basename, suffix))
+                # gctf_job.add_outputs(POW_file, stage_out=False, register_replica=True)
 
-                pf_file = File("{}{}_pf.mrc".format(basename, suffix))
-                gctf_job.add_outputs(pf_file, stage_out=True, register_replica=True)
+                # pf_file = File("{}{}_pf.mrc".format(basename, suffix))
+                # gctf_job.add_outputs(pf_file, stage_out=True, register_replica=True)
 
-                gctf_log_file = File("{}{}_gctf.log".format(basename, suffix))
-                gctf_job.add_outputs(gctf_log_file, stage_out=False, register_replica=True)
+                # gctf_log_file = File("{}{}_gctf.log".format(basename, suffix))
+                # gctf_job.add_outputs(gctf_log_file, stage_out=False, register_replica=True)
 
-                epa_log_file = File("{}{}_EPA.log".format(basename, suffix))
-                gctf_job.add_outputs(epa_log_file, stage_out=False, register_replica=True)
+                # epa_log_file = File("{}{}_EPA.log".format(basename, suffix))
+                # gctf_job.add_outputs(epa_log_file, stage_out=False, register_replica=True)
 
-                ctf_file = File("{}{}.ctf".format(basename, suffix))
-                gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=True)
+                # ctf_file = File("{}{}.ctf".format(basename, suffix))
+                # gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=True)
 
-                if suffix != '_DWS':
-                    jpg_gctf_pf_file = File("{}_pf.jpg".format(basename))
+                # if suffix != '_DWS':
+                    # jpg_gctf_pf_file = File("{}_pf.jpg".format(basename))
 
-                    e2proc2d_job2=Job("e2proc2d")            
-                    e2proc2d_job2.add_inputs(pf_file)
-                    e2proc2d_job2.add_outputs(jpg_gctf_pf_file, stage_out=True)
-                    e2proc2d_job2.add_args("--scale 0.25", pf_file, jpg_gctf_pf_file)
+                    # e2proc2d_job2=Job("e2proc2d")            
+                    # e2proc2d_job2.add_inputs(pf_file)
+                    # e2proc2d_job2.add_outputs(jpg_gctf_pf_file, stage_out=True)
+                    # e2proc2d_job2.add_args("--scale 0.25", pf_file, jpg_gctf_pf_file)
 
-                    jpg_gctf_ctf_file = File("{}_ctf.jpg".format(basename))
+                    # jpg_gctf_ctf_file = File("{}_ctf.jpg".format(basename))
 
-                    e2proc2d_job3 = Job("e2proc2d")            
-                    e2proc2d_job3.add_inputs(ctf_file)
-                    e2proc2d_job3.add_outputs(jpg_gctf_ctf_file, stage_out=True)
-                    e2proc2d_job3.add_args("--scale 0.25",ctf_file, jpg_gctf_ctf_file)
+                    # e2proc2d_job3 = Job("e2proc2d")            
+                    # e2proc2d_job3.add_inputs(ctf_file)
+                    # e2proc2d_job3.add_outputs(jpg_gctf_ctf_file, stage_out=True)
+                    # e2proc2d_job3.add_args("--scale 0.25",ctf_file, jpg_gctf_ctf_file)
 
             self.wf.add_jobs(gctf_job)
             self.wf.add_jobs(e2proc2d_job1)
-            self.wf.add_jobs(e2proc2d_job2)
-            self.wf.add_jobs(e2proc2d_job3)
+            #self.wf.add_jobs(e2proc2d_job2)
+            #self.wf.add_jobs(e2proc2d_job3)
 
 
     # --- Submit Workflow -----------------------------------------------------
