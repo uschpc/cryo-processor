@@ -203,7 +203,7 @@ class Session:
                                     os.path.join(self._session_dir, "processed"),
                                     debug=self._config.getboolean("general", "debug"))
         try:
-            self.wf.submit_workflow(self)
+            self.wf.submit_workflow()
         except Exception as e:
             log.exception(e)
 
