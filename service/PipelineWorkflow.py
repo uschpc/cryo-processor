@@ -367,43 +367,9 @@ class PipelineWorkflow:
             e2proc2d_job1.add_inputs(ctf_file)
             e2proc2d_job1.add_outputs(jpg_ctf_file, stage_out=True)
             e2proc2d_job1.add_args(ctf_file, jpg_ctf_file)
-            
-            
-            # for suffix in ['','_DWS']:
-                # POW_file = File("{}{}.pow".format(basename, suffix))
-                # gctf_job.add_outputs(POW_file, stage_out=False, register_replica=True)
-
-                # pf_file = File("{}{}_pf.mrc".format(basename, suffix))
-                # gctf_job.add_outputs(pf_file, stage_out=True, register_replica=True)
-
-                # gctf_log_file = File("{}{}_gctf.log".format(basename, suffix))
-                # gctf_job.add_outputs(gctf_log_file, stage_out=False, register_replica=True)
-
-                # epa_log_file = File("{}{}_EPA.log".format(basename, suffix))
-                # gctf_job.add_outputs(epa_log_file, stage_out=False, register_replica=True)
-
-                # ctf_file = File("{}{}.ctf".format(basename, suffix))
-                # gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=True)
-
-                # if suffix != '_DWS':
-                    # jpg_gctf_pf_file = File("{}_pf.jpg".format(basename))
-
-                    # e2proc2d_job2=Job("e2proc2d")            
-                    # e2proc2d_job2.add_inputs(pf_file)
-                    # e2proc2d_job2.add_outputs(jpg_gctf_pf_file, stage_out=True)
-                    # e2proc2d_job2.add_args("--scale 0.25", pf_file, jpg_gctf_pf_file)
-
-                    # jpg_gctf_ctf_file = File("{}_ctf.jpg".format(basename))
-
-                    # e2proc2d_job3 = Job("e2proc2d")            
-                    # e2proc2d_job3.add_inputs(ctf_file)
-                    # e2proc2d_job3.add_outputs(jpg_gctf_ctf_file, stage_out=True)
-                    # e2proc2d_job3.add_args("--scale 0.25",ctf_file, jpg_gctf_ctf_file)
 
             self.wf.add_jobs(gctf_job)
             self.wf.add_jobs(e2proc2d_job1)
-            #self.wf.add_jobs(e2proc2d_job2)
-            #self.wf.add_jobs(e2proc2d_job3)
 
 
     # --- Submit Workflow -----------------------------------------------------

@@ -97,6 +97,16 @@ class Session:
                             throw=1,
                             trunc=23,
                             superresolution=False):
+        self.apix = apix
+        self.fmdose = fmdose
+        self.kev = kev
+        self.particle_size = particle_size
+        self.rawgainref = rawgainref
+        self.rawdefectsmap = rawdefectsmap
+        self.basename_prefix = basename_prefix
+        self.throw=throw
+        self.trunc=trunc
+        self.superresolution = superresolution
         self._state = self._STATE_PROCESSING
         self._next_processing_time = time.time()
     
@@ -203,7 +213,7 @@ class Session:
                                     os.path.join(self._session_dir, "processed"),
                                     debug=self._config.getboolean("general", "debug"))
         try:
-            self.wf.submit_workflow()
+            self.wf.submit_workflow(self)
         except Exception as e:
             log.exception(e)
 
