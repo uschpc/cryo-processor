@@ -459,6 +459,7 @@ class PipelineWorkflow:
         '''
         search_path=os.path.join(root_dir,regex)
         found_files=glob.glob(search_path, recursive=True)
+        logger.info(" ... searching for {}".format(search_path))
         logger.info(" ... found {} files matching {}".format(len(found_files), regex))
         return found_files
 
