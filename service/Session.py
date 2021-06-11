@@ -85,18 +85,30 @@ class Session:
     #throw, how many frames discard from the top
     #trunc, how many frames keep
     #superresolution,
+    # def start_processing(self,
+                            # apix=1.08,
+                            # fmdose=1.250,
+                            # kev=300,
+                            # rawgainref="gain-ref/*x1.m1.dm4",
+                            # rawdefectsmap="gain-ref/*Map.m1.dm4",
+                            # basename_prefix="FoilHole",
+                            # basename_suffix="fractions",
+                            # basename_extension="tiff",
+                            # throw=1,
+                            # trunc=23,
+                            # superresolution=False):
     def start_processing(self,
-                            apix=1.08,
-                            fmdose=1.250,
-                            kev=300,
-                            rawgainref="gain-ref/*x1.m1.dm4",
-                            rawdefectsmap="gain-ref/*Map.m1.dm4",
-                            basename_prefix="FoilHole",
-                            basename_suffix="fractions",
-                            basename_extension="tiff",
-                            throw=1,
-                            trunc=23,
-                            superresolution=False):
+                            apix,
+                            fmdose,
+                            kev,
+                            rawgainref,
+                            rawdefectsmap,
+                            basename_prefix,
+                            basename_suffix,
+                            basename_extension,
+                            throw,
+                            trunc,
+                            superresolution):
         self.apix = apix
         self.fmdose = fmdose
         self.kev = kev
@@ -104,6 +116,8 @@ class Session:
         self.rawgainref = rawgainref
         self.rawdefectsmap = rawdefectsmap
         self.basename_prefix = basename_prefix
+        self.basename_suffix = basename_suffix,
+        self.basename_extension = basename_extension,
         self.throw=throw
         self.trunc=trunc
         self.superresolution = superresolution
@@ -212,6 +226,22 @@ class Session:
                                     os.path.join(self._session_dir, "raw"),
                                     os.path.join(self._session_dir, "processed"),
                                     debug=self._config.getboolean("general", "debug"))
+        try:
+            # self.apix = apix
+            # self.fmdose = fmdose
+            # self.kev = kev
+            # #self.particle_size = particle_size
+            # self.rawgainref = rawgainref
+            # self.rawdefectsmap = rawdefectsmap
+            # self.basename_prefix = basename_prefix
+            # self.basename_suffix = basename_suffix,
+            # self.basename_extension = basename_extension,
+            # self.throw=throw
+            # self.trunc=trunc
+            # self.superresolution = superresolution
+            self.wf.set_params(self, self.apix, self.fmdose,self.kev,self.rawgainref,self.rawdefectsmap,self.basename_prefix,self.basename_suffix,self.basename_extension,self.throw,self.trunc,self.superresolution)
+        except Exception as e:
+            log.exception(e)
         try:
             self.wf.submit_workflow(self)
         except Exception as e:

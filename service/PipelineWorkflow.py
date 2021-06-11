@@ -308,7 +308,7 @@ class PipelineWorkflow:
         #                    "_fractions.tiff$")
         file_list = self.find_files2(
                             os.path.join(self.inputs_dir, "Images-Disc1","*","Data"),
-                            "*%s.%s"%(self.basename_prefix,self.basename_extension))
+                            "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
         if self.debug:
             # when debugging, only do a fraction of the files
             file_list = random.sample(file_list, 10)
@@ -323,7 +323,7 @@ class PipelineWorkflow:
             self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))
 
             # generated files will be named based on the input
-            basename = re.sub("_%s.%s$"%(self.basename_prefix,self.basename_extension), "", fraction_file_name)
+            basename = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name)
 
             mrc_file = File("{}.mrc".format(basename))
             dw_file = File("{}_DW.mrc".format(basename))
@@ -372,13 +372,27 @@ class PipelineWorkflow:
             self.wf.add_jobs(e2proc2d_job1)
 
 
+    def set_params(self, apix, fmdose, kev, rawgainref, rawdefectsmap, 
+                        basename_prefix, basename_suffix, basename_extension, 
+                        throw, trunc, superresolution):
+        self.apix = apix
+        self.fmdose = fmdose
+        self.kev = kev
+        #self.particle_size = particle_size
+        self.rawgainref = rawgainref
+        self.rawdefectsmap = rawdefectsmap
+        self.basename_prefix = basename_prefix
+        self.basename_suffix = basename_suffix,
+        self.basename_extension = basename_extension,
+        self.throw=throw
+        self.trunc=trunc
+        self.superresolution = superresolution
+
     # --- Submit Workflow -----------------------------------------------------
     # def submit_workflow(self, apix, fmdose, kev, rawgainref, rawdefectsmap, 
                         # basename_prefix, basename_suffix, basename_extension, 
                         # throw, trunc, superresolution):
-    def submit_workflow(self, apix, fmdose, kev, rawgainref, rawdefectsmap, 
-                        basename_prefix, basename_suffix, basename_extension, 
-                        throw, trunc, superresolution):
+    def submit_workflow(self):
         # self.apix = apix
         # self.fmdose = fmdose
         # self.kev = kev
