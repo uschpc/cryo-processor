@@ -325,8 +325,10 @@ class PipelineWorkflow:
             # generated files will be named based on the input
             basename = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name)
 
-            mrc_file = File("{}.mrc".format(basename))
-            dw_file = File("{}_DW.mrc".format(basename))
+            mrc_file_name="{}.mrc".format(basename)
+            dw_file_name="{}_DW.mrc".format(basename)
+            mrc_file = File(mrc_file_name)
+            dw_file = File(dw_file_name)
 
             
             
@@ -343,10 +345,10 @@ class PipelineWorkflow:
             self.wf.add_jobs(motionCor_job)
 
             # gctf
-            ctf_star_file = File(mrc_file.replace(".mrc",".star"))
-            ctf_pf_file = File(mrc_file.replace(".mrc","_pf.mrc"))
-            ctf_file = File(mrc_file.replace(".mrc",".ctf"))
-            gctf_log_file = File(mrc_file.replace(".mrc","_gctf.log"))
+            ctf_star_file = File(mrc_file_name.replace(".mrc",".star"))
+            ctf_pf_file = File(mrc_file_name.replace(".mrc","_pf.mrc"))
+            ctf_file = File(mrc_file_name.replace(".mrc",".ctf"))
+            gctf_log_file = File(mrc_file_name.replace(".mrc","_gctf.log"))
                         
             
             gctf_job = (
@@ -362,7 +364,7 @@ class PipelineWorkflow:
             gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=True)
 
             # e2proc2d            
-            jpg_ctf_file = File(mrc_file.replace(".mrc","_ctf.jpg"))
+            jpg_ctf_file = File(mrc_file_name.replace(".mrc","_ctf.jpg"))
             e2proc2d_job1 = Job("e2proc2d")            
             e2proc2d_job1.add_inputs(ctf_file)
             e2proc2d_job1.add_outputs(jpg_ctf_file, stage_out=True)
