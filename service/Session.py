@@ -239,11 +239,11 @@ class Session:
             # self.throw=throw
             # self.trunc=trunc
             # self.superresolution = superresolution
-            self.wf.set_params(self, self.apix, self.fmdose,self.kev,self.rawgainref,self.rawdefectsmap,self.basename_prefix,self.basename_suffix,self.basename_extension,self.throw,self.trunc,self.superresolution)
+            self.wf.set_params(self.apix, self.fmdose,self.kev,self.rawgainref,self.rawdefectsmap,self.basename_prefix,self.basename_suffix,self.basename_extension,self.throw,self.trunc,self.superresolution)
         except Exception as e:
             log.exception(e)
         try:
-            self.wf.submit_workflow(self)
+            self.wf.submit_workflow()
         except Exception as e:
             log.exception(e)
 

@@ -372,21 +372,19 @@ class PipelineWorkflow:
             self.wf.add_jobs(e2proc2d_job1)
 
 
-    def set_params(self, apix, fmdose, kev, rawgainref, rawdefectsmap, 
-                        basename_prefix, basename_suffix, basename_extension, 
-                        throw, trunc, superresolution):
-        self.apix = apix
-        self.fmdose = fmdose
-        self.kev = kev
+    def set_params(self, datum):
+        self.apix = datum.apix
+        self.fmdose = datum.fmdose
+        self.kev = datum.kev
         #self.particle_size = particle_size
-        self.rawgainref = rawgainref
-        self.rawdefectsmap = rawdefectsmap
-        self.basename_prefix = basename_prefix
-        self.basename_suffix = basename_suffix,
-        self.basename_extension = basename_extension,
-        self.throw=throw
-        self.trunc=trunc
-        self.superresolution = superresolution
+        self.rawgainref = datum.rawgainref
+        self.rawdefectsmap = datum.rawdefectsmap
+        self.basename_prefix = datum.basename_prefix
+        self.basename_suffix = datum.basename_suffix
+        self.basename_extension = datum.basename_extension
+        self.throw=datum.throw
+        self.trunc=datum.trunc
+        self.superresolution = datum.superresolution
 
     # --- Submit Workflow -----------------------------------------------------
     # def submit_workflow(self, apix, fmdose, kev, rawgainref, rawdefectsmap, 
