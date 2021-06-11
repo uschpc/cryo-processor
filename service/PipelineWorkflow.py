@@ -373,20 +373,22 @@ class PipelineWorkflow:
 
 
     # --- Submit Workflow -----------------------------------------------------
+    # def submit_workflow(self, apix, fmdose, kev, rawgainref, rawdefectsmap, 
+                        # basename_prefix, basename_suffix, basename_extension, 
+                        # throw, trunc, superresolution):
     def submit_workflow(self, apix, fmdose, kev, rawgainref, rawdefectsmap, 
                         basename_prefix, basename_suffix, basename_extension, 
                         throw, trunc, superresolution):
-
-        self.apix = apix
-        self.fmdose = fmdose
-        self.kev = kev
-        self.particle_size = particle_size
-        self.rawgainref = rawgainref
-        self.rawdefectsmap = rawdefectsmap
-        self.basename_prefix = basename_prefix
-        self.throw=throw
-        self.trunc=trunc
-        self.superresolution = superresolution
+        # self.apix = apix
+        # self.fmdose = fmdose
+        # self.kev = kev
+        # self.particle_size = particle_size
+        # self.rawgainref = rawgainref
+        # self.rawdefectsmap = rawdefectsmap
+        # self.basename_prefix = basename_prefix
+        # self.throw=throw
+        # self.trunc=trunc
+        # self.superresolution = superresolution
         
         logger.info("Starting a new workflow in {} ...".format(self.wf_dir))
        
