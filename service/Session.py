@@ -108,6 +108,7 @@ class Session:
                             basename_extension,
                             throw,
                             trunc,
+                            particle_size,
                             superresolution):
         self.apix = apix
         self.fmdose = fmdose
@@ -116,11 +117,24 @@ class Session:
         self.rawgainref = rawgainref
         self.rawdefectsmap = rawdefectsmap
         self.basename_prefix = basename_prefix
-        self.basename_suffix = basename_suffix,
-        self.basename_extension = basename_extension,
+        self.basename_suffix = basename_suffix
+        self.basename_extension = basename_extension
         self.throw=throw
         self.trunc=trunc
+        self.particle_size=particle_size
         self.superresolution = superresolution
+        log.info("apix: %s"%self.apix)
+        log.info("fmdose: %s"%self.fmdose)
+        log.info("kev: %s"%self.kev)
+        log.info("rawgainref: %s"%self.rawgainref)
+        log.info("rawdefectsmap: %s"%self.rawdefectsmap)
+        log.info("basename_prefix: %s"%self.basename_prefix)
+        log.info("basename_suffix: %s"%self.basename_suffix)
+        log.info("basename_extension: %s"%self.basename_extension)
+        log.info("throw: %s"%self.throw)
+        log.info("trunc: %s"%self.trunc)
+        log.info("particle_size: %s"%self.particle_size)
+        log.info("superresolution: %s"%self.superresolution)
         self._state = self._STATE_PROCESSING
         self._next_processing_time = time.time()
     

@@ -193,6 +193,7 @@ async def start_processing(user: str,
                            basename_extension: str = "tiff",
                            throw: int = 1,
                            trunc: int = 23,
+                           particle_size: int = 100,
                            superresolution: bool = False ):
     key = "{}/{}".format(user, session_id)
     if key in app.state.sessions:
@@ -209,13 +210,14 @@ async def start_processing(user: str,
             apix = apix,
             fmdose = fmdose,
             kev = kev,
-            rawgainref = rawgainref[0],
-            rawdefectsmap = rawdefectsmap[0],
-            basename_prefix = basename_prefix[0],
-            basename_suffix = basename_suffix[0],
-            basename_extension = basename_extension[0],
+            rawgainref = rawgainref,
+            rawdefectsmap = rawdefectsmap,
+            basename_prefix = basename_prefix,
+            basename_suffix = basename_suffix,
+            basename_extension = basename_extension,
             throw = throw,
             trunc = trunc,
+            particle_size = particle_size,
             superresolution = superresolution )
 
     return {"result": "ok"}
