@@ -239,7 +239,8 @@ class Session:
             # self.throw=throw
             # self.trunc=trunc
             # self.superresolution = superresolution
-            self.wf.set_params(self.apix, self.fmdose,self.kev,self.rawgainref,self.rawdefectsmap,self.basename_prefix,self.basename_suffix,self.basename_extension,self.throw,self.trunc,self.superresolution)
+            #self.wf.set_params(self.apix, self.fmdose,self.kev,self.rawgainref,self.rawdefectsmap,self.basename_prefix,self.basename_suffix,self.basename_extension,self.throw,self.trunc,self.superresolution)
+            self.wf.set_params(self)
         except Exception as e:
             log.exception(e)
         try:
