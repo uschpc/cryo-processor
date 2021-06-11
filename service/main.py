@@ -182,6 +182,7 @@ async def session_status(user: str, session_id: str, api_key: APIKey = Depends(g
 @app.post("/{user}/session/{session_id}/start-processing")
 async def start_processing(user: str,
                            session_id: str, 
+                           api_key: APIKey = Depends(get_api_key),
                            apix: float = 1.08,
                            fmdose: float = 1.250,
                            kev: int = 300,
@@ -192,8 +193,7 @@ async def start_processing(user: str,
                            basename_extension: str = "tiff",
                            throw: int = 1,
                            trunc: int = 23,
-                           superresolution: bool = False,
-                           api_key: APIKey = Depends(get_api_key) ):
+                           superresolution: bool = False ):
     key = "{}/{}".format(user, session_id)
     if key in app.state.sessions:
         s = app.state.sessions[key]
