@@ -160,7 +160,7 @@ class PipelineWorkflow:
                                         runtime="180"
         )
         if self.debug:
-            cluster_size = 5
+            cluster_size = 1
         else:
             cluster_size = 100
 
@@ -172,6 +172,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/motioncor2_wrapper.sh"),
             is_stageable=False
         )
+        motionCor2.add_pegasus_profile( cores="4",cluster_size
         motionCor2.add_pegasus_profile( cores="4",
                                         runtime="240",
                                         glite_arguments="--gres=gpu:p100:2"
@@ -183,11 +184,11 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/gctf_wrapper.sh"),
             is_stageable=False
         )
-        gctf.add_pegasus_profile( cores="2",
+        gctf.add_pegasus_profile( cores="4",
                                         runtime="240",
                                         memory="2048",
-                                        glite_arguments="--gres=gpu:k20:2"
-                                        #glite_arguments="--gres=gpu:p100:2"
+                                        #glite_arguments="--gres=gpu:k20:2"
+                                        glite_arguments="--gres=gpu:p100:2"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
 
         e2proc2d = Transformation(
