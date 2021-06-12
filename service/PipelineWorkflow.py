@@ -172,7 +172,6 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/motioncor2_wrapper.sh"),
             is_stageable=False
         )
-        motionCor2.add_pegasus_profile( cores="4",cluster_size
         motionCor2.add_pegasus_profile( cores="4",
                                         runtime="240",
                                         glite_arguments="--gres=gpu:p100:2"
