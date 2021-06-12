@@ -174,7 +174,7 @@ class PipelineWorkflow:
         )
         motionCor2.add_pegasus_profile( cores="4",
                                         runtime="180",
-                                        glite_arguments="--gres=gpu:p100:2"
+                                        glite_arguments="--gres=gpu:p100:1"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
 
         gctf = Transformation(
@@ -186,7 +186,7 @@ class PipelineWorkflow:
         gctf.add_pegasus_profile( cores="4",
                                         runtime="180",
                                         memory="2048",
-                                        glite_arguments="--gres=gpu:p100:2"
+                                        glite_arguments="--gres=gpu:p100:1"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
 
         e2proc2d = Transformation(
