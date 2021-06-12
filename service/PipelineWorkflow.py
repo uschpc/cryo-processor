@@ -174,7 +174,7 @@ class PipelineWorkflow:
         )
         motionCor2.add_pegasus_profile( cores="4",
                                         runtime="180",
-                                        glite_arguments="--gres=gpu:p100:1"
+                                        glite_arguments="--gres=gpu:p100:2"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
 
         gctf = Transformation(
@@ -183,10 +183,11 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/gctf_wrapper.sh"),
             is_stageable=False
         )
-        gctf.add_pegasus_profile( cores="4",
+        gctf.add_pegasus_profile( cores="2",
                                         runtime="180",
                                         memory="2048",
-                                        glite_arguments="--gres=gpu:p100:1"
+                                        glite_arguments="--gres=gpu:k20:2"
+                                        #glite_arguments="--gres=gpu:p100:2"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
 
         e2proc2d = Transformation(
@@ -336,7 +337,7 @@ class PipelineWorkflow:
             # MotionCor2
             motionCor_job = Job("MotionCor2").add_args("-InTiff", "./{}".format(fraction_file_name), "-OutMrc",
                 mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5 -RotGain 2",
-                "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
+                "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 1 -Serial 0",
                 "-OutStack 0", "-SumRange 0 0")
 
             motionCor_job.add_inputs(fraction_file, FlipY)
@@ -353,7 +354,7 @@ class PipelineWorkflow:
             
             gctf_job = (
                 Job("gctf").add_args("--apix", self.apix, "--kV", self.kev, "--Cs", "2.7", "--ac", "0.1",
-                                     "--ctfstar", ctf_star_file, "--boxsize", "512")
+                                     "--ctfstar", ctf_star_file, "--gid", "0", "--boxsize", "512")
             )
 
             gctf_job.add_inputs(mrc_file)
