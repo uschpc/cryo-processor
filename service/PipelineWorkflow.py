@@ -346,20 +346,20 @@ class PipelineWorkflow:
 
             # gctf
             ctf_star_file = File(mrc_file_name.replace(".mrc",".star"))
-            ctf_pf_file = File(mrc_file_name.replace(".mrc","_pf.mrc"))
+            #ctf_pf_file = File(mrc_file_name.replace(".mrc","_pf.mrc"))
             ctf_file = File(mrc_file_name.replace(".mrc",".ctf"))
             gctf_log_file = File(mrc_file_name.replace(".mrc","_gctf.log"))
                         
             
             gctf_job = (
                 Job("gctf").add_args("--apix", self.apix, "--kV", self.kev, "--Cs", "2.7", "--ac", "0.1",
-                                     "--Do_phase_flip", "--ctfstar", ctf_star_file, "--boxsize", "512")
+                                     "--ctfstar", ctf_star_file, "--boxsize", "512")
             )
 
             gctf_job.add_inputs(mrc_file)
             gctf_job.add_args(mrc_file)
             gctf_job.add_outputs(ctf_star_file, stage_out=True, register_replica=True)
-            gctf_job.add_outputs(ctf_pf_file, stage_out=True, register_replica=True)
+            #gctf_job.add_outputs(ctf_pf_file, stage_out=True, register_replica=True)
             gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=True)
             gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=True)
 
