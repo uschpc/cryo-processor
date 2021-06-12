@@ -173,7 +173,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         motionCor2.add_pegasus_profile( cores="4",
-                                        runtime="180",
+                                        runtime="240",
                                         glite_arguments="--gres=gpu:p100:2"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
 
@@ -184,7 +184,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         gctf.add_pegasus_profile( cores="2",
-                                        runtime="180",
+                                        runtime="240",
                                         memory="2048",
                                         glite_arguments="--gres=gpu:k20:2"
                                         #glite_arguments="--gres=gpu:p100:2"
@@ -197,7 +197,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         e2proc2d.add_pegasus_profile(cores="1",
-                                     runtime="180",
+                                     runtime="240",
                                      memory="2048"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
 
