@@ -160,7 +160,7 @@ class PipelineWorkflow:
                                         runtime="180"
         )
         if self.debug:
-            cluster_size = 5
+            cluster_size = 20
         else:
             cluster_size = 100
 
