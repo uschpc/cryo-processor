@@ -99,17 +99,6 @@ class PipelineWorkflow:
         self.sc.add_sites(local, exec_site)
 
     # --- Transformation Catalog (Executables and Containers) -----------------
-    # Obligatory args for input:
-    # [-a|--apix FLOAT]            use specified pixel size
-    # [-d|--fmdose FLOAT]          use specified fmdose in calculations
-    # Optional args for input:
-    # [-g|--gainref GAINREF_FILE]  use specificed gain reference file
-    # [-b|--basename STR]          output files names with specified STR as prefix
-    # [-k|--kev INT]               input micrograph was taken with INT keV microscope
-    # [-s|--superres]              input micrograph was taken in super-resolution mode (so we should half the number of pixels)
-    # [-P|--patch STRING]          use STRING patch settings for motioncor2 alignment
-    # [-e|--particle-size INT]     pick particles with size INT
-    # [-t|--task sum|align|pick|all] what to process; sum the stack, align the stack; just particle pick or all
     def create_transformation_catalog(self, exec_site_name="slurm"):
         self.tc = TransformationCatalog()
         # first - let's try to get the Gain reference file:
@@ -160,7 +149,7 @@ class PipelineWorkflow:
                                         runtime="180"
         )
         if self.debug:
-            cluster_size = 20
+            cluster_size = 1
         else:
             cluster_size = 100
 
