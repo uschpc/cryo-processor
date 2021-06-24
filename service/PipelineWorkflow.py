@@ -336,7 +336,7 @@ class PipelineWorkflow:
             #find nad copy the jpeg file 
             jpeg_file_path_dirname=os.path.dirname(fraction_file_path)
             jpeg_file_name=("%s.jpg"%"_".join(fraction_file_name.split("_")[:-1]))
-            jpeg_file_path=os.sep.join(jpeg_file_path_dirname,jpeg_file_name)
+            jpeg_file_path=os.sep.join([jpeg_file_path_dirname,jpeg_file_name])
             jpeg_file = File(jpeg_file_name)
             jpeg_file_out = File(jpeg_file_name)
             self.rc.add_replica("slurm", jpeg_file_name, "file://{}".format(jpeg_file_path))
