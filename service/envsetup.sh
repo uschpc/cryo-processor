@@ -3,7 +3,7 @@
 set -e
 
 # ensure we start in the right directory
-cd $(dirname $0)
+#cd $(dirname $0)
 
 module load openjdk/11.0.2
 
