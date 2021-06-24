@@ -102,6 +102,7 @@ class PipelineWorkflow:
     # --- Transformation Catalog (Executables and Containers) -----------------
     def create_transformation_catalog(self, exec_site_name="slurm"):
         self.tc = TransformationCatalog()
+        
         # first - let's try to get the Gain reference file:
         dm2mrc_gainref = Transformation(
             "dm2mrc_gainref",
@@ -153,8 +154,17 @@ class PipelineWorkflow:
             cluster_size = 5
         else:
             cluster_size = 100
-
-        # third - let's do the Motioncor2
+        # third - let's copy the original jpg file to processed dir:
+        copy_jpeg = Transformation(
+            "copy_jpeg",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/cp_wrapper.sh"),
+            is_stageable=False
+        )
+        copy_jpeg.add_pegasus_profile( cores="1",
+                                        runtime="15"
+        )
+        # fourth - let's do the Motioncor2
         # these are fast jobs - cluster to improve performance
         motionCor2 = Transformation(
             "MotionCor2",
@@ -192,6 +202,7 @@ class PipelineWorkflow:
                                      memory="2048"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
 
+        self.tc.add_transformations(copy_jpeg)
         self.tc.add_transformations(dm2mrc_gainref)
         self.tc.add_transformations(newstack_gainref)
         self.tc.add_transformations(clip_gainref)
@@ -322,8 +333,18 @@ class PipelineWorkflow:
             mrc_file = File(mrc_file_name)
             dw_file = File(dw_file_name)
 
-            
-            
+            #find nad copy the jpeg file 
+            jpeg_file_path_dirname=os.path.dirname(fraction_file_path)
+            jpeg_file_name=("%s.jpg"%"_".join(fraction_file_name.split("_")[:-1]))
+            jpeg_file_path=os.sep.join(jpeg_file_path_dirname,jpeg_file_name)
+            jpeg_file = File(jpeg_file_name)
+            jpeg_file_out = File(jpeg_file_name)
+            self.rc.add_replica("slurm", jpeg_file_name, "file://{}".format(jpeg_file_path))
+            copy_jpeg_job = Job("copy_jpeg").add_args("-v", jpeg_file, jpeg_file_out)
+            copy_jpeg_job.add_inputs(jpeg_file)
+            copy_jpeg_job.add_outputs(jpeg_file_out, stage_out=True, register_replica=False)
+            self.wf.add_jobs(copy_jpeg_job)
+
 
             # MotionCor2
             motionCor_job = Job("MotionCor2").add_args("-InTiff", "./{}".format(fraction_file_name), "-OutMrc",
