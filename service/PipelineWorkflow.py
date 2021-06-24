@@ -92,7 +92,8 @@ class PipelineWorkflow:
             )
         )
         if self.debug:
-            exec_site.add_profiles(Namespace.PEGASUS, key="queue", value="debug")
+            #exec_site.add_profiles(Namespace.PEGASUS, key="queue", value="debug")
+            exec_site.add_profiles(Namespace.PEGASUS, key="queue", value="main")
         else:
             exec_site.add_profiles(Namespace.PEGASUS, key="queue", value="main")
 
