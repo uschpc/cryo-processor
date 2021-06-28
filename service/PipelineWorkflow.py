@@ -325,7 +325,7 @@ class PipelineWorkflow:
             fraction_file_name = os.path.basename(fraction_file_path)
             fraction_file = File(fraction_file_name)
             self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))
-`
+
             # generated files will be named based on the input
             basename = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name)
 
@@ -338,11 +338,12 @@ class PipelineWorkflow:
             jpeg_file_path_dirname=os.path.dirname(fraction_file_path)
             jpeg_file_name=("%s.jpg"%"_".join(fraction_file_name.split("_")[:-1]))
             jpeg_file_path=os.sep.join([jpeg_file_path_dirname,jpeg_file_name])
-            jpeg_file = File(jpeg_file_name)
+            # use a "fake" input lfn and a real output lfn
+            jpeg_file = File(jpeg_file_name + "-IN")
             jpeg_file_out = File(jpeg_file_name)
-            self.rc.add_replica("slurm", jpeg_file_name, "file://{}".format(jpeg_file_path))
-            copy_jpeg_job = Job("copy_jpeg").add_args("-v", "./{}".format(jpeg_file_name), jpeg_file_out)
-            #copy_jpeg_job.add_inputs(jpeg_file)
+            self.rc.add_replica("slurm", jpeg_file_name + "-IN", "file://{}".format(jpeg_file_path))
+            copy_jpeg_job = Job("copy_jpeg").add_args("-v", "-L", "./{}-IN".format(jpeg_file_name), jpeg_file_out)
+            copy_jpeg_job.add_inputs(jpeg_file)
             copy_jpeg_job.add_outputs(jpeg_file_out, stage_out=True, register_replica=False)
             self.wf.add_jobs(copy_jpeg_job)
 
