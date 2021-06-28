@@ -241,19 +241,6 @@ class Session:
                                     os.path.join(self._session_dir, "processed"),
                                     debug=self._config.getboolean("general", "debug"))
         try:
-            # self.apix = apix
-            # self.fmdose = fmdose
-            # self.kev = kev
-            # #self.particle_size = particle_size
-            # self.rawgainref = rawgainref
-            # self.rawdefectsmap = rawdefectsmap
-            # self.basename_prefix = basename_prefix
-            # self.basename_suffix = basename_suffix,
-            # self.basename_extension = basename_extension,
-            # self.throw=throw
-            # self.trunc=trunc
-            # self.superresolution = superresolution
-            #self.wf.set_params(self.apix, self.fmdose,self.kev,self.rawgainref,self.rawdefectsmap,self.basename_prefix,self.basename_suffix,self.basename_extension,self.throw,self.trunc,self.superresolution)
             self.wf.set_params(self)
         except Exception as e:
             log.exception(e)

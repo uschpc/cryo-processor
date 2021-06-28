@@ -162,8 +162,8 @@ class PipelineWorkflow:
             is_stageable=False
         )
         copy_jpeg.add_pegasus_profile( cores="1",
-                                        runtime="15"
-        )
+                                        runtime="20"
+        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
         # fourth - let's do the Motioncor2
         # these are fast jobs - cluster to improve performance
         motionCor2 = Transformation(
@@ -202,12 +202,13 @@ class PipelineWorkflow:
                                      memory="2048"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
 
-        self.tc.add_transformations(copy_jpeg)
+        
         self.tc.add_transformations(dm2mrc_gainref)
         self.tc.add_transformations(newstack_gainref)
         self.tc.add_transformations(clip_gainref)
         self.tc.add_transformations(clip_gainref_superres)
         self.tc.add_transformations(dm2mrc_defect_map)
+        self.tc.add_transformations(copy_jpeg)
         self.tc.add_transformations(motionCor2)
         self.tc.add_transformations(gctf)
         self.tc.add_transformations(e2proc2d)
@@ -223,8 +224,8 @@ class PipelineWorkflow:
         self.wf = Workflow(self.wf_name, infer_dependencies=True)
         
         #tho lines below can probably be removed - TO will check for it
-        raw_prefix="raw_"
-        mc_prefix = "mc_"
+        #raw_prefix="raw_"
+        #mc_prefix = "mc_"
         
         
         
@@ -339,7 +340,7 @@ class PipelineWorkflow:
             jpeg_file_path=os.sep.join([jpeg_file_path_dirname,jpeg_file_name])
             jpeg_file = File(jpeg_file_name)
             jpeg_file_out = File(jpeg_file_name)
-            #self.rc.add_replica("slurm", jpeg_file_name, "file://{}".format(jpeg_file_path))
+            self.rc.add_replica("slurm", jpeg_file_name, "file://{}".format(jpeg_file_path))
             copy_jpeg_job = Job("copy_jpeg").add_args("-v", "./{}".format(jpeg_file_name), jpeg_file_out)
             #copy_jpeg_job.add_inputs(jpeg_file)
             copy_jpeg_job.add_outputs(jpeg_file_out, stage_out=True, register_replica=False)
