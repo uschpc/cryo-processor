@@ -325,7 +325,7 @@ class PipelineWorkflow:
             fraction_file_name = os.path.basename(fraction_file_path)
             fraction_file = File(fraction_file_name)
             self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))
-
+`
             # generated files will be named based on the input
             basename = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name)
 
@@ -348,7 +348,18 @@ class PipelineWorkflow:
 
 
             # MotionCor2
-            motionCor_job = Job("MotionCor2").add_args("-InTiff", "./{}".format(fraction_file_name), "-OutMrc",
+            #adjust for one of three different extensions: mrc, tiff or eer
+            if self.basename_extension=="tiff":
+                mc2_in="-InTiff"
+            elif self.basename_extension=="mrc":
+                mc2_in="-InMrc"
+            elif self.basename_extension=="eer":
+                mc2_in="-InEer"
+            else:
+                logger.info("Unknown image extension - %s"%self.basename_extension)
+                sys.exit(1)
+            
+            motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
                 mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5 -RotGain 2",
                 "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 1 -Serial 0",
                 "-OutStack 0", "-SumRange 0 0")
