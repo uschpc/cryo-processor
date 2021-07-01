@@ -400,7 +400,7 @@ class PipelineWorkflow:
             
             gctf_job = (
                 Job("gctf").add_args("--apix", self.apix, "--kV", self.kev, "--Cs", "2.7", "--ac", "0.1",
-                                     "--ctfstar", ctf_star_file, "--gid", "0", "--boxsize", "512")
+                                     "--ctfstar", ctf_star_file, "--gid", "0", "--boxsize", "512", mrc_file)
             )
 
             gctf_job.add_inputs(mrc_file)
@@ -416,7 +416,7 @@ class PipelineWorkflow:
             dw_jpg_file = File(dw_jpg_name)
             e2proc2d_job1 = Job("e2proc2d")            
             e2proc2d_job1.add_inputs(dw_file)
-            e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True)
+            e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=True)
             e2proc2d_job1.add_args(dw_file, dw_jpg_file)
             self.wf.add_jobs(e2proc2d_job1)
             magick_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_DW.jpg"))
