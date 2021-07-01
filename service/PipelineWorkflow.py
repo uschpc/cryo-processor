@@ -243,6 +243,7 @@ class PipelineWorkflow:
         Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, self.rawgainref)[0]
         if len(Raw_Gain_Ref_SR_path) != 0:
             Raw_Gain_Ref_SR_name = os.path.basename(Raw_Gain_Ref_SR_path)
+            logger.info("Found gain reference file {} ...".format(Raw_Gain_Ref_SR_name))
             Raw_Gain_Ref_SR = File(Raw_Gain_Ref_SR_name)
             #TODO: improve lines below
             Gain_Ref_SR_path = Raw_Gain_Ref_SR_path.replace('x1.m1.dm4','_SuperRes.x1.m1.mrc')
@@ -303,6 +304,7 @@ class PipelineWorkflow:
         Raw_Defect_Map_path = self.find_files2(self.inputs_dir, self.rawdefectsmap)[0]
         if len(Raw_Gain_Ref_SR_path) != 0:
             Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
+            logger.info("Found Defect Map file {} ...".format(Raw_Defect_Map_name))
             Raw_Defect_Map = File(Raw_Defect_Map_name)
             Defect_Map_path = Raw_Defect_Map_path.replace('.dm4','.mrc')
             Defect_Map_name = os.path.basename(Defect_Map_path)
