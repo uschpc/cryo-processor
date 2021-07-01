@@ -306,7 +306,8 @@ class PipelineWorkflow:
         #define Defect Map input and output filename
         Raw_Defect_Map_path = self.find_files2(self.inputs_dir, self.rawdefectsmap)
         if len(Raw_Gain_Ref_SR_path) != 0:
-            Raw_Defect_Map_path = Raw_Defect_Map_path[0]
+            try: Raw_Defect_Map_path = Raw_Defect_Map_path[0]
+            except: logger.info("Raw_Defect_Map_path {} ...".format(Raw_Defect_Map_path))
             Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
             logger.info("Found Defect Map file {} ...".format(Raw_Defect_Map_name))
             Raw_Defect_Map = File(Raw_Defect_Map_name)
