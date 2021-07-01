@@ -240,8 +240,9 @@ class PipelineWorkflow:
         #Try to find Gain reference file - it might not be a part of the dataset, 
         #so we must take it into account.
         #define Gain reference Super resolution input and output filename
-        Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, self.rawgainref)[0]
+        Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, self.rawgainref)
         if len(Raw_Gain_Ref_SR_path) != 0:
+            Raw_Gain_Ref_SR_path = Raw_Gain_Ref_SR_path[0]
             Raw_Gain_Ref_SR_name = os.path.basename(Raw_Gain_Ref_SR_path)
             logger.info("Found gain reference file {} ...".format(Raw_Gain_Ref_SR_name))
             Raw_Gain_Ref_SR = File(Raw_Gain_Ref_SR_name)
@@ -298,12 +299,14 @@ class PipelineWorkflow:
             self.wf.add_jobs(newstack_gainref_job)
             self.wf.add_jobs(clip_gainref_job)
             self.wf.add_jobs(clip_gainref_superres_job)
-        
+        else:
+            pass
         #Try to find Defect Map file - it might not be a part of the dataset, 
         #so we must take it into account.        
         #define Defect Map input and output filename
-        Raw_Defect_Map_path = self.find_files2(self.inputs_dir, self.rawdefectsmap)[0]
+        Raw_Defect_Map_path = self.find_files2(self.inputs_dir, self.rawdefectsmap)
         if len(Raw_Gain_Ref_SR_path) != 0:
+            Raw_Defect_Map_path = Raw_Defect_Map_path[0]
             Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
             logger.info("Found Defect Map file {} ...".format(Raw_Defect_Map_name))
             Raw_Defect_Map = File(Raw_Defect_Map_name)
@@ -319,7 +322,8 @@ class PipelineWorkflow:
             dm2mrc_defect_map_job.add_inputs(Raw_Defect_Map)
             dm2mrc_defect_map_job.add_outputs(Defect_Map, stage_out=True)
             self.wf.add_jobs(dm2mrc_defect_map_job)
-        
+        else:
+            pass
         
         # for each _fractions.(tiff|mrc) in the Images-Disc1 dir 
         #file_list = self.find_files(
