@@ -208,8 +208,8 @@ class PipelineWorkflow:
             is_stageable=False
         )
         magick.add_pegasus_profile( cores="1",
-                                        runtime="180"
-        )
+                                        runtime="300"
+        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
         
         self.tc.add_transformations(dm2mrc_gainref)
         self.tc.add_transformations(newstack_gainref)
