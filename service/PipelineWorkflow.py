@@ -246,27 +246,28 @@ class PipelineWorkflow:
             logger.info("Found gain reference file {} ...".format(Raw_Gain_Ref_SR_name))
             Raw_Gain_Ref_SR = File(Raw_Gain_Ref_SR_name)
             #TODO: improve lines below
-            Gain_Ref_SR_path = Raw_Gain_Ref_SR_path.replace('x1.m1.dm4','_SuperRes.x1.m1.mrc')
+            #Gain_Ref_SR_path = Raw_Gain_Ref_SR_path.replace('x1.m1.dm4','_SuperRes.x1.m1.mrc')
+            Gain_Ref_SR_path = "%s_sr.%s"%(".".join(Raw_Gain_Ref_SR_path.split(".")[:-1]), "mrc")
             Gain_Ref_SR_name = os.path.basename(Gain_Ref_SR_path)
             Gain_Ref_SR = File(Gain_Ref_SR_name)
             self.rc.add_replica("slurm", Raw_Gain_Ref_SR_name, "file://{}".format(Raw_Gain_Ref_SR_path))
         
             #define Gain reference output filename
             #TODO: improve lines below
-            Gain_Ref_path = Gain_Ref_SR_path.replace('_SuperRes.x1.m1.mrc','_std.x1.m1.mrc')
+            Gain_Ref_path = Gain_Ref_SR_path.replace('_sr.mrc','_std.mrc')
             Gain_Ref_name = os.path.basename(Gain_Ref_path)
             Gain_Ref = File(Gain_Ref_name)
         
             #define flip Y Super resolution output filename
             #TODO: improve lines below
-            FlipY_SR_path = Gain_Ref_SR_path.replace('_SuperRes.x1.m1.mrc','_sr.flipy.x1.m1.mrc')
+            FlipY_SR_path = Gain_Ref_SR_path.replace('_sr.mrc','_sr.flipy.mrc')
             #logger.info(" ... found {} ".format(FlipY_SR_path))
             FlipY_SR_name = os.path.basename(FlipY_SR_path)
             FlipY_SR = File(FlipY_SR_name)
         
             #define flip Y std resolution output filename
             #TODO: improve lines below
-            FlipY_path = Gain_Ref_path.replace('_std.x1.m1.mrc','_std.flipy.x1.m1.mrc')
+            FlipY_path = Gain_Ref_path.replace('_std.mrc','_std.flipy.mrc')
             FlipY_name = os.path.basename(FlipY_path)
             FlipY = File(FlipY_name)
             #convert Superres dm4 file to mrc
