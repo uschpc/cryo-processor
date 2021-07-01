@@ -405,10 +405,10 @@ class PipelineWorkflow:
 
             gctf_job.add_inputs(mrc_file)
             #gctf_job.add_args(mrc_file) # i guess it should be removed
-            gctf_job.add_outputs(ctf_star_file, stage_out=True, register_replica=True)
+            gctf_job.add_outputs(ctf_star_file, stage_out=True, register_replica=False)
             #gctf_job.add_outputs(ctf_pf_file, stage_out=True, register_replica=True)
-            gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=True)
-            gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=True)
+            gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=False)
+            gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
             self.wf.add_jobs(gctf_job)
 
             # e2proc2d - motion-corrected to jpg, then resize to 20% size
@@ -416,13 +416,13 @@ class PipelineWorkflow:
             dw_jpg_file = File(dw_jpg_name)
             e2proc2d_job1 = Job("e2proc2d")            
             e2proc2d_job1.add_inputs(dw_file)
-            e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=True)
+            e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
             e2proc2d_job1.add_args(dw_file, dw_jpg_file)
             self.wf.add_jobs(e2proc2d_job1)
             magick_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_DW.jpg"))
             magick_resize = Job("magick")
             magick_resize.add_inputs(dw_jpg_file)
-            magick_resize.add_outputs(magick_jpg_file, stage_out=True, register_replica=True)
+            magick_resize.add_outputs(magick_jpg_file, stage_out=True, register_replica=False)
             magick_resize.add_args("convert -resize 20%", dw_jpg_file, magick_jpg_file)
             self.wf.add_jobs(magick_resize)
             
@@ -431,7 +431,7 @@ class PipelineWorkflow:
             jpg_ctf_file = File(mrc_file_name.replace(".mrc","_ctf.jpg"))
             e2proc2d_job2 = Job("e2proc2d")            
             e2proc2d_job2.add_inputs(ctf_file)
-            e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True)
+            e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True, register_replica=False)
             e2proc2d_job2.add_args(ctf_file, jpg_ctf_file)
             self.wf.add_jobs(e2proc2d_job2)
             
