@@ -242,88 +242,93 @@ class PipelineWorkflow:
         #define Gain reference Super resolution input and output filename
         Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, self.rawgainref)
         if len(Raw_Gain_Ref_SR_path) != 0:
-            Raw_Gain_Ref_SR_path = Raw_Gain_Ref_SR_path[0]
-            Raw_Gain_Ref_SR_name = os.path.basename(Raw_Gain_Ref_SR_path)
-            logger.info("Found gain reference file {} ...".format(Raw_Gain_Ref_SR_name))
-            Raw_Gain_Ref_SR = File(Raw_Gain_Ref_SR_name)
-            #TODO: improve lines below
-            #Gain_Ref_SR_path = Raw_Gain_Ref_SR_path.replace('x1.m1.dm4','_SuperRes.x1.m1.mrc')
-            Gain_Ref_SR_path = "%s_sr.%s"%(".".join(Raw_Gain_Ref_SR_path.split(".")[:-1]), "mrc")
-            Gain_Ref_SR_name = os.path.basename(Gain_Ref_SR_path)
-            Gain_Ref_SR = File(Gain_Ref_SR_name)
-            self.rc.add_replica("slurm", Raw_Gain_Ref_SR_name, "file://{}".format(Raw_Gain_Ref_SR_path))
+            try:
+                Raw_Gain_Ref_SR_path = Raw_Gain_Ref_SR_path[0]
+                Raw_Gain_Ref_SR_name = os.path.basename(Raw_Gain_Ref_SR_path)
+                logger.info("Found gain reference file {} ...".format(Raw_Gain_Ref_SR_name))
+                Raw_Gain_Ref_SR = File(Raw_Gain_Ref_SR_name)
+                Gain_Ref_SR_path = "%s_sr.%s"%(".".join(Raw_Gain_Ref_SR_path.split(".")[:-1]), "mrc")
+                Gain_Ref_SR_name = os.path.basename(Gain_Ref_SR_path)
+                Gain_Ref_SR = File(Gain_Ref_SR_name)
+                self.rc.add_replica("slurm", Raw_Gain_Ref_SR_name, "file://{}".format(Raw_Gain_Ref_SR_path))
         
-            #define Gain reference output filename
-            #TODO: improve lines below
-            Gain_Ref_path = Gain_Ref_SR_path.replace('_sr.mrc','_std.mrc')
-            Gain_Ref_name = os.path.basename(Gain_Ref_path)
-            Gain_Ref = File(Gain_Ref_name)
+                #define Gain reference output filename
+                #TODO: improve lines below
+                Gain_Ref_path = Gain_Ref_SR_path.replace('_sr.mrc','_std.mrc')
+                Gain_Ref_name = os.path.basename(Gain_Ref_path)
+                Gain_Ref = File(Gain_Ref_name)
         
-            #define flip Y Super resolution output filename
-            #TODO: improve lines below
-            FlipY_SR_path = Gain_Ref_SR_path.replace('_sr.mrc','_sr.flipy.mrc')
-            #logger.info(" ... found {} ".format(FlipY_SR_path))
-            FlipY_SR_name = os.path.basename(FlipY_SR_path)
-            FlipY_SR = File(FlipY_SR_name)
+                #define flip Y Super resolution output filename
+                #TODO: improve lines below
+                FlipY_SR_path = Gain_Ref_SR_path.replace('_sr.mrc','_sr.flipy.mrc')
+                #logger.info(" ... found {} ".format(FlipY_SR_path))
+                FlipY_SR_name = os.path.basename(FlipY_SR_path)
+                FlipY_SR = File(FlipY_SR_name)
         
-            #define flip Y std resolution output filename
-            #TODO: improve lines below
-            FlipY_path = Gain_Ref_path.replace('_std.mrc','_std.flipy.mrc')
-            FlipY_name = os.path.basename(FlipY_path)
-            FlipY = File(FlipY_name)
-            #convert Superres dm4 file to mrc
-            #dm2mrc usage: dm2mrc infile outfile
-            dm2mrc_gainref_sr_job = Job("dm2mrc_gainref")
-            dm2mrc_gainref_sr_job.add_args(Raw_Gain_Ref_SR, Gain_Ref_SR)
-            dm2mrc_gainref_sr_job.add_inputs(Raw_Gain_Ref_SR)
-            dm2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR, stage_out=True)
-            #create standard resolution gain ref file from superres gain ref file
-            #newstack usage here (decrease the size of Super resolution image by factor of 2): newstack -bin 2 infile outfile
-            newstack_gainref_job = Job("newstack_gainref")
-            newstack_gainref_job.add_args("-bin", "2", Gain_Ref_SR, Gain_Ref)
-            newstack_gainref_job.add_inputs(Gain_Ref_SR)
-            newstack_gainref_job.add_outputs(Gain_Ref, stage_out=True)
-            #flip both gain reference files on y axis
-            #clip usage here (flip img on Y axis): clip flipy infile outfile
-            #std resolution
-            clip_gainref_job = Job("clip_gainref")
-            clip_gainref_job.add_args("flipy", Gain_Ref, FlipY)
-            clip_gainref_job.add_inputs(Gain_Ref)
-            clip_gainref_job.add_outputs(FlipY, stage_out=True)
-            #super resolution
-            clip_gainref_superres_job = Job("clip_gainref_superres")
-            clip_gainref_superres_job.add_args("flipy", Gain_Ref_SR, FlipY_SR)
-            clip_gainref_superres_job.add_inputs(Gain_Ref_SR)
-            clip_gainref_superres_job.add_outputs(FlipY_SR, stage_out=True)
-            self.wf.add_jobs(dm2mrc_gainref_sr_job)
-            self.wf.add_jobs(newstack_gainref_job)
-            self.wf.add_jobs(clip_gainref_job)
-            self.wf.add_jobs(clip_gainref_superres_job)
+                #define flip Y std resolution output filename
+                #TODO: improve lines below
+                FlipY_path = Gain_Ref_path.replace('_std.mrc','_std.flipy.mrc')
+                FlipY_name = os.path.basename(FlipY_path)
+                FlipY = File(FlipY_name)
+                #convert Superres dm4 file to mrc
+                #dm2mrc usage: dm2mrc infile outfile
+                dm2mrc_gainref_sr_job = Job("dm2mrc_gainref")
+                dm2mrc_gainref_sr_job.add_args(Raw_Gain_Ref_SR, Gain_Ref_SR)
+                dm2mrc_gainref_sr_job.add_inputs(Raw_Gain_Ref_SR)
+                dm2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR, stage_out=True)
+                #create standard resolution gain ref file from superres gain ref file
+                #newstack usage here (decrease the size of Super resolution image by factor of 2): newstack -bin 2 infile outfile
+                newstack_gainref_job = Job("newstack_gainref")
+                newstack_gainref_job.add_args("-bin", "2", Gain_Ref_SR, Gain_Ref)
+                newstack_gainref_job.add_inputs(Gain_Ref_SR)
+                newstack_gainref_job.add_outputs(Gain_Ref, stage_out=True)
+                #flip both gain reference files on y axis
+                #clip usage here (flip img on Y axis): clip flipy infile outfile
+                #std resolution
+                clip_gainref_job = Job("clip_gainref")
+                clip_gainref_job.add_args("flipy", Gain_Ref, FlipY)
+                clip_gainref_job.add_inputs(Gain_Ref)
+                clip_gainref_job.add_outputs(FlipY, stage_out=True)
+                #super resolution
+                clip_gainref_superres_job = Job("clip_gainref_superres")
+                clip_gainref_superres_job.add_args("flipy", Gain_Ref_SR, FlipY_SR)
+                clip_gainref_superres_job.add_inputs(Gain_Ref_SR)
+                clip_gainref_superres_job.add_outputs(FlipY_SR, stage_out=True)
+                self.wf.add_jobs(dm2mrc_gainref_sr_job)
+                self.wf.add_jobs(newstack_gainref_job)
+                self.wf.add_jobs(clip_gainref_job)
+                self.wf.add_jobs(clip_gainref_superres_job)
+            except:
+                logger.info("Raw_Gain_Ref_SR_path {} ...".format(Raw_Gain_Ref_SR_path))
         else:
+            logger.info("Raw_Gain_Ref_SR_path {} from else...".format(Raw_Gain_Ref_SR_path))
             pass
         #Try to find Defect Map file - it might not be a part of the dataset, 
         #so we must take it into account.        
         #define Defect Map input and output filename
         Raw_Defect_Map_path = self.find_files2(self.inputs_dir, self.rawdefectsmap)
         if len(Raw_Gain_Ref_SR_path) != 0:
-            try: Raw_Defect_Map_path = Raw_Defect_Map_path[0]
-            except: logger.info("Raw_Defect_Map_path {} ...".format(Raw_Defect_Map_path))
-            Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
-            logger.info("Found Defect Map file {} ...".format(Raw_Defect_Map_name))
-            Raw_Defect_Map = File(Raw_Defect_Map_name)
-            Defect_Map_path = Raw_Defect_Map_path.replace('.dm4','.mrc')
-            Defect_Map_name = os.path.basename(Defect_Map_path)
-            Defect_Map = File(Defect_Map_name)
-            self.rc.add_replica("slurm", Raw_Defect_Map_name, "file://{}".format(Raw_Defect_Map_path))
-            #we do this, but if it impacts the processing speed to much it can be disabled for now
-            #create defect map file
-            #dm2mrc usage: dm2mrc infile outfile
-            dm2mrc_defect_map_job = Job("dm2mrc_defect_map")
-            dm2mrc_defect_map_job.add_args(Raw_Defect_Map, Defect_Map)
-            dm2mrc_defect_map_job.add_inputs(Raw_Defect_Map)
-            dm2mrc_defect_map_job.add_outputs(Defect_Map, stage_out=True)
-            self.wf.add_jobs(dm2mrc_defect_map_job)
+            try: 
+                Raw_Defect_Map_path = Raw_Defect_Map_path[0]
+                Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
+                logger.info("Found Defect Map file {} ...".format(Raw_Defect_Map_name))
+                Raw_Defect_Map = File(Raw_Defect_Map_name)
+                Defect_Map_path = "%s_sr.%s"%(".".join(Raw_Defect_Map_path.split(".")[:-1]), "mrc")
+                Defect_Map_name = os.path.basename(Defect_Map_path)
+                Defect_Map = File(Defect_Map_name)
+                self.rc.add_replica("slurm", Raw_Defect_Map_name, "file://{}".format(Raw_Defect_Map_path))
+                #we do this, but if it impacts the processing speed to much it can be disabled for now
+                #create defect map file
+                #dm2mrc usage: dm2mrc infile outfile
+                dm2mrc_defect_map_job = Job("dm2mrc_defect_map")
+                dm2mrc_defect_map_job.add_args(Raw_Defect_Map, Defect_Map)
+                dm2mrc_defect_map_job.add_inputs(Raw_Defect_Map)
+                dm2mrc_defect_map_job.add_outputs(Defect_Map, stage_out=True)
+                self.wf.add_jobs(dm2mrc_defect_map_job)
+            except: 
+                logger.info("Raw_Defect_Map_path {} ...".format(Raw_Defect_Map_path))
         else:
+            logger.info("Raw_Defect_Map_path {} from else...".format(Raw_Defect_Map_path))
             pass
         
         # for each _fractions.(tiff|mrc) in the Images-Disc1 dir 
@@ -410,7 +415,6 @@ class PipelineWorkflow:
             )
 
             gctf_job.add_inputs(mrc_file)
-            #gctf_job.add_args(mrc_file) # i guess it should be removed
             gctf_job.add_outputs(ctf_star_file, stage_out=True, register_replica=False)
             #gctf_job.add_outputs(ctf_pf_file, stage_out=True, register_replica=True)
             gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=False)
@@ -535,4 +539,18 @@ class PipelineWorkflow:
         logger.info(" ... found {} files matching {}".format(len(found_files), regex))
         return found_files
 
+    def find_files3(self, root_dir, regex):
+        '''
+        Returns sorted list of files matching regex = root_dir+/+regex (similar to ls)
+        Much faster than find_files
+        eg. f=find_files2("/project/cryoem/K3_sample_dataset/20210205_mutant/Images-Disc1", "*/Data/*_fractions.tiff") to get all files
+        '''
+        search_path=os.path.join(root_dir,regex)
+        logger.info(" ... searching for {} {}".format(search_path, regex))
+        found_files = []
+        for path in Path(root_dir).rglob(regex):
+            found_files.append(path.name)
+        
+        logger.info(" ... found {} files matching {}".format(len(found_files), regex))
+        return found_files
 
