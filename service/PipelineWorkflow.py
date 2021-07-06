@@ -175,6 +175,7 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4192",
                                         glite_arguments="--gres=gpu:p100:2"
+                                        glite_arguments="--gres=gpu:k40:2"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
 
         gctf = Transformation(
@@ -187,7 +188,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4192",
                                         #glite_arguments="--gres=gpu:k20:2"
-                                        glite_arguments="--gres=gpu:p100:2"
+                                        #glite_arguments="--gres=gpu:p100:2"
+                                        glite_arguments="--gres=gpu:k40:2"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
 
         e2proc2d = Transformation(
