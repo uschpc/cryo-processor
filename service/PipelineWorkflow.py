@@ -429,7 +429,7 @@ class PipelineWorkflow:
             e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
             e2proc2d_job1.add_args("--average", dw_file, dw_jpg_file)
             self.wf.add_jobs(e2proc2d_job1)
-            magick_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_DW.jpg"))
+            magick_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg",".jpg"))
             magick_resize = Job("magick")
             magick_resize.add_inputs(dw_jpg_file)
             magick_resize.add_outputs(magick_jpg_file, stage_out=True, register_replica=False)
