@@ -346,7 +346,7 @@ class PipelineWorkflow:
         else:
             # even for production, only process a part of the dataset (maybe change this later?)
             #
-            file_list = random.sample(file_list, 100)
+            file_list = random.sample(file_list, 1000)
 
         for fraction_file_path in file_list:
 
