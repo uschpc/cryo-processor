@@ -150,9 +150,9 @@ class PipelineWorkflow:
                                         runtime="180"
         )
         if self.debug:
-            cluster_size = 5
+            cluster_size = 1
         else:
-            cluster_size = 5
+            cluster_size = 4
         # third - let's copy the original jpg file to processed dir:
         copy_jpeg = Transformation(
             "copy_jpeg",
