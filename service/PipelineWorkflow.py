@@ -152,7 +152,7 @@ class PipelineWorkflow:
         if self.debug:
             cluster_size = 5
         else:
-            cluster_size = 100
+            cluster_size = 5
         # third - let's copy the original jpg file to processed dir:
         copy_jpeg = Transformation(
             "copy_jpeg",
@@ -346,7 +346,7 @@ class PipelineWorkflow:
         else:
             # even for production, only process a part of the dataset (maybe change this later?)
             #
-            file_list = random.sample(file_list, 1000)
+            file_list = random.sample(file_list, 100)
 
         for fraction_file_path in file_list:
 
