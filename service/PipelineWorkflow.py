@@ -344,7 +344,7 @@ class PipelineWorkflow:
                             "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
         #sort?
         file_list.sort()
-        if self.self.no_of_files_to_proc_in_cycle != -1:
+        if self.no_of_files_to_proc_in_cycle != -1:
             file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
         
         if self.debug:
