@@ -28,13 +28,15 @@ class PipelineWorkflow:
     inputs_dir = None
 
     # --- Init ----------------------------------------------------------------
-    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=False):
+    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=False, cluster_size=10, no_of_files_to_proc_in_cycle=5):
         self.wf_name = "motioncor2"
         self.base_dir = base_dir
         self.wf_dir = wf_dir
         self.inputs_dir = inputs_dir
         self.outputs_dir = outputs_dir
         self.debug = debug
+        self.cluster_size = cluster_size
+        self.no_of_files_to_proc_in_cycle = no_of_files_to_proc_in_cycle
 
     # --- Write files in directory --------------------------------------------
     def write(self):
@@ -150,9 +152,9 @@ class PipelineWorkflow:
                                         runtime="180"
         )
         if self.debug:
-            cluster_size = 1
-        else:
-            cluster_size = 4
+            self.cluster_size = 1
+        #else:
+        #    pass
         # third - let's copy the original jpg file to processed dir:
         copy_jpeg = Transformation(
             "copy_jpeg",
@@ -162,7 +164,7 @@ class PipelineWorkflow:
         )
         copy_jpeg.add_pegasus_profile( cores="1",
                                         runtime="20"
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
+        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         # fourth - let's do the Motioncor2
         # these are fast jobs - cluster to improve performance
         motionCor2 = Transformation(
@@ -177,7 +179,7 @@ class PipelineWorkflow:
                                         #use p100 as soon as permanently available
                                         #glite_arguments="--gres=gpu:p100:2"
                                         glite_arguments="--gres=gpu:k40:2"
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
+        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         gctf = Transformation(
             "gctf",
@@ -190,7 +192,7 @@ class PipelineWorkflow:
                                         memory="4192",
                                         #glite_arguments="--gres=gpu:p100:2"
                                         glite_arguments="--gres=gpu:k40:2"
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
+        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         e2proc2d = Transformation(
             "e2proc2d",
@@ -201,7 +203,7 @@ class PipelineWorkflow:
         e2proc2d.add_pegasus_profile(cores="1",
                                      runtime="600",
                                      memory="2048"
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
+        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         magick = Transformation(
             "magick",
@@ -211,7 +213,7 @@ class PipelineWorkflow:
         )
         magick.add_pegasus_profile( cores="1",
                                         runtime="300"
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=cluster_size)
+        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         
         self.tc.add_transformations(dm2mrc_gainref)
         self.tc.add_transformations(newstack_gainref)
@@ -340,13 +342,19 @@ class PipelineWorkflow:
         file_list = self.find_files2(
                             os.path.join(self.inputs_dir, "Images-Disc1","*","Data"),
                             "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
+        #sort?
+        file_list.sort()
+        if self.self.no_of_files_to_proc_in_cycle != -1:
+            file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
+        
         if self.debug:
             # when debugging, only do a fraction of the files
-            file_list = random.sample(file_list, 10)
+            file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
+        
         else:
             # even for production, only process a part of the dataset (maybe change this later?)
             #
-            #file_list = random.sample(file_list, 1000)
+            file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
             pass
 
         for fraction_file_path in file_list:
