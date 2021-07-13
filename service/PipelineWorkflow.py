@@ -112,7 +112,8 @@ class PipelineWorkflow:
             is_stageable=False
         )
         dm2mrc_gainref.add_pegasus_profile( cores="4",
-                                        runtime="180"
+                                        runtime="300",
+                                        memory="4096"
         )
         newstack_gainref = Transformation(
             "newstack_gainref",
@@ -121,7 +122,8 @@ class PipelineWorkflow:
             is_stageable=False
         )
         newstack_gainref.add_pegasus_profile( cores="4",
-                                        runtime="180"
+                                        runtime="300",
+                                        memory="4096"
         )
         clip_gainref = Transformation(
             "clip_gainref",
@@ -130,7 +132,8 @@ class PipelineWorkflow:
             is_stageable=False
         )
         clip_gainref.add_pegasus_profile( cores="4",
-                                        runtime="180",
+                                        runtime="300",
+                                        memory="4096"
         )
         clip_gainref_superres = Transformation(
             "clip_gainref_superres",
@@ -139,7 +142,8 @@ class PipelineWorkflow:
             is_stageable=False
         )
         clip_gainref_superres.add_pegasus_profile( cores="4",
-                                        runtime="180",
+                                        runtime="300",
+                                        memory="4096"
         )
         # second - let's try to get the Defect map file:
         dm2mrc_defect_map = Transformation(
@@ -149,7 +153,8 @@ class PipelineWorkflow:
             is_stageable=False
         )
         dm2mrc_defect_map.add_pegasus_profile( cores="4",
-                                        runtime="180"
+                                        runtime="300",
+                                        memory="4096"
         )
         if self.debug:
             self.cluster_size = 1
@@ -163,7 +168,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         copy_jpeg.add_pegasus_profile( cores="1",
-                                        runtime="20"
+                                        runtime="60"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         # fourth - let's do the Motioncor2
         # these are fast jobs - cluster to improve performance
@@ -173,9 +178,9 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/motioncor2_wrapper.sh"),
             is_stageable=False
         )
-        motionCor2.add_pegasus_profile( cores="4",
+        motionCor2.add_pegasus_profile( cores="2",
                                         runtime="600",
-                                        memory="4192",
+                                        memory="4096",
                                         #use p100 as soon as permanently available
                                         #glite_arguments="--gres=gpu:p100:2"
                                         glite_arguments="--gres=gpu:k40:2"
@@ -187,11 +192,11 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/gctf_wrapper.sh"),
             is_stageable=False
         )
-        gctf.add_pegasus_profile( cores="4",
+        gctf.add_pegasus_profile( cores="2",
                                         runtime="600",
-                                        memory="4192",
+                                        memory="4096",
                                         #glite_arguments="--gres=gpu:p100:2"
-                                        glite_arguments="--gres=gpu:k40:2"
+                                        glite_arguments="--gres=gpu:k40:1"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         e2proc2d = Transformation(
@@ -202,7 +207,7 @@ class PipelineWorkflow:
         )
         e2proc2d.add_pegasus_profile(cores="1",
                                      runtime="600",
-                                     memory="2048"
+                                     memory="4096"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         magick = Transformation(
@@ -212,7 +217,8 @@ class PipelineWorkflow:
             is_stageable=False
         )
         magick.add_pegasus_profile( cores="1",
-                                        runtime="300"
+                                        runtime="300",
+                                        memory="2048"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         
         self.tc.add_transformations(dm2mrc_gainref)
@@ -384,7 +390,6 @@ class PipelineWorkflow:
             copy_jpeg_job.add_outputs(jpeg_file_out, stage_out=True, register_replica=False)
             self.wf.add_jobs(copy_jpeg_job)
 
-
             # MotionCor2
             #adjust for one of three different extensions: mrc, tiff or eer
             if self.basename_extension=="tiff":
@@ -398,17 +403,21 @@ class PipelineWorkflow:
                 sys.exit(1)
             
             if len(Raw_Gain_Ref_SR_path) != 0:
+                #case where we have gain referencee file
                 motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
                     mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5 -RotGain 2",
                     "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 1 -Serial 0",
                     "-OutStack 0", "-SumRange 0 0")
+                motionCor_job.add_inputs(fraction_file, FlipY)
             else:
+                #case where we do not have gain referencee file
                 motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
                     mrc_file, "-Iter 7 -Tol 0.5 -RotGain 2",
                     "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 1 -Serial 0",
                     "-OutStack 0", "-SumRange 0 0")
+                motionCor_job.add_inputs(fraction_file)
 
-            motionCor_job.add_inputs(fraction_file, FlipY)
+            
             motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
             motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
             self.wf.add_jobs(motionCor_job)
