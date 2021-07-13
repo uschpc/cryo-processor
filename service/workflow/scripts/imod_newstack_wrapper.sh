@@ -21,9 +21,9 @@ export MANPATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3/man:$MANPA
 export LD_LIBRARY_PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3/qtlib:$LD_LIBRARY_PATH
 #export IMOD_ROOT=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3
-function subm () { 
-submfg $* & }", modeA={"load"}
-}
+#function subm () { 
+#submfg $* & }", modeA={"load"}
+#}
 
 newstack "$@"
 
