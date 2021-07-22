@@ -223,10 +223,10 @@ class Session:
             shutil.rmtree(self._scratch_dir)
         except:
             pass
-        rawdatadir=os.path.basename(glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*"))[0])
+        rawdatadirs=glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*"))
         self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
                                     self._wf_dir,
-                                    rawdatadir,
+                                    rawdatadirs,
                                     os.path.join(self._session_dir, "processed"),
                                     debug=self._config.getboolean("general", "debug"))
         try:

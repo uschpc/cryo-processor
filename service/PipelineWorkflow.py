@@ -251,7 +251,13 @@ class PipelineWorkflow:
         #so we must take it into account.
         #define Gain reference Super resolution input and output filename
         logger.info("self.inputs_dir {}".format(self.inputs_dir))
-        Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, self.rawgainref)
+        raw_gain_ref_path=None
+        for i in self.inputs_dir:
+            raw_gain_ref_path = self.find_files2(i, self.rawgainref)
+            if len(raw_gain_ref_path)>=1:
+                Raw_Gain_Ref_SR_path=raw_gain_ref_path
+                break
+        #Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, self.rawgainref)
         if len(Raw_Gain_Ref_SR_path) != 0:
             try:
                 Raw_Gain_Ref_SR_path = Raw_Gain_Ref_SR_path[0]
@@ -317,7 +323,12 @@ class PipelineWorkflow:
         #Try to find Defect Map file - it might not be a part of the dataset, 
         #so we must take it into account.        
         #define Defect Map input and output filename
-        Raw_Defect_Map_path = self.find_files2(self.inputs_dir, self.rawdefectsmap)
+        for i in self.inputs_dir:
+            raw_defect_map_path = self.find_files2(i, self.rawdefectsmap)
+            if len(raw_defect_map_path)>=1:
+                Raw_Defect_Map_path=raw_defect_map_path
+                break
+        #Raw_Defect_Map_path = self.find_files2(self.inputs_dir, self.rawdefectsmap)
         if len(Raw_Gain_Ref_SR_path) != 0:
             try: 
                 Raw_Defect_Map_path = Raw_Defect_Map_path[0]
@@ -346,9 +357,16 @@ class PipelineWorkflow:
         #file_list = self.find_files(
         #                    os.path.join(self.inputs_dir, "Images-Disc1"),
         #                    "_fractions.tiff$")
-        file_list = self.find_files2(
-                            os.path.join(self.inputs_dir, "Images-Disc1","*","Data"),
-                            "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
+        for i in self.inputs_dir:
+            flist = self.find_files2(os.path.join(i, "Images-Disc1","*","Data"),
+                            "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension)
+            if len(flist)>=1:
+                file_list=flist
+                break
+                
+        #file_list = self.find_files2(
+        #                    os.path.join(self.inputs_dir, "Images-Disc1","*","Data"),
+        #                    "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
         #sort?
         file_list.sort()
         #define filename extension
