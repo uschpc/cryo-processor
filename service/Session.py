@@ -102,7 +102,6 @@ class Session:
         self.apix = apix
         self.fmdose = fmdose
         self.kev = kev
-        #self.particle_size = particle_size
         self.rawgainref = rawgainref
         self.rawdefectsmap = rawdefectsmap
         self.basename_prefix = basename_prefix
