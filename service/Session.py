@@ -5,6 +5,7 @@ import os
 import pprint
 import shutil
 import time
+import glob
 
 from Pegasus.api import *
 
@@ -223,6 +224,7 @@ class Session:
             shutil.rmtree(self._scratch_dir)
         except:
             pass
+        rawdatadir=os.path.basename(glob.glob(os.path.join(self._session_dir, "*"))[0])
         self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
                                     self._wf_dir,
                                     os.path.join(self._session_dir, "raw"),
