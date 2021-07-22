@@ -256,7 +256,7 @@ class PipelineWorkflow:
         logger.info("looking for gain reference")
         for i in self.inputs_dir:
             logger.info("searching gain ref here: {} with {}".format(i, self.rawgainref))
-            raw_gain_ref_path = self.find_files2(i, self.rawgainref)
+            raw_gain_ref_path = self.find_files2(os.path.join(i,"**"), self.rawgainref)
             if len(raw_gain_ref_path)>=1:
                 Raw_Gain_Ref_SR_path=raw_gain_ref_path
                 break
@@ -327,7 +327,7 @@ class PipelineWorkflow:
         #so we must take it into account.        
         #define Defect Map input and output filename
         for i in self.inputs_dir:
-            raw_defect_map_path = self.find_files2(i, self.rawdefectsmap)
+            raw_defect_map_path = self.find_files2(os.path.join(i,"**"), self.rawdefectsmap)
             if len(raw_defect_map_path)>=1:
                 Raw_Defect_Map_path=raw_defect_map_path
                 break
