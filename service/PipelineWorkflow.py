@@ -360,7 +360,7 @@ class PipelineWorkflow:
         for i in self.inputs_dir:
             flist = self.find_files2(os.path.join(i, "Images-Disc1","*","Data"),
                             "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension)
-            if len(flist)>=1:
+            if len(flist)>0:
                 file_list=flist
                 break
                 
