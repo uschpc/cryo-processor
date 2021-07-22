@@ -225,7 +225,6 @@ class Session:
         except:
             pass
         rawdatadir=os.path.basename(glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*"))[0])
-        log.info("session_dir {}".format(rawdatadir))
         self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
                                     self._wf_dir,
                                     rawdatadir,
