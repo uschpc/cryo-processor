@@ -252,7 +252,7 @@ class PipelineWorkflow:
         #define Gain reference Super resolution input and output filename
         logger.info("self.inputs_dir {}".format(self.inputs_dir))
         raw_gain_ref_path=None
-        Raw_Gain_Ref_SR_path=None
+        Raw_Gain_Ref_SR_path=[]
         logger.info("looking for gain reference")
         for i in self.inputs_dir:
             logger.info("searching gain ref here: {} with {}".format(i, self.rawgainref))
@@ -326,6 +326,8 @@ class PipelineWorkflow:
         #Try to find Defect Map file - it might not be a part of the dataset, 
         #so we must take it into account.        
         #define Defect Map input and output filename
+        raw_defect_map_path=None
+        Raw_Defect_Map_path=[]
         for i in self.inputs_dir:
             raw_defect_map_path = self.find_files2(os.path.join(i,"**"), self.rawdefectsmap)
             if len(raw_defect_map_path)>=1:
