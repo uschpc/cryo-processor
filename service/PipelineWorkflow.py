@@ -252,6 +252,7 @@ class PipelineWorkflow:
         #define Gain reference Super resolution input and output filename
         logger.info("self.inputs_dir {}".format(self.inputs_dir))
         raw_gain_ref_path=None
+        Raw_Gain_Ref_SR_path=None
         logger.info("looking for gain reference")
         for i in self.inputs_dir:
             logger.info("searching gain ref here: {} with {}".format(i, self.rawgainref))
