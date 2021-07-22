@@ -85,18 +85,6 @@ class Session:
     #throw, how many frames discard from the top
     #trunc, how many frames keep
     #superresolution,
-    # def start_processing(self,
-                            # apix=1.08,
-                            # fmdose=1.250,
-                            # kev=300,
-                            # rawgainref="gain-ref/*x1.m1.dm4",
-                            # rawdefectsmap="gain-ref/*Map.m1.dm4",
-                            # basename_prefix="FoilHole",
-                            # basename_suffix="fractions",
-                            # basename_extension="tiff",
-                            # throw=1,
-                            # trunc=23,
-                            # superresolution=False):
     def start_processing(self,
                             apix,
                             fmdose,
