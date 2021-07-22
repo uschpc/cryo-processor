@@ -363,7 +363,7 @@ class PipelineWorkflow:
         #                    os.path.join(self.inputs_dir, "Images-Disc1"),
         #                    "_fractions.tiff$")
         for i in self.inputs_dir:
-            flist = self.find_files2(os.path.join(i, "Images-Disc1","*","Data"),
+            flist = self.find_files2(os.path.join(i, "**"),
                             "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
             if len(flist)>=1:
                 file_list=flist
