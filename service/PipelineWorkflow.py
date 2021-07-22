@@ -937,13 +937,13 @@ class PipelineWorkflow:
         
         if self.debug:
             # when debugging, only do a fraction of the files
-            file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
+            file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle, 10)
         
         else:
             # even for production, only process a part of the dataset (maybe change this later?)
             #
             file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
-            pass
+            #pass
 
         for fraction_file_path in file_list:
 
