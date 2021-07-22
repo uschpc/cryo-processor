@@ -250,7 +250,7 @@ class PipelineWorkflow:
         #Try to find Gain reference file - it might not be a part of the dataset, 
         #so we must take it into account.
         #define Gain reference Super resolution input and output filename
-        logger.info("inputs_dir {}".format(inputs_dir))
+        logger.info("self.inputs_dir {}".format(self.inputs_dir))
         Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, self.rawgainref)
         if len(Raw_Gain_Ref_SR_path) != 0:
             try:
