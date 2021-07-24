@@ -273,7 +273,7 @@ class PipelineWorkflow:
                 break
         #Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, self.rawgainref)
         if len(Raw_Gain_Ref_SR_path) != 0:
-            try:
+            #try:
                 # get the extension
                 gainref_extension=Raw_Gain_Ref_SR_path.split('.')[-1]
                 
@@ -349,8 +349,8 @@ class PipelineWorkflow:
                 self.wf.add_jobs(newstack_gainref_job)
                 self.wf.add_jobs(clip_gainref_job)
                 self.wf.add_jobs(clip_gainref_superres_job)
-            except:
-                logger.info("Raw_Gain_Ref_SR_path {} ...".format(Raw_Gain_Ref_SR_path))
+            #except:
+            #    logger.info("Raw_Gain_Ref_SR_path {} ...".format(Raw_Gain_Ref_SR_path))
         else:
             logger.info("Raw_Gain_Ref_SR_path {} from else...".format(Raw_Gain_Ref_SR_path))
             pass
@@ -365,7 +365,7 @@ class PipelineWorkflow:
                 Raw_Defect_Map_path=raw_defect_map_path
                 break
         #Raw_Defect_Map_path = self.find_files2(self.inputs_dir, self.rawdefectsmap)
-        if len(Raw_Gain_Ref_SR_path) != 0:
+        if len(Raw_Defect_Map_path) != 0:
             try: 
                 Raw_Defect_Map_path = Raw_Defect_Map_path[0]
                 Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
