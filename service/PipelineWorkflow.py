@@ -161,15 +161,15 @@ class PipelineWorkflow:
         #else:
         #    pass
         # third - let's copy the original jpg file to processed dir:
-        copy_jpeg = Transformation(
-            "copy_jpeg",
-            site=exec_site_name,
-            pfn=os.path.join(self.base_dir, "workflow/scripts/cp_wrapper.sh"),
-            is_stageable=False
-        )
-        copy_jpeg.add_pegasus_profile( cores="1",
-                                        runtime="60"
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        #copy_jpeg = Transformation(
+        #    "copy_jpeg",
+        #    site=exec_site_name,
+        #    pfn=os.path.join(self.base_dir, "workflow/scripts/cp_wrapper.sh"),
+        #    is_stageable=False
+        #)
+        #copy_jpeg.add_pegasus_profile( cores="1",
+        #                                runtime="60"
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         # fourth - let's do the Motioncor2
         # these are fast jobs - cluster to improve performance
         motionCor2 = Transformation(
@@ -226,7 +226,7 @@ class PipelineWorkflow:
         self.tc.add_transformations(clip_gainref)
         self.tc.add_transformations(clip_gainref_superres)
         self.tc.add_transformations(dm2mrc_defect_map)
-        self.tc.add_transformations(copy_jpeg)
+        #self.tc.add_transformations(copy_jpeg)
         self.tc.add_transformations(motionCor2)
         self.tc.add_transformations(gctf)
         self.tc.add_transformations(e2proc2d)
@@ -404,18 +404,19 @@ class PipelineWorkflow:
             mrc_file = File(mrc_file_name)
             dw_file = File(dw_file_name)
 
-            #find and copy the jpeg file 
-            jpeg_file_path_dirname=os.path.dirname(fraction_file_path)
-            jpeg_file_name=("%s.jpg"%"_".join(fraction_file_name.split("_")[:-1]))
-            jpeg_file_path=os.sep.join([jpeg_file_path_dirname,jpeg_file_name])
-            # use a "fake" input lfn and a real output lfn
-            jpeg_file = File(jpeg_file_name + "-IN")
-            jpeg_file_out = File(jpeg_file_name.replace(".jpg","_raw.jpg"))
-            self.rc.add_replica("slurm", jpeg_file_name + "-IN", "file://{}".format(jpeg_file_path))
-            copy_jpeg_job = Job("copy_jpeg").add_args("-v", "-L", "./{}-IN".format(jpeg_file_name), jpeg_file_out)
-            copy_jpeg_job.add_inputs(jpeg_file)
-            copy_jpeg_job.add_outputs(jpeg_file_out, stage_out=True, register_replica=False)
-            self.wf.add_jobs(copy_jpeg_job)
+            ##find and copy the jpeg file 
+            ## 2021-07-23; TO; skipping temprarily due to the uncertain location of the file
+            #jpeg_file_path_dirname=os.path.dirname(fraction_file_path)
+            #jpeg_file_name=("%s.jpg"%"_".join(fraction_file_name.split("_")[:-1]))
+            #jpeg_file_path=os.sep.join([jpeg_file_path_dirname,jpeg_file_name])
+            ## use a "fake" input lfn and a real output lfn
+            #jpeg_file = File(jpeg_file_name + "-IN")
+            #jpeg_file_out = File(jpeg_file_name.replace(".jpg","_raw.jpg"))
+            #self.rc.add_replica("slurm", jpeg_file_name + "-IN", "file://{}".format(jpeg_file_path))
+            #copy_jpeg_job = Job("copy_jpeg").add_args("-v", "-L", "./{}-IN".format(jpeg_file_name), jpeg_file_out)
+            #copy_jpeg_job.add_inputs(jpeg_file)
+            #copy_jpeg_job.add_outputs(jpeg_file_out, stage_out=True, register_replica=False)
+            #self.wf.add_jobs(copy_jpeg_job)
 
             # MotionCor2
             #adjust for one of three different extensions: mrc, tiff or eer
