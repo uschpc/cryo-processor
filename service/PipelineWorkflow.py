@@ -308,17 +308,17 @@ class PipelineWorkflow:
                 #dm2mrc usage: dm2mrc infile outfile
                 #tif2mrc usage: tif2mrc infile outfile
                 if gainref_extension=="tiff":
+                    logger.info("gain reference file extension {} ...".format(gainref_extension))
                     tif2mrc_gainref_sr_job = Job("tif2mrc_gainref")
                     tif2mrc_gainref_sr_job.add_args(Raw_Gain_Ref_SR, Gain_Ref_SR)
                     tif2mrc_gainref_sr_job.add_inputs(Raw_Gain_Ref_SR)
                     tif2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR, stage_out=True)
-                    self.wf.add_jobs(tif2mrc_gainref_sr_job)
                 elif gainref_extension=="dm":
+                    logger.info("gain reference file extension {} ...".format(gainref_extension))
                     dm2mrc_gainref_sr_job = Job("dm2mrc_gainref")
                     dm2mrc_gainref_sr_job.add_args(Raw_Gain_Ref_SR, Gain_Ref_SR)
                     dm2mrc_gainref_sr_job.add_inputs(Raw_Gain_Ref_SR)
                     dm2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR, stage_out=True)
-                    self.wf.add_jobs(dm2mrc_gainref_sr_job)
                 else:
                     logger.info("Unknown gain reference file extension {} ...".format(gainref_extension))
                     raise
@@ -340,7 +340,12 @@ class PipelineWorkflow:
                 clip_gainref_superres_job.add_args("flipy", Gain_Ref_SR, FlipY_SR)
                 clip_gainref_superres_job.add_inputs(Gain_Ref_SR)
                 clip_gainref_superres_job.add_outputs(FlipY_SR, stage_out=True)
-                
+                if gainref_extension == "tiff":
+                    self.wf.add_jobs(tif2mrc_gainref_sr_job)
+                elif gainref_extension == "dm":
+                    self.wf.add_jobs(dm2mrc_gainref_sr_job)
+                else:
+                    raise
                 self.wf.add_jobs(newstack_gainref_job)
                 self.wf.add_jobs(clip_gainref_job)
                 self.wf.add_jobs(clip_gainref_superres_job)
