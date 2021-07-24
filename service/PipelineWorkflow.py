@@ -115,6 +115,16 @@ class PipelineWorkflow:
                                         runtime="300",
                                         memory="4096"
         )
+        tif2mrc_gainref = Transformation(
+            "tif2mrc_gainref",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/imod_tif2mrc_wrapper.sh"),
+            is_stageable=False
+        )
+        tif2mrc_gainref.add_pegasus_profile( cores="4",
+                                        runtime="300",
+                                        memory="4096"
+        )
         newstack_gainref = Transformation(
             "newstack_gainref",
             site=exec_site_name,
@@ -222,6 +232,7 @@ class PipelineWorkflow:
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         
         self.tc.add_transformations(dm2mrc_gainref)
+        self.tc.add_transformations(tif2mrc_gainref)
         self.tc.add_transformations(newstack_gainref)
         self.tc.add_transformations(clip_gainref)
         self.tc.add_transformations(clip_gainref_superres)
@@ -263,6 +274,9 @@ class PipelineWorkflow:
         #Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, self.rawgainref)
         if len(Raw_Gain_Ref_SR_path) != 0:
             try:
+                # get the extension
+                gainref_extension=Raw_Gain_Ref_SR_path.split('.')[-1]
+                
                 Raw_Gain_Ref_SR_path = Raw_Gain_Ref_SR_path[0]
                 Raw_Gain_Ref_SR_name = os.path.basename(Raw_Gain_Ref_SR_path)
                 logger.info("Found gain reference file {} ...".format(Raw_Gain_Ref_SR_name))
@@ -290,12 +304,24 @@ class PipelineWorkflow:
                 FlipY_path = Gain_Ref_path.replace('_std.mrc','_std.flipy.mrc')
                 FlipY_name = os.path.basename(FlipY_path)
                 FlipY = File(FlipY_name)
-                #convert Superres dm4 file to mrc
+                #convert Superres dm4 or tiff file to mrc
                 #dm2mrc usage: dm2mrc infile outfile
-                dm2mrc_gainref_sr_job = Job("dm2mrc_gainref")
-                dm2mrc_gainref_sr_job.add_args(Raw_Gain_Ref_SR, Gain_Ref_SR)
-                dm2mrc_gainref_sr_job.add_inputs(Raw_Gain_Ref_SR)
-                dm2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR, stage_out=True)
+                #tif2mrc usage: tif2mrc infile outfile
+                if gainref_extension=="tiff":
+                    tif2mrc_gainref_sr_job = Job("tif2mrc_gainref")
+                    tif2mrc_gainref_sr_job.add_args(Raw_Gain_Ref_SR, Gain_Ref_SR)
+                    tif2mrc_gainref_sr_job.add_inputs(Raw_Gain_Ref_SR)
+                    tif2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR, stage_out=True)
+                    self.wf.add_jobs(tif2mrc_gainref_sr_job)
+                elif gainref_extension=="dm":
+                    dm2mrc_gainref_sr_job = Job("dm2mrc_gainref")
+                    dm2mrc_gainref_sr_job.add_args(Raw_Gain_Ref_SR, Gain_Ref_SR)
+                    dm2mrc_gainref_sr_job.add_inputs(Raw_Gain_Ref_SR)
+                    dm2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR, stage_out=True)
+                    self.wf.add_jobs(dm2mrc_gainref_sr_job)
+                else:
+                    logger.info("Unknown gain reference file extension {} ...".format(gainref_extension))
+                    raise
                 #create standard resolution gain ref file from superres gain ref file
                 #newstack usage here (decrease the size of Super resolution image by factor of 2): newstack -bin 2 infile outfile
                 newstack_gainref_job = Job("newstack_gainref")
@@ -314,7 +340,7 @@ class PipelineWorkflow:
                 clip_gainref_superres_job.add_args("flipy", Gain_Ref_SR, FlipY_SR)
                 clip_gainref_superres_job.add_inputs(Gain_Ref_SR)
                 clip_gainref_superres_job.add_outputs(FlipY_SR, stage_out=True)
-                self.wf.add_jobs(dm2mrc_gainref_sr_job)
+                
                 self.wf.add_jobs(newstack_gainref_job)
                 self.wf.add_jobs(clip_gainref_job)
                 self.wf.add_jobs(clip_gainref_superres_job)
