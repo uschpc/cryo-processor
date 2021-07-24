@@ -274,10 +274,11 @@ class PipelineWorkflow:
         #Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, self.rawgainref)
         if len(Raw_Gain_Ref_SR_path) != 0:
             #try:
+                Raw_Gain_Ref_SR_path = Raw_Gain_Ref_SR_path[0]
                 # get the extension
                 gainref_extension=Raw_Gain_Ref_SR_path.split('.')[-1]
                 
-                Raw_Gain_Ref_SR_path = Raw_Gain_Ref_SR_path[0]
+                
                 Raw_Gain_Ref_SR_name = os.path.basename(Raw_Gain_Ref_SR_path)
                 logger.info("Found gain reference file {} ...".format(Raw_Gain_Ref_SR_name))
                 Raw_Gain_Ref_SR = File(Raw_Gain_Ref_SR_name)
