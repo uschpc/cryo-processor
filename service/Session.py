@@ -69,7 +69,7 @@ class Session:
         }
 
 
-    def count_raw_files(self)
+    def count_raw_files(self):
         try:
             log.info("RAW files %s"%self.wf.no_of_raw)
             return self.wf.no_of_raw
@@ -78,7 +78,7 @@ class Session:
             return 0
       
 
-    def count_processed_files(self)
+    def count_processed_files(self):
         try:
             log.info("processed files %s"%self.wf.no_of_processed)
             return self.wf.no_of_processed
