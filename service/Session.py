@@ -35,6 +35,8 @@ class Session:
     _no_of_processed = 0
     _no_of_failed = 0
     _next_processing_time = 0
+    _no_of_raw = 0
+    _no_of_succeeded = 0
 
 
     def __init__(self, config, user, session_id):
@@ -67,13 +69,33 @@ class Session:
         }
 
 
+    def count_raw_files(self)
+        try:
+            log.info("RAW files %s"%self.wf.no_of_raw)
+            return self.wf.no_of_raw
+        except:
+            log.info("self.wf.no_of_raw is not set yet")
+            return 0
+      
+
+    def count_processed_files(self)
+        try:
+            log.info("processed files %s"%self.wf.no_of_processed)
+            return self.wf.no_of_processed
+        except:
+            log.info("self.wf.no_of_processed is not set yet")
+            return 0
+        
+
     def get_status(self):
     
         response = {
             "state": self._state,
             "percent_done": self._percent,
-            "no_of_processed": self._no_of_processed,
-            "no_of_failed": self._no_of_failed
+            "no_of_succeeded": self._no_of_succeeded,
+            "no_of_failed": self._no_of_failed,
+            "nop": self.no_of_processed,
+            "nor": self.no_of_raw
         }
     
         return response
@@ -172,15 +194,19 @@ class Session:
         if status is None or "totals" not in status:
             self._state = self._STATE_NEEDS_PROCESSING
             self._percent = -1
-            self._no_of_processed = 0
+            self._no_of_succeeded = 0
             self._no_of_failed = 0
+            self.no_of_raw = 0
+            self.no_of_processed = 0
             return
         else:
             self._state = self._STATE_PROCESSING
             self._percent = status['dags']['root']['percent_done']
-            self._no_of_processed = status['dags']['root']['succeeded']
-            self._no_of_failed = status['dags']['root']['failed']
+            self._no_of_succeeded = status['dags']['root']['succeeded']
+            self._no_of_failed = status['dags']['root']['failed'],
             #self._no_of_processed = wf.no_of_processed 
+            self.no_of_raw = count_raw_files(),
+            self.no_of_processed = count_processed_files()
             return
 
 
@@ -205,14 +231,18 @@ class Session:
         # FIXME: improve this logic to match the web ui expectations 
         if status is None or "totals" not in status:
             self._percent = -1
-            self._no_of_processed = 0
+            self._no_of_succeeded = 0
             self._no_of_failed = 0
+            self.no_of_raw = 0
+            self.no_of_processed = 0
         else:
             self._state = self._STATE_PROCESSING
             self._percent = status['dags']['root']['percent_done']
-            self._no_of_processed = status['dags']['root']['succeeded']
+            self._no_of_succeeded = status['dags']['root']['succeeded']
             self._no_of_failed = status['dags']['root']['failed']
             #self._no_of_processed = wf.no_of_processed
+            self.no_of_raw = count_raw_files(),
+            self.no_of_processed = count_processed_files()
 
         # is the workflow already running?
         if status is not None:

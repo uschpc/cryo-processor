@@ -26,6 +26,7 @@ class PipelineWorkflow:
     wf_name = None
     wf_dir = None
     inputs_dir = None
+    
 
     # --- Init ----------------------------------------------------------------
     def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=False, cluster_size=10, no_of_files_to_proc_in_cycle=5):
@@ -38,6 +39,7 @@ class PipelineWorkflow:
         self.cluster_size = cluster_size
         self.no_of_files_to_proc_in_cycle = no_of_files_to_proc_in_cycle
         self.no_of_processed = 0
+        self.no_of_raw = 0
 
     # --- Write files in directory --------------------------------------------
     def write(self):
@@ -422,6 +424,9 @@ class PipelineWorkflow:
             #
             file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
             pass
+        
+        #set the number of raw files
+        self.no_of_raw=len(file_list)
 
         for fraction_file_path in file_list:
 
