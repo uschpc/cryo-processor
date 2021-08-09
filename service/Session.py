@@ -32,6 +32,7 @@ class Session:
     # state
     _state = None
     _percent = -1
+    _no_of_processed = 0
     _next_processing_time = 0
 
 
@@ -69,7 +70,8 @@ class Session:
     
         response = {
             "state": self._state,
-            "percent_done": self._percent
+            "percent_done": self._percent,
+            "no_of_processed": self._no_of_processed
         }
     
         return response
@@ -168,10 +170,13 @@ class Session:
         if status is None or "totals" not in status:
             self._state = self._STATE_NEEDS_PROCESSING
             self._percent = -1
+            self._no_of_processed = 0
             return
         else:
             self._state = self._STATE_PROCESSING
             self._percent = status['dags']['root']['percent_done']
+            #self._no_of_processed = status['dags']['root']['succeeded']
+            self._no_of_processed = wf.no_of_processed 
             return
 
 
@@ -196,9 +201,12 @@ class Session:
         # FIXME: improve this logic to match the web ui expectations 
         if status is None or "totals" not in status:
             self._percent = -1
+            self._no_of_processed = 0
         else:
             self._state = self._STATE_PROCESSING
             self._percent = status['dags']['root']['percent_done']
+            #self._no_of_processed = status['dags']['root']['succeeded']
+            self._no_of_processed = wf.no_of_processed
 
         # is the workflow already running?
         if status is not None:

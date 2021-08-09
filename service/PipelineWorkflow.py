@@ -37,6 +37,7 @@ class PipelineWorkflow:
         self.debug = debug
         self.cluster_size = cluster_size
         self.no_of_files_to_proc_in_cycle = no_of_files_to_proc_in_cycle
+        self.no_of_processed = 0
 
     # --- Write files in directory --------------------------------------------
     def write(self):
@@ -524,6 +525,7 @@ class PipelineWorkflow:
             e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True, register_replica=False)
             e2proc2d_job2.add_args(ctf_file, jpg_ctf_file)
             self.wf.add_jobs(e2proc2d_job2)
+            self.no_of_processed+=1
             
             
 
