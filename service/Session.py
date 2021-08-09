@@ -175,8 +175,8 @@ class Session:
         else:
             self._state = self._STATE_PROCESSING
             self._percent = status['dags']['root']['percent_done']
-            #self._no_of_processed = status['dags']['root']['succeeded']
-            self._no_of_processed = wf.no_of_processed 
+            self._no_of_processed = status['dags']['root']['succeeded']
+            #self._no_of_processed = wf.no_of_processed 
             return
 
 
@@ -205,8 +205,8 @@ class Session:
         else:
             self._state = self._STATE_PROCESSING
             self._percent = status['dags']['root']['percent_done']
-            #self._no_of_processed = status['dags']['root']['succeeded']
-            self._no_of_processed = wf.no_of_processed
+            self._no_of_processed = status['dags']['root']['succeeded']
+            #self._no_of_processed = wf.no_of_processed
 
         # is the workflow already running?
         if status is not None:
