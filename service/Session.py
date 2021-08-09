@@ -203,9 +203,8 @@ class Session:
             self._state = self._STATE_PROCESSING
             self._percent = status['dags']['root']['percent_done']
             self._no_of_succeeded = status['dags']['root']['succeeded']
-            self._no_of_failed = status['dags']['root']['failed'],
-            #self._no_of_processed = wf.no_of_processed 
-            self.no_of_raw = self.count_raw_files(),
+            self._no_of_failed = status['dags']['root']['failed']
+            self.no_of_raw = self.count_raw_files()
             self.no_of_processed = self.count_processed_files()
             return
 
@@ -240,8 +239,7 @@ class Session:
             self._percent = status['dags']['root']['percent_done']
             self._no_of_succeeded = status['dags']['root']['succeeded']
             self._no_of_failed = status['dags']['root']['failed']
-            #self._no_of_processed = wf.no_of_processed
-            self.no_of_raw = self.count_raw_files(),
+            self.no_of_raw = self.count_raw_files()
             self.no_of_processed = self.count_processed_files()
 
         # is the workflow already running?
