@@ -33,6 +33,7 @@ class Session:
     _state = None
     _percent = -1
     _no_of_processed = 0
+    _no_of_failed = 0
     _next_processing_time = 0
 
 
