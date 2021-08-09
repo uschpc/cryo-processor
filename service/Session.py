@@ -71,7 +71,7 @@ class Session:
         response = {
             "state": self._state,
             "percent_done": self._percent,
-            "no_of_processed": self._no_of_processed
+            "no_of_processed": self._no_of_processed,
             "no_of_failed": self._no_of_failed
         }
     
