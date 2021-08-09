@@ -205,8 +205,8 @@ class Session:
             self._no_of_succeeded = status['dags']['root']['succeeded']
             self._no_of_failed = status['dags']['root']['failed'],
             #self._no_of_processed = wf.no_of_processed 
-            self.no_of_raw = count_raw_files(),
-            self.no_of_processed = count_processed_files()
+            self.no_of_raw = self.count_raw_files(),
+            self.no_of_processed = self.count_processed_files()
             return
 
 
@@ -241,8 +241,8 @@ class Session:
             self._no_of_succeeded = status['dags']['root']['succeeded']
             self._no_of_failed = status['dags']['root']['failed']
             #self._no_of_processed = wf.no_of_processed
-            self.no_of_raw = count_raw_files(),
-            self.no_of_processed = count_processed_files()
+            self.no_of_raw = self.count_raw_files(),
+            self.no_of_processed = self.count_processed_files()
 
         # is the workflow already running?
         if status is not None:
