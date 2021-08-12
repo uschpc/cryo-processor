@@ -29,13 +29,18 @@ class PipelineWorkflow:
     
 
     # --- Init ----------------------------------------------------------------
-    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=False, cluster_size=10, no_of_files_to_proc_in_cycle=-1):
+    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=False, partition="debug", account="osinski_703", glite_arguments="--gres=gpu:p100:2", maxjobs=100, debug_maxjobs=10, cluster_size=10, no_of_files_to_proc_in_cycle=-1):
         self.wf_name = "motioncor2"
         self.base_dir = base_dir
         self.wf_dir = wf_dir
         self.inputs_dir = inputs_dir
         self.outputs_dir = outputs_dir
         self.debug = debug
+        self.partition = partition
+        self.account = account
+        self.glite_arguments = glite_arguments
+        self.maxjobs = maxjobs
+        self.debug_maxjobs = debug_maxjobs
         self.cluster_size = cluster_size
         self.no_of_files_to_proc_in_cycle = no_of_files_to_proc_in_cycle
         self.no_of_processed = 0
@@ -58,9 +63,9 @@ class PipelineWorkflow:
         self.props["pegasus.transfer.links"] = "True"
         # debug queue means we can not put too many jobs in the queue
         if self.debug:
-            self.props["dagman.maxjobs"] = "5"
+            self.props["dagman.maxjobs"] = self.debug_maxjobs
         else:
-            self.props["dagman.maxjobs"] = "50"
+            self.props["dagman.maxjobs"] = self.maxjobs
         return
         # Help Pegasus developers by sharing performance data (optional)
         self.props["pegasus.monitord.encoding"] = "json"
@@ -87,7 +92,7 @@ class PipelineWorkflow:
             Site(exec_site_name)
             .add_profiles(Namespace.CONDOR, key="grid_resource", value="batch slurm")
             .add_profiles(Namespace.PEGASUS, key="style", value="glite")
-            .add_profiles(Namespace.PEGASUS, key="project", value="osinski_703")
+            .add_profiles(Namespace.PEGASUS, key="project", value=self.account)
             .add_profiles(Namespace.PEGASUS, key="auxillary.local", value=True)
             .add_profiles(Namespace.ENV, key="PEGASUS_HOME", value=os.environ["PEGASUS_HOME"])
             .add_directories(
@@ -97,9 +102,9 @@ class PipelineWorkflow:
             )
         )
         if self.debug:
-            exec_site.add_profiles(Namespace.PEGASUS, key="queue", value="gpu")
+            exec_site.add_profiles(Namespace.PEGASUS, key="queue", value=self.partition)
         else:
-            exec_site.add_profiles(Namespace.PEGASUS, key="queue", value="gpu")
+            exec_site.add_profiles(Namespace.PEGASUS, key="queue", value=self.partition)
 
         self.sc.add_sites(local, exec_site)
 
@@ -195,9 +200,7 @@ class PipelineWorkflow:
         motionCor2.add_pegasus_profile( cores="2",
                                         runtime="600",
                                         memory="4096",
-                                        #use p100 as soon as permanently available
-                                        glite_arguments="--gres=gpu:p100:2"
-                                        #glite_arguments="--gres=gpu:k40:2"
+                                        glite_arguments=self.glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         gctf = Transformation(
@@ -209,8 +212,7 @@ class PipelineWorkflow:
         gctf.add_pegasus_profile( cores="2",
                                         runtime="600",
                                         memory="4096",
-                                        glite_arguments="--gres=gpu:p100:2"
-                                        #glite_arguments="--gres=gpu:k40:1"
+                                        glite_arguments=self.glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         e2proc2d = Transformation(

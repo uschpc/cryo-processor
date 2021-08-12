@@ -270,7 +270,15 @@ class Session:
                                     self._wf_dir,
                                     rawdatadirs,
                                     os.path.join(self._session_dir, "processed"),
-                                    debug=self._config.getboolean("general", "debug"))
+                                    debug=self._config.getboolean("general", "debug"),
+                                    glite_arguments=self._config.getboolean("params", "glite_arguments"),
+                                    maxjobs=self._config.getboolean("params", "maxjobs"),
+                                    debug_maxjobs=self._config.getboolean("params", "debug_maxjobs"),
+                                    partition=self._config.getboolean("params", "partition"),
+                                    account=self._config.getboolean("params", "account"),
+                                    cluster_size=self._config.getboolean("params", "cluster_size"),
+                                    no_of_files_to_proc_in_cycle=self._config.getboolean("params", "no_of_files_to_proc_in_cycle"),
+                                    )
         try:
             self.wf.set_params(self)
         except Exception as e:
