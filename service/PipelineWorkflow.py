@@ -404,7 +404,7 @@ class PipelineWorkflow:
             raw_location=(os.path.join(i, "**"),
                             "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
             self.corrrect_input_dir=i
-            flist = self.find_files2(raw_location)
+            flist = self.find_files2(raw_location[0], raw_location[1])
             if len(flist)>=1:
                 file_list=flist
                 self.raw_location = raw_location
