@@ -71,19 +71,20 @@ class Session:
 
     def count_raw_files(self):
         try:
-            log.info("RAW files %s"%self.wf.no_of_raw)
-            return self.wf.no_of_raw
+            log.info("RAW files %s"%self.wf.raw_location)
+            return len(self.wf.find_files2(self.wf.raw_location))
+            log.info("No. of raw files %i"%len(self.wf.find_files2(self.wf.raw_location)))
         except:
-            log.info("self.wf.no_of_raw is not set yet")
+            log.info("self.wf.raw_location is not set yet")
             return 0
       
 
     def count_processed_files(self):
         try:
-            log.info("processed files %s"%self.wf.no_of_processed)
-            return self.wf.no_of_processed
+            log.info("processed files %s"%self.wf.corrrect_input_dir)
+            return len(self.wf.find_files3(os.path.join(os.path.join(self._session_dir, "processed"),"*DW.mrc"))
         except:
-            log.info("self.wf.no_of_processed is not set yet")
+            log.info("self.wf.corrrect_input_dir is not set yet")
             return 0
         
 

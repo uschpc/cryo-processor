@@ -401,10 +401,12 @@ class PipelineWorkflow:
         #                    os.path.join(self.inputs_dir, "Images-Disc1"),
         #                    "_fractions.tiff$")
         for i in self.inputs_dir:
-            flist = self.find_files2(os.path.join(i, "**"),
-                            "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
+            raw_location=os.path.join(i, "**"),
+                            "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension)
+            flist = self.find_files2(raw_location)
             if len(flist)>=1:
                 file_list=flist
+                self.raw_location = raw_location
                 break
                 
         #file_list = self.find_files2(
@@ -632,18 +634,15 @@ class PipelineWorkflow:
         logger.info(" ... found {} files matching {}".format(len(found_files), regex))
         return found_files
 
-    def find_files3(self, root_dir, regex):
+
+    def find_files3(self, regex):
         '''
         Returns sorted list of files matching regex = root_dir+/+regex (similar to ls)
         Much faster than find_files
         eg. f=find_files2("/project/cryoem/K3_sample_dataset/20210205_mutant/Images-Disc1", "*/Data/*_fractions.tiff") to get all files
         '''
-        search_path=os.path.join(root_dir,regex)
-        logger.info(" ... searching for {} {}".format(search_path, regex))
-        found_files = []
-        for path in Path(root_dir).rglob(regex):
-            found_files.append(path.name)
-        
+
+        found_files=glob.glob(regex, recursive=True)
+        logger.info(" ... searching for {}".format(search_path))
         logger.info(" ... found {} files matching {}".format(len(found_files), regex))
         return found_files
-
