@@ -29,7 +29,7 @@ class PipelineWorkflow:
     
 
     # --- Init ----------------------------------------------------------------
-    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=False, cluster_size=10, no_of_files_to_proc_in_cycle=5):
+    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=False, cluster_size=10, no_of_files_to_proc_in_cycle=-1):
         self.wf_name = "motioncor2"
         self.base_dir = base_dir
         self.wf_dir = wf_dir
@@ -170,7 +170,8 @@ class PipelineWorkflow:
                                         memory="4096"
         )
         if self.debug:
-            self.cluster_size = 1
+            pass
+            #self.cluster_size = 1
         #else:
         #    pass
         # third - let's copy the original jpg file to processed dir:
@@ -412,6 +413,9 @@ class PipelineWorkflow:
         #define filename extension
         self.basename_extension=file_list[0].split('.')[-1]
         
+        #set the number of raw files
+        self.no_of_raw=len(file_list)
+        
         if self.no_of_files_to_proc_in_cycle != -1:
             file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
         
@@ -425,8 +429,7 @@ class PipelineWorkflow:
             file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
             pass
         
-        #set the number of raw files
-        self.no_of_raw=len(file_list)
+
 
         for fraction_file_path in file_list:
 
