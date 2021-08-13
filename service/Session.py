@@ -95,7 +95,7 @@ class Session:
         try:
             pf = self.wf.find_files3(os.path.join(os.path.join(self._session_dir, "processed"),"*DW.mrc"))
             log.info("processed files are in: %s"%os.path.join(os.path.join(self._session_dir, "processed")))
-            log.info("No. of raw files %i"%len(pf)
+            log.info("No. of raw files %i"%len(pf))
             return len(pf)
         except:
             log.info("self._session_dir is not set yet")
