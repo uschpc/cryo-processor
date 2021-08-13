@@ -71,21 +71,31 @@ class Session:
 
     def count_raw_files(self):
         try:
-            log.info("RAW files %s"%self.wf.raw_location)
-            log.info("No. of raw files %i"%len(self.wf.find_files2(self.wf.raw_location)))
-            return len(self.wf.find_files2(self.wf.raw_location))
+            
+            for i in glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*")):
+            raw_location=(os.path.join(i, "**"),
+                            "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
+            corrrect_input_dir=i
+            flist = self.wf.find_files2(raw_location[0], raw_location[1])
+            if len(flist)>=1:
+                file_list=flist
+                self.raw_location = raw_location
+                break
+            log.info("RAW files are in %s"%os.path.join(os.path.join(self._session_dir, "raw"))
+            log.info("No. of raw files %i"%len(file_list)
+            return len(file_list)
         except:
-            log.info("self.wf.raw_location is not set yet")
+            log.info("self.raw_location is not set yet")
             return 0
       
 
     def count_processed_files(self):
         try:
-            log.info("processed files %s"%self.wf.corrrect_input_dir)
+            log.info("processed files are in: %s"%os.path.join(os.path.join(self._session_dir, "processed"))
             log.info("No. of raw files %i"%len(self.wf.find_files3(os.path.join(os.path.join(self._session_dir, "processed"),"*DW.mrc"))))
             return len(self.wf.find_files3(os.path.join(os.path.join(self._session_dir, "processed"),"*DW.mrc")))
         except:
-            log.info("self.wf.corrrect_input_dir is not set yet")
+            log.info("self._session_dir is not set yet")
             return 0
         
 
