@@ -83,8 +83,8 @@ class Session:
                         break
             else:
                 flist = self.wf.find_files2(self.raw_location[0], self.raw_location[1])
-            log.info("RAW files are in %s"%os.path.join(os.path.join(self._session_dir, "raw"))
-            log.info("No. of raw files %i"%len(file_list)
+            log.info("RAW files are in %s"%os.path.join(os.path.join(self._session_dir, "raw")))
+            log.info("No. of raw files %i"%len(file_list))
             return len(file_list)
         except:
             log.info("self.raw_location is not set yet")
