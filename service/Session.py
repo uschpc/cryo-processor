@@ -48,7 +48,7 @@ class Session:
         self._wf_dir = os.path.join(self._session_dir, 'workflow')
         self._run_dir = os.path.join(self._wf_dir, 'motioncor2')
         self._scratch_dir = os.path.join(self._wf_dir, 'scratch')
-
+        self.raw_location = ""
         self._state = self._STATE_UNKNOWN
 
 
@@ -71,16 +71,18 @@ class Session:
 
     def count_raw_files(self):
         try:
-            
-            for i in glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*")):
-            raw_location=(os.path.join(i, "**"),
+            if self.raw_location == "":
+                for i in glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*")):
+                    raw_location=(os.path.join(i, "**"),
                             "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
-            corrrect_input_dir=i
-            flist = self.wf.find_files2(raw_location[0], raw_location[1])
-            if len(flist)>=1:
-                file_list=flist
-                self.raw_location = raw_location
-                break
+                    corrrect_input_dir=i
+                    flist = self.wf.find_files2(raw_location[0], raw_location[1])
+                    if len(flist)>=1:
+                        file_list=flist
+                        self.raw_location = raw_location
+                        break
+            else:
+                flist = self.wf.find_files2(self.raw_location[0], self.raw_location[1])
             log.info("RAW files are in %s"%os.path.join(os.path.join(self._session_dir, "raw"))
             log.info("No. of raw files %i"%len(file_list)
             return len(file_list)
