@@ -36,7 +36,6 @@ class Session:
     _no_of_failed = 0
     _next_processing_time = 0
     _no_of_raw = 0
-    _no_of_succeeded = 0
 
 
     def __init__(self, config, user, session_id):
@@ -48,9 +47,12 @@ class Session:
         self._wf_dir = os.path.join(self._session_dir, 'workflow')
         self._run_dir = os.path.join(self._wf_dir, 'motioncor2')
         self._scratch_dir = os.path.join(self._wf_dir, 'scratch')
-        self.raw_location = ""
         self._state = self._STATE_UNKNOWN
 
+        # defaults to get us started
+        self.basename_prefix = 'FoilHole'
+        self.basename_suffix = 'fractions'
+        self.basename_extension = 'tiff'
 
     def is_valid(self):
         return os.path.exists(self._session_dir)
@@ -71,33 +73,34 @@ class Session:
 
     def count_raw_files(self):
         try:
-            if self.raw_location == "":
-                for i in glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*")):
-                    raw_location=(os.path.join(i, "**"),
-                            "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
-                    corrrect_input_dir=i
-                    flist = self.wf.find_files2(raw_location[0], raw_location[1])
-                    if len(flist)>=1:
-                        file_list=flist
-                        self.raw_location = raw_location
-                        break
+            for i in glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*")):
+                raw_location=(os.path.join(i, "**"),
+                        "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
+                correct_input_dir=i
+                flist = self._find_files(raw_location[0], raw_location[1])
+                if len(flist)>=1:
+                    file_list=flist
+                    self.raw_location = raw_location
+                    break
             else:
-                flist = self.wf.find_files2(self.raw_location[0], self.raw_location[1])
+                flist = self._find_files(self.raw_location[0], self.raw_location[1])
             log.info("RAW files are in %s"%os.path.join(os.path.join(self._session_dir, "raw")))
             log.info("No. of raw files %i"%len(file_list))
             return len(file_list)
-        except:
+        except Exception as e:
+            log.info(e)
             log.info("self.raw_location is not set yet")
             return 0
       
 
     def count_processed_files(self):
         try:
-            pf = self.wf.find_files3(os.path.join(os.path.join(self._session_dir, "processed"),"*DW.mrc"))
+            pf = self._find_files(os.path.join(os.path.join(self._session_dir, "processed"),"*DW.mrc"))
             log.info("processed files are in: %s"%os.path.join(os.path.join(self._session_dir, "processed")))
             log.info("No. of raw files %i"%len(pf))
             return len(pf)
-        except:
+        except Exception as e:
+            log.info(e)
             log.info("self._session_dir is not set yet")
             return 0
         
@@ -107,10 +110,9 @@ class Session:
         response = {
             "state": self._state,
             "percent_done": self._percent,
-            "no_of_succeeded": self._no_of_succeeded,
-            "no_of_failed": self._no_of_failed,
-            "nop": self.no_of_processed,
-            "nor": self.no_of_raw
+            "failed_jobs": self._no_of_failed,
+            "processed_files": self._no_of_processed,
+            "raw_files": self._no_of_raw
         }
     
         return response
@@ -187,9 +189,9 @@ class Session:
         '''
 
         if self._state == self._STATE_UNKNOWN:
-            self._update_unknown()
+            self._update_processing()
         elif self._state == self._STATE_NEEDS_PROCESSING:
-            pass
+            self._update_processing()
         elif self._state == self._STATE_PROCESSING:
             self._update_processing()
         else:
@@ -197,40 +199,16 @@ class Session:
             pass
 
 
-    def _update_unknown(self):
-        # try to determine the state
-
-        wf = Workflow("motioncor2")
-        wf._submit_dir = self._run_dir
-        status = wf.get_status()
-
-        # FIXME: how do we know we have completed?
- 
-        if status is None or "totals" not in status:
-            self._state = self._STATE_NEEDS_PROCESSING
-            self._percent = -1
-            self._no_of_succeeded = 0
-            self._no_of_failed = 0
-            self.no_of_raw = 0
-            self.no_of_processed = 0
-            return
-        else:
-            self._state = self._STATE_PROCESSING
-            self._percent = status['dags']['root']['percent_done']
-            self._no_of_succeeded = status['dags']['root']['succeeded']
-            self._no_of_failed = status['dags']['root']['failed']
-            self.no_of_raw = self.count_raw_files()
-            self.no_of_processed = self.count_processed_files()
-            return
-
-
     def _update_processing(self):
 
+        self._no_of_raw = self.count_raw_files()
+        self._no_of_processed = self.count_processed_files()
+        
+        self._percent = 0
+        if self._no_of_raw > 0:
+            self._percent = (float(self._no_of_processed) / self._no_of_raw) * 100.0
+
         # get the status from Pegasus
-        wf = Workflow("motioncor2")
-        wf._submit_dir = self._run_dir
-        status = wf.get_status()
-    
         # {'dagname': 'motioncor2-0.dag',
         # 'failed': 0,
         # 'percent_done': 100.0,
@@ -241,21 +219,22 @@ class Session:
         # 'state': 'Running',
         # 'succeeded': 22,
         # 'unready': 0}
+        wf = Workflow("motioncor2")
+        wf._submit_dir = self._run_dir
+        try:
+            status = wf.get_status()
+        except:
+            pass
        
         # FIXME: improve this logic to match the web ui expectations 
         if status is None or "totals" not in status:
-            self._percent = -1
+            self._state = self._STATE_NEEDS_PROCESSING
             self._no_of_succeeded = 0
             self._no_of_failed = 0
-            self.no_of_raw = 0
-            self.no_of_processed = 0
         else:
             self._state = self._STATE_PROCESSING
-            self._percent = status['dags']['root']['percent_done']
             self._no_of_succeeded = status['dags']['root']['succeeded']
             self._no_of_failed = status['dags']['root']['failed']
-            self.no_of_raw = self.count_raw_files()
-            self.no_of_processed = self.count_processed_files()
 
         # is the workflow already running?
         if status is not None:
@@ -305,4 +284,16 @@ class Session:
 
         return True
 
+
+    def _find_files(self, root_dir, regex):
+        '''
+        Returns sorted list of files matching regex = root_dir+/+regex (similar to ls)
+        Much faster than find_files
+        eg. f=find_files2("/project/cryoem/K3_sample_dataset/20210205_mutant/Images-Disc1", "*/Data/*_fractions.tiff") to get all files
+        '''
+        search_path=os.path.join(root_dir,regex)
+        found_files=glob.glob(search_path, recursive=True)
+        log.info(" ... searching for {}".format(search_path))
+        log.info(" ... found {} files matching {}".format(len(found_files), regex))
+        return found_files
 
