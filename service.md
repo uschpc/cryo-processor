@@ -46,6 +46,17 @@ Create a config file under `~/.cryoem.conf` with the contents like:
     
     port = 8112
     token = somesecret
+    
+    [params]
+    
+    maxjobs = 50
+    debug_maxjobs = 50
+    partition = gpu
+    account = osinski_703
+    glite_arguments = --gres=gpu:p100:2
+    cluster_size = 10
+    no_of_files_to_proc_in_cycle = -1
+
 
 
 Then simply start the service on discovery1 by running
