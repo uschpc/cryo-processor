@@ -82,7 +82,7 @@ def main_loop():
         # fix for
         # future: <Future finished exception=RuntimeError('dictionary changed size during iteration',)>
         
-        print(app.state.sessions)
+        log.info("Checking on SESSIONS {}".format(app.state.sessions))
         #for sid, session in app.state.sessions:
         for sid, session in app.state.sessions.items():
             log.info("Checking on session {}".format(sid))
