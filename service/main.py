@@ -81,8 +81,10 @@ def main_loop():
         # check on all the tracked sessions
         # fix for
         # future: <Future finished exception=RuntimeError('dictionary changed size during iteration',)>
-        #for sid, session in app.state.sessions.items():
-        for sid, session in app.state.sessions:
+        
+        print(app.state.sessions)
+        #for sid, session in app.state.sessions:
+        for sid, session in app.state.sessions.items():
             log.info("Checking on session {}".format(sid))
             session.update()
             log.info(pprint.pformat(session.get_status()))
