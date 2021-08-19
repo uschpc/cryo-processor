@@ -95,7 +95,7 @@ class Session:
 
     def count_processed_files(self):
         try:
-            pf = self._find_files3(os.path.join(os.path.join(self._session_dir, "processed"),"*DW.mrc"))
+            pf = self._find_files(os.path.join(os.path.join(self._session_dir, "processed"),"*DW.mrc"))
             log.info("processed files are in: %s"%os.path.join(os.path.join(self._session_dir, "processed")))
             log.info("No. of raw files %i"%len(pf))
             return len(pf)
@@ -297,3 +297,14 @@ class Session:
         log.info(" ... found {} files matching {}".format(len(found_files), regex))
         return found_files
 
+    def _find_files3(self, regex):
+        '''
+        Returns sorted list of files matching regex = root_dir+/+regex (similar to ls)
+        Much faster than find_files
+        eg. f=find_files2("/project/cryoem/K3_sample_dataset/20210205_mutant/Images-Disc1", "*/Data/*_fractions.tiff") to get all files
+        '''
+
+        found_files=glob.glob(regex, recursive=True)
+        logger.info(" ... searching for {}".format(search_path))
+        logger.info(" ... found {} files matching {}".format(len(found_files), regex))
+        return found_files
