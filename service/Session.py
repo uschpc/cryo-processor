@@ -95,7 +95,7 @@ class Session:
 
     def count_processed_files(self):
         try:
-            pf = self._find_files(os.path.join(os.path.join(self._session_dir, "processed"),"*DW.mrc"))
+            pf = self._find_files(os.path.join(self._session_dir, "processed"),"*DW.mrc")
             log.info("processed files are in: %s"%os.path.join(os.path.join(self._session_dir, "processed")))
             log.info("No. of raw files %i"%len(pf))
             return len(pf)
