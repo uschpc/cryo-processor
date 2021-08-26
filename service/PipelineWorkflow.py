@@ -63,17 +63,17 @@ class PipelineWorkflow:
         self.props["pegasus.metrics.app"] = self.wf_name
         self.props["pegasus.data.configuration"] = "sharedfs"
         self.props["pegasus.transfer.links"] = "True"
+        self.props["pegasus.stageout.clusters"] = "1000"
+        self.props["pegasus.transfer.refiner"] = "Basic"
         # debug queue means we can not put too many jobs in the queue
+        # Help Pegasus developers by sharing performance data (optional)
+        self.props["pegasus.monitord.encoding"] = "json"
+        self.props["pegasus.catalog.workflow.amqp.url"] = "amqp://friend:donatedata@msgs.pegasus.isi.edu:5672/prod/workflows"
         if self.debug:
             self.props["dagman.maxjobs"] = self.debug_maxjobs
         else:
             self.props["dagman.maxjobs"] = self.maxjobs
         return
-        # Help Pegasus developers by sharing performance data (optional)
-        self.props["pegasus.monitord.encoding"] = "json"
-        self.props["pegasus.catalog.workflow.amqp.url"] = "amqp://friend:donatedata@msgs.pegasus.isi.edu:5672/prod/workflows"
-        self.props["pegasus.stageout.clusters"] = "1000"
-        self.props["pegasus.transfer.refiner"] = "Basic"
 
     # --- Site Catalog --------------------------------------------------------
     def create_sites_catalog(self, exec_site_name="slurm"):
