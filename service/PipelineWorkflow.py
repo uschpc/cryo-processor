@@ -73,6 +73,7 @@ class PipelineWorkflow:
         self.props["pegasus.monitord.encoding"] = "json"
         self.props["pegasus.catalog.workflow.amqp.url"] = "amqp://friend:donatedata@msgs.pegasus.isi.edu:5672/prod/workflows"
         self.props["pegasus.stageout.clusters"] = "1000"
+        self.props["pegasus.transfer.refiner"] = "Basic"
 
     # --- Site Catalog --------------------------------------------------------
     def create_sites_catalog(self, exec_site_name="slurm"):
