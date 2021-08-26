@@ -237,13 +237,14 @@ class PipelineWorkflow:
                                         runtime="300",
                                         memory="2048"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
-        
+        #dealing with gain reference and similar
         self.tc.add_transformations(dm2mrc_gainref)
         self.tc.add_transformations(tif2mrc_gainref)
         self.tc.add_transformations(newstack_gainref)
         self.tc.add_transformations(clip_gainref)
         self.tc.add_transformations(clip_gainref_superres)
         self.tc.add_transformations(dm2mrc_defect_map)
+        #dealing with motioncor and ctf
         #self.tc.add_transformations(copy_jpeg)
         self.tc.add_transformations(motionCor2)
         self.tc.add_transformations(gctf)
@@ -496,7 +497,8 @@ class PipelineWorkflow:
             
             motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
             motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
-            motionCor_job.add_profiles(Namespace.PEGASUS, "clusterer.label.key", "./{}".format(fraction_file_name))
+            motionCor_job.add_profiles(Namespace.PEGASUS, "clusterer.label.key", "{}".format(fraction_file_name))
+            motionCor_job.add_profiles(Namespace.PEGASUS, "pegasus.clusterer.label.key", "{}".format(fraction_file_name))
             self.wf.add_jobs(motionCor_job)
 
             # gctf
@@ -516,7 +518,8 @@ class PipelineWorkflow:
             #gctf_job.add_outputs(ctf_pf_file, stage_out=True, register_replica=True)
             gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=False)
             gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
-            gctf_job.add_profiles(Namespace.PEGASUS, "clusterer.label.key", "./{}".format(fraction_file_name))
+            gctf_job.add_profiles(Namespace.PEGASUS, "clusterer.label.key", "{}".format(fraction_file_name))
+            gctf_job.add_profiles(Namespace.PEGASUS, "pegasus.clusterer.label.key", "{}".format(fraction_file_name))
             self.wf.add_jobs(gctf_job)
 
             # e2proc2d - motion-corrected to jpg, then resize to 20% size
@@ -526,7 +529,8 @@ class PipelineWorkflow:
             e2proc2d_job1.add_inputs(dw_file)
             e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
             e2proc2d_job1.add_args("--average", dw_file, dw_jpg_file)
-            e2proc2d_job1.add_profiles(Namespace.PEGASUS, "clusterer.label.key", "./{}".format(fraction_file_name))
+            e2proc2d_job1.add_profiles(Namespace.PEGASUS, "clusterer.label.key", "{}".format(fraction_file_name))
+            e2proc2d_job1.add_profiles(Namespace.PEGASUS, "pegasus.clusterer.label.key", "{}".format(fraction_file_name))
             self.wf.add_jobs(e2proc2d_job1)
             
             #imagemagick - resize the input jpg from about 5k to 1k px
@@ -535,7 +539,8 @@ class PipelineWorkflow:
             magick_resize.add_inputs(dw_jpg_file)
             magick_resize.add_outputs(magick_jpg_file, stage_out=True, register_replica=False)
             magick_resize.add_args("convert", "-resize", '20%', dw_jpg_file, magick_jpg_file)
-            magick_resize.add_profiles(Namespace.PEGASUS, "clusterer.label.key", "./{}".format(fraction_file_name))
+            magick_resize.add_profiles(Namespace.PEGASUS, "clusterer.label.key", "{}".format(fraction_file_name))
+            magick_resize.add_profiles(Namespace.PEGASUS, "pegasus.clusterer.label.key", "{}".format(fraction_file_name))
             self.wf.add_jobs(magick_resize)
             
             
@@ -545,7 +550,8 @@ class PipelineWorkflow:
             e2proc2d_job2.add_inputs(ctf_file)
             e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True, register_replica=False)
             e2proc2d_job2.add_args(ctf_file, jpg_ctf_file)
-            e2proc2d_job2.add_profiles(Namespace.PEGASUS, "clusterer.label.key", "./{}".format(fraction_file_name))
+            e2proc2d_job2.add_profiles(Namespace.PEGASUS, "clusterer.label.key", "{}".format(fraction_file_name))
+            e2proc2d_job2.add_profiles(Namespace.PEGASUS, "pegasus.clusterer.label.key", "{}".format(fraction_file_name))
             self.wf.add_jobs(e2proc2d_job2)
             
             #imagemagick - stitch together resized jpg and ctf
@@ -555,7 +561,8 @@ class PipelineWorkflow:
             magick_convert.add_inputs(jpg_ctf_file)
             magick_convert.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
             magick_convert.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
-            magick_convert.add_profiles(Namespace.PEGASUS, "clusterer.label.key", "./{}".format(fraction_file_name))
+            magick_convert.add_profiles(Namespace.PEGASUS, "clusterer.label.key", "{}".format(fraction_file_name))
+            magick_convert.add_profiles(Namespace.PEGASUS, "pegasus.clusterer.label.key", "{}".format(fraction_file_name))
             self.wf.add_jobs(magick_convert)
             
             self.no_of_processed+=1
