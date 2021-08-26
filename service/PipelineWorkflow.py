@@ -630,7 +630,7 @@ class PipelineWorkflow:
                      output_sites=["local"],
                      dir=os.getcwd(),
                      relative_dir=self.wf_name,
-                     cluster=["horizontal"]
+                     cluster=["label"]
                     )
 
 
