@@ -63,7 +63,7 @@ class PipelineWorkflow:
         self.props["pegasus.metrics.app"] = self.wf_name
         self.props["pegasus.data.configuration"] = "sharedfs"
         self.props["pegasus.transfer.links"] = "True"
-        self.props["pegasus.stageout.clusters"] = "1000"
+        self.props["pegasus.stageout.clusters"] = "100"
         self.props["pegasus.transfer.refiner"] = "Basic"
         # debug queue means we can not put too many jobs in the queue
         # Help Pegasus developers by sharing performance data (optional)
@@ -240,6 +240,28 @@ class PipelineWorkflow:
                                         runtime="300",
                                         memory="2048"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        
+        grep_wrapper = Transformation(
+            "grep_wrapper",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/grep_wrapper.sh"),
+            is_stageable=False
+        )
+        grep_wrapper.add_pegasus_profile( cores="1",
+                                        runtime="300",
+                                        memory="2048"
+        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        
+        slack_notify = Transformation(
+            "slack_notify",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/slack_notify.sh"),
+            is_stageable=False
+        )
+        slack_notify.add_pegasus_profile( cores="1",
+                                        runtime="300",
+                                        memory="2048"
+        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         #dealing with gain reference and similar
         self.tc.add_transformations(dm2mrc_gainref)
         self.tc.add_transformations(tif2mrc_gainref)
@@ -253,6 +275,8 @@ class PipelineWorkflow:
         self.tc.add_transformations(gctf)
         self.tc.add_transformations(e2proc2d)
         self.tc.add_transformations(magick)
+        self.tc.add_transformations(grep_wrapper)
+        self.tc.add_transformations(slack_notify)
 
     # --- Replica Catalog ------------------------------------------------------
     def create_replica_catalog(self,exec_site_name="slurm"):
@@ -448,13 +472,6 @@ class PipelineWorkflow:
             fraction_file = File(fraction_file_name)
             self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))
 
-            # generated files will be named based on the input
-            basename = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name)
-
-            mrc_file_name="{}.mrc".format(basename)
-            dw_file_name="{}_DW.mrc".format(basename)
-            mrc_file = File(mrc_file_name)
-            dw_file = File(dw_file_name)
 
             ##find and copy the jpeg file 
             ## 2021-07-23; TO; skipping temprarily due to the uncertain location of the file
@@ -469,6 +486,18 @@ class PipelineWorkflow:
             #copy_jpeg_job.add_inputs(jpeg_file)
             #copy_jpeg_job.add_outputs(jpeg_file_out, stage_out=True, register_replica=False)
             #self.wf.add_jobs(copy_jpeg_job)
+
+            # generated files will be named based on the input
+            basename = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name)
+            mrc_file_name="{}.mrc".format(basename)
+            dw_file_name="{}_DW.mrc".format(basename)
+            mc2_stdout_file_name="{}_DW.stdout.txt".format(basename)
+            mc2_stderr_file_name="{}_DW.stderr.txt".format(basename)
+            mrc_file = File(mrc_file_name)
+            dw_file = File(dw_file_name)
+            mc2_stdout = File(mc2_stdout_file_name)
+            mc2_stderr = File(mc2_stderr_file_name)
+
 
             # MotionCor2
             #adjust for one of three different extensions: mrc, tiff or eer
@@ -487,19 +516,20 @@ class PipelineWorkflow:
                 motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
                     mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5 -RotGain 2",
                     "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 1 -Serial 0",
-                    "-OutStack 0", "-SumRange 0 0")
+                    "-OutStack 0", "-SumRange 0 0", ">", mc2_stdout, "2>", mc2_stderr)
                 motionCor_job.add_inputs(fraction_file, FlipY)
             else:
                 #case where we do not have gain referencee file
                 motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
                     mrc_file, "-Iter 7 -Tol 0.5 -RotGain 2",
                     "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 1 -Serial 0",
-                    "-OutStack 0", "-SumRange 0 0")
+                    "-OutStack 0", "-SumRange 0 0", ">", mc2_stdout, "2>", mc2_stderr)
                 motionCor_job.add_inputs(fraction_file)
-
             
             motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
             motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
+            motionCor_job.add_outputs(mc2_stdout, stage_out=True, register_replica=False)
+            motionCor_job.add_outputs(mc2_stderr, stage_out=True, register_replica=False)
             motionCor_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(motionCor_job)
 
@@ -561,6 +591,34 @@ class PipelineWorkflow:
             magick_convert.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
             magick_convert.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(magick_convert)
+            
+            # #prepare text output - shifts from motioncor2
+            # magick_combined_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg"))
+            # grep_wrapper_shifts = Job("grep_wrapper")
+            # grep_wrapper_shifts.add_inputs(mc2_stdout)
+            # grep_wrapper_shifts.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
+            # grep_wrapper_shifts.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
+            # grep_wrapper_shifts.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # self.wf.add_jobs(grep_wrapper_shifts)
+            
+            # #prepare text output - estimated resolution from ctf
+            # magick_combined_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg"))
+            # grep_wrapper_ctf_reso = Job("grep_wrapper")
+            # grep_wrapper_ctf_reso.add_inputs(mc2_stdout)
+            # grep_wrapper_ctf_reso.add_inputs(jpg_ctf_file)
+            # grep_wrapper_ctf_reso.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
+            # grep_wrapper_ctf_reso.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
+            # grep_wrapper_ctf_reso.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # self.wf.add_jobs(grep_wrapper_ctf_reso)
+            
+            #send notification to the slack channel
+            slack_notify = Job("slack_notify")
+            slack_notify.add_inputs(fraction_file_path)
+            slack_notify.add_inputs(mc2_stdout)
+            slack_notify.add_inputs(gctf_log_file)
+            slack_notify.add_args(fraction_file_path, mc2_stdout, gctf_log_file)
+            slack_notify.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            self.wf.add_jobs(slack_notify)
             
             self.no_of_processed+=1
             label_counter+=1
