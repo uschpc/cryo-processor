@@ -33,7 +33,7 @@ class PipelineWorkflow:
         self.wf_name = "motioncor2"
         self.debug = debug
         logger.info("PipelineWorkflow init")
-        logger.info("debug {}".format(i, self.debug))
+        logger.info("debug {}".format(self.debug))
         self.base_dir = base_dir
         self.wf_dir = wf_dir
         self.inputs_dir = inputs_dir
@@ -47,18 +47,18 @@ class PipelineWorkflow:
         self.cluster_size = cluster_size
         self.no_of_files_to_proc_in_cycle = no_of_files_to_proc_in_cycle
         if self.debug:
-            logger.info("sbase_dir {}".format(i, self.base_dir))
-            logger.info("wf_dir {}".format(i, self.wf_dir))
-            logger.info("inputs_dir {}".format(i, self.inputs_dir))
-            logger.info("outputs_dir {}".format(i, self.outputs_dir))
-            logger.info("partition {}".format(i, self.partition))
-            logger.info("account {}".format(i, self.account))
-            logger.info("glite_arguments {}".format(i, self.glite_arguments))
-            logger.info("pgss_stgt_clusters {}".format(i, self.pgss_stgt_clusters))
-            logger.info("maxjobs {}".format(i, self.maxjobs))
-            logger.info("debug_maxjobs {}".format(i, self.debug_maxjobs))
-            logger.info("cluster_size {}".format(i, self.cluster_size))
-            logger.info("no_of_files_to_proc_in_cycle {}".format(i, self.no_of_files_to_proc_in_cycle))
+            logger.info("sbase_dir {}".format(self.base_dir))
+            logger.info("wf_dir {}".format(self.wf_dir))
+            logger.info("inputs_dir {}".format(self.inputs_dir))
+            logger.info("outputs_dir {}".format(self.outputs_dir))
+            logger.info("partition {}".format(self.partition))
+            logger.info("account {}".format(self.account))
+            logger.info("glite_arguments {}".format(self.glite_arguments))
+            logger.info("pgss_stgt_clusters {}".format(self.pgss_stgt_clusters))
+            logger.info("maxjobs {}".format(self.maxjobs))
+            logger.info("debug_maxjobs {}".format(self.debug_maxjobs))
+            logger.info("cluster_size {}".format(self.cluster_size))
+            logger.info("no_of_files_to_proc_in_cycle {}".format(self.no_of_files_to_proc_in_cycle))
         
         self.no_of_processed = 0
         self.no_of_raw = 0
