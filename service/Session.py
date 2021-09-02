@@ -270,6 +270,7 @@ class Session:
                                     debug_maxjobs=self._config.get("params", "debug_maxjobs"),
                                     partition=self._config.get("params", "partition"),
                                     account=self._config.get("params", "account"),
+                                    pgss_stgt_clusters=self._config.get("params", "pegasus_stageout_clusters"),
                                     cluster_size=self._config.get("params", "cluster_size"),
                                     no_of_files_to_proc_in_cycle=self._config.get("params", "no_of_files_to_proc_in_cycle"),
                                     )

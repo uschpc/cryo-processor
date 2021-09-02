@@ -29,7 +29,7 @@ class PipelineWorkflow:
     
 
     # --- Init ----------------------------------------------------------------
-    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=False, partition="debug", account="osinski_703", glite_arguments="--gres=gpu:p100:2", maxjobs=100, debug_maxjobs=10, cluster_size=10, no_of_files_to_proc_in_cycle=-1):
+    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=False, partition="debug", account="osinski_703", glite_arguments="--gres=gpu:p100:2", maxjobs=100, debug_maxjobs=10, pgss_stgt_clusters=10, cluster_size=10, no_of_files_to_proc_in_cycle=-1):
         self.wf_name = "motioncor2"
         self.base_dir = base_dir
         self.wf_dir = wf_dir
@@ -39,6 +39,7 @@ class PipelineWorkflow:
         self.partition = partition
         self.account = account
         self.glite_arguments = glite_arguments
+        self.self.pgss_stgt_clusters = pgss_stgt_clusters
         self.maxjobs = maxjobs
         self.debug_maxjobs = debug_maxjobs
         self.cluster_size = cluster_size
@@ -63,7 +64,7 @@ class PipelineWorkflow:
         self.props["pegasus.metrics.app"] = self.wf_name
         self.props["pegasus.data.configuration"] = "sharedfs"
         self.props["pegasus.transfer.links"] = "True"
-        self.props["pegasus.stageout.clusters"] = "10"
+        self.props["pegasus.stageout.clusters"] = self.pgss_stgt_clusters
         self.props["pegasus.transfer.refiner"] = "Basic"
         # debug queue means we can not put too many jobs in the queue
         # Help Pegasus developers by sharing performance data (optional)
