@@ -81,7 +81,7 @@ class PipelineWorkflow:
         self.props["pegasus.data.configuration"] = "sharedfs"
         self.props["pegasus.transfer.links"] = "True"
         self.props["pegasus.stageout.clusters"] = self.pgss_stgt_clusters
-        self.props["pegasus.transfer.refiner"] = "Basic"
+        #self.props["pegasus.transfer.refiner"] = "Basic"
         # debug queue means we can not put too many jobs in the queue
         # Help Pegasus developers by sharing performance data (optional)
         self.props["pegasus.monitord.encoding"] = "json"
@@ -547,6 +547,8 @@ class PipelineWorkflow:
             motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
             motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
             motionCor_job.add_outputs(mc2_stdout, stage_out=True, register_replica=False)
+            #job.set_stdout(<str | file object>)
+
             motionCor_job.add_outputs(mc2_stderr, stage_out=True, register_replica=False)
             motionCor_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(motionCor_job)
