@@ -592,33 +592,33 @@ class PipelineWorkflow:
             magick_convert.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(magick_convert)
             
-            # #prepare text output - shifts from motioncor2
-            # magick_combined_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg"))
-            # grep_wrapper_shifts = Job("grep_wrapper")
-            # grep_wrapper_shifts.add_inputs(mc2_stdout)
-            # grep_wrapper_shifts.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
-            # grep_wrapper_shifts.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
-            # grep_wrapper_shifts.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            # self.wf.add_jobs(grep_wrapper_shifts)
+            # # #prepare text output - shifts from motioncor2
+            # # magick_combined_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg"))
+            # # grep_wrapper_shifts = Job("grep_wrapper")
+            # # grep_wrapper_shifts.add_inputs(mc2_stdout)
+            # # grep_wrapper_shifts.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
+            # # grep_wrapper_shifts.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
+            # # grep_wrapper_shifts.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # # self.wf.add_jobs(grep_wrapper_shifts)
             
-            # #prepare text output - estimated resolution from ctf
-            # magick_combined_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg"))
-            # grep_wrapper_ctf_reso = Job("grep_wrapper")
-            # grep_wrapper_ctf_reso.add_inputs(mc2_stdout)
-            # grep_wrapper_ctf_reso.add_inputs(jpg_ctf_file)
-            # grep_wrapper_ctf_reso.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
-            # grep_wrapper_ctf_reso.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
-            # grep_wrapper_ctf_reso.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            # self.wf.add_jobs(grep_wrapper_ctf_reso)
+            # # #prepare text output - estimated resolution from ctf
+            # # magick_combined_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg"))
+            # # grep_wrapper_ctf_reso = Job("grep_wrapper")
+            # # grep_wrapper_ctf_reso.add_inputs(mc2_stdout)
+            # # grep_wrapper_ctf_reso.add_inputs(jpg_ctf_file)
+            # # grep_wrapper_ctf_reso.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
+            # # grep_wrapper_ctf_reso.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
+            # # grep_wrapper_ctf_reso.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # # self.wf.add_jobs(grep_wrapper_ctf_reso)
             
-            #send notification to the slack channel
-            slack_notify_job = Job("slack_notify")
-            slack_notify_job.add_inputs(fraction_file_path)
-            slack_notify_job.add_inputs(mc2_stdout)
-            slack_notify_job.add_inputs(gctf_log_file)
-            slack_notify_job.add_args(fraction_file_path, mc2_stdout, gctf_log_file)
-            slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            self.wf.add_jobs(slack_notify_job)
+            # #send notification to the slack channel
+            # slack_notify_job = Job("slack_notify")
+            # slack_notify_job.add_inputs(fraction_file_path)
+            # slack_notify_job.add_inputs(mc2_stdout)
+            # slack_notify_job.add_inputs(gctf_log_file)
+            # slack_notify_job.add_args(fraction_file_path, mc2_stdout, gctf_log_file)
+            # slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # self.wf.add_jobs(slack_notify_job)
             
             self.no_of_processed+=1
             label_counter+=1
