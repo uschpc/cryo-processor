@@ -63,7 +63,7 @@ class PipelineWorkflow:
         self.props["pegasus.metrics.app"] = self.wf_name
         self.props["pegasus.data.configuration"] = "sharedfs"
         self.props["pegasus.transfer.links"] = "True"
-        self.props["pegasus.stageout.clusters"] = "100"
+        self.props["pegasus.stageout.clusters"] = "10"
         self.props["pegasus.transfer.refiner"] = "Basic"
         # debug queue means we can not put too many jobs in the queue
         # Help Pegasus developers by sharing performance data (optional)
@@ -614,7 +614,6 @@ class PipelineWorkflow:
             
             #send notification to the slack channel
             slack_notify_job = Job("slack_notify")
-            #slack_notify_job.add_inputs(fraction_file_path)
             slack_notify_job.add_inputs(mc2_stdout)
             slack_notify_job.add_inputs(gctf_log_file)
             slack_notify_job.add_args(fraction_file_path, mc2_stdout, gctf_log_file)
