@@ -262,6 +262,7 @@ class PipelineWorkflow:
                                         runtime="300",
                                         memory="2048"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        
         #dealing with gain reference and similar
         self.tc.add_transformations(dm2mrc_gainref)
         self.tc.add_transformations(tif2mrc_gainref)
@@ -611,14 +612,14 @@ class PipelineWorkflow:
             # # grep_wrapper_ctf_reso.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             # # self.wf.add_jobs(grep_wrapper_ctf_reso)
             
-            # #send notification to the slack channel
-            # slack_notify_job = Job("slack_notify")
-            # slack_notify_job.add_inputs(fraction_file_path)
-            # slack_notify_job.add_inputs(mc2_stdout)
-            # slack_notify_job.add_inputs(gctf_log_file)
-            # slack_notify_job.add_args(fraction_file_path, mc2_stdout, gctf_log_file)
-            # slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            # self.wf.add_jobs(slack_notify_job)
+            #send notification to the slack channel
+            slack_notify_job = Job("slack_notify")
+            #slack_notify_job.add_inputs(fraction_file_path)
+            slack_notify_job.add_inputs(mc2_stdout)
+            slack_notify_job.add_inputs(gctf_log_file)
+            slack_notify_job.add_args(fraction_file_path, mc2_stdout, gctf_log_file)
+            slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            self.wf.add_jobs(slack_notify_job)
             
             self.no_of_processed+=1
             label_counter+=1
