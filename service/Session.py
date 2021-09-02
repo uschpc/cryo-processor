@@ -42,8 +42,8 @@ class Session:
         self._config = config
         self._user = user
         self._session_id = session_id
-
         self._session_dir = os.path.join(config.get('general', 'session_dir'), self._user, self._session_id)
+
         self._wf_dir = os.path.join(self._session_dir, 'workflow')
         self._run_dir = os.path.join(self._wf_dir, 'motioncor2')
         self._scratch_dir = os.path.join(self._wf_dir, 'scratch')
@@ -266,13 +266,13 @@ class Session:
                                     os.path.join(self._session_dir, "processed"),
                                     debug=self._config.getboolean("general", "debug"),
                                     glite_arguments=self._config.get("params", "glite_arguments"),
-                                    maxjobs=self._config.get("params", "maxjobs"),
-                                    debug_maxjobs=self._config.get("params", "debug_maxjobs"),
+                                    maxjobs=self._config.getint("params", "maxjobs"),
+                                    debug_maxjobs=self._config.getint("params", "debug_maxjobs"),
                                     partition=self._config.get("params", "partition"),
                                     account=self._config.get("params", "account"),
-                                    pgss_stgt_clusters=self._config.get("params", "pegasus_stageout_clusters"),
-                                    cluster_size=self._config.get("params", "cluster_size"),
-                                    no_of_files_to_proc_in_cycle=self._config.get("params", "no_of_files_to_proc_in_cycle"),
+                                    pgss_stgt_clusters=self._config.getint("params", "pegasus_stageout_clusters"),
+                                    cluster_size=self._config.getint("params", "cluster_size"),
+                                    no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
                                     )
         try:
             self.wf.set_params(self)
