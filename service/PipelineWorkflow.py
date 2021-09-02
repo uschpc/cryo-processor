@@ -31,11 +31,13 @@ class PipelineWorkflow:
     # --- Init ----------------------------------------------------------------
     def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=False, partition="debug", account="osinski_703", glite_arguments="--gres=gpu:p100:2", maxjobs=100, debug_maxjobs=10, pgss_stgt_clusters=10, cluster_size=10, no_of_files_to_proc_in_cycle=-1):
         self.wf_name = "motioncor2"
+        self.debug = debug
+        logger.info("PipelineWorkflow init")
+        logger.info("debug {}".format(i, self.debug))
         self.base_dir = base_dir
         self.wf_dir = wf_dir
         self.inputs_dir = inputs_dir
         self.outputs_dir = outputs_dir
-        self.debug = debug
         self.partition = partition
         self.account = account
         self.glite_arguments = glite_arguments
@@ -44,6 +46,20 @@ class PipelineWorkflow:
         self.debug_maxjobs = debug_maxjobs
         self.cluster_size = cluster_size
         self.no_of_files_to_proc_in_cycle = no_of_files_to_proc_in_cycle
+        if self.debug:
+            logger.info("sbase_dir {}".format(i, self.base_dir))
+            logger.info("wf_dir {}".format(i, self.wf_dir))
+            logger.info("inputs_dir {}".format(i, self.inputs_dir))
+            logger.info("outputs_dir {}".format(i, self.outputs_dir))
+            logger.info("partition {}".format(i, self.partition))
+            logger.info("account {}".format(i, self.account))
+            logger.info("glite_arguments {}".format(i, self.glite_arguments))
+            logger.info("pgss_stgt_clusters {}".format(i, self.pgss_stgt_clusters))
+            logger.info("maxjobs {}".format(i, self.maxjobs))
+            logger.info("debug_maxjobs {}".format(i, self.debug_maxjobs))
+            logger.info("cluster_size {}".format(i, self.cluster_size))
+            logger.info("no_of_files_to_proc_in_cycle {}".format(i, self.no_of_files_to_proc_in_cycle))
+        
         self.no_of_processed = 0
         self.no_of_raw = 0
         self.processed = []
@@ -515,17 +531,17 @@ class PipelineWorkflow:
             
             if len(Raw_Gain_Ref_SR_path) != 0:
                 #case where we have gain referencee file
-                motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
+                motionCor_job = Job("MotionCor2").add_args(mc2_stdout, mc2_stderr, mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
                     mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5 -RotGain 2",
                     "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 1 -Serial 0",
-                    "-OutStack 0", "-SumRange 0 0", ">", mc2_stdout, "2>", mc2_stderr)
+                    "-OutStack 0", "-SumRange 0 0")
                 motionCor_job.add_inputs(fraction_file, FlipY)
             else:
                 #case where we do not have gain referencee file
-                motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
+                motionCor_job = Job("MotionCor2").add_args(mc2_stdout, mc2_stderr, mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
                     mrc_file, "-Iter 7 -Tol 0.5 -RotGain 2",
                     "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 1 -Serial 0",
-                    "-OutStack 0", "-SumRange 0 0", ">", mc2_stdout, "2>", mc2_stderr)
+                    "-OutStack 0", "-SumRange 0 0")
                 motionCor_job.add_inputs(fraction_file)
             
             motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
