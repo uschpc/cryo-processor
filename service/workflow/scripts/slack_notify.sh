@@ -11,8 +11,7 @@ shifts=`cat ${mc2_output} | grep "...... Frame"`
 
 message="Estimated resolution limit: $resolution\nMotion correction shifts:\n${shifts}"
 
-curl --data-urlencode "file=${filepath}" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'
-curl --data-urlencode "message=${message}" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postmessage.php'
+curl --data-urlencode "file=${filepath}" --data-urlencode "message=${message}" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'
 
 exit $?
 
