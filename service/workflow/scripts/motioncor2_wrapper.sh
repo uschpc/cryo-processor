@@ -17,12 +17,13 @@ export CUDA_ROOT=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/cuda-10.0.130-t6gcqr
 
 export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/motioncor2-1.2.3/bin:$PATH
 
-mc_stdout=$1
-mc_stderr=$2
-shift
-shift
+##mc_stdout=$1
+##mc_stderr=$2
+##shift
+##shift
 
-MotionCor2 "$@" >$mc_stdout 2>$mc_stderr
+##MotionCor2 "$@" >$mc_stdout 2>$mc_stderr
+MotionCor2 "$@"
 
 exit $?
 

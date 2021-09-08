@@ -288,7 +288,7 @@ class PipelineWorkflow:
         self.tc.add_transformations(clip_gainref_superres)
         self.tc.add_transformations(dm2mrc_defect_map)
         #dealing with motioncor and ctf
-        #self.tc.add_transformations(copy_jpeg)
+        #self.tc.add_transformations(copy_jpeg) # cannot be used; might be removed soon
         self.tc.add_transformations(motionCor2)
         self.tc.add_transformations(gctf)
         self.tc.add_transformations(e2proc2d)
@@ -300,7 +300,6 @@ class PipelineWorkflow:
     def create_replica_catalog(self,exec_site_name="slurm"):
         self.rc = ReplicaCatalog()
 
-        
 
     # --- Create Workflow -----------------------------------------------------
     def create_workflow(self):
@@ -326,91 +325,86 @@ class PipelineWorkflow:
                 break
         #Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, self.rawgainref)
         if len(Raw_Gain_Ref_SR_path) != 0:
-            #try:
-                Raw_Gain_Ref_SR_path = Raw_Gain_Ref_SR_path[0]
-                # get the extension
-                gainref_extension=Raw_Gain_Ref_SR_path.split('.')[-1]
-                
-                
-                Raw_Gain_Ref_SR_name = os.path.basename(Raw_Gain_Ref_SR_path)
-                logger.info("Found gain reference file {} ...".format(Raw_Gain_Ref_SR_name))
-                Raw_Gain_Ref_SR = File(Raw_Gain_Ref_SR_name)
-                Gain_Ref_SR_path = "%s_sr.%s"%(".".join(Raw_Gain_Ref_SR_path.split(".")[:-1]), "mrc")
-                Gain_Ref_SR_name = os.path.basename(Gain_Ref_SR_path)
-                Gain_Ref_SR = File(Gain_Ref_SR_name)
-                self.rc.add_replica("slurm", Raw_Gain_Ref_SR_name, "file://{}".format(Raw_Gain_Ref_SR_path))
-        
-                #define Gain reference output filename
-                #TODO: improve lines below
-                Gain_Ref_path = Gain_Ref_SR_path.replace('_sr.mrc','_std.mrc')
-                Gain_Ref_name = os.path.basename(Gain_Ref_path)
-                Gain_Ref = File(Gain_Ref_name)
-        
-                #define flip Y Super resolution output filename
-                #TODO: improve lines below
-                FlipY_SR_path = Gain_Ref_SR_path.replace('_sr.mrc','_sr.flipy.mrc')
-                #logger.info(" ... found {} ".format(FlipY_SR_path))
-                FlipY_SR_name = os.path.basename(FlipY_SR_path)
-                FlipY_SR = File(FlipY_SR_name)
-        
-                #define flip Y std resolution output filename
-                #TODO: improve lines below
-                FlipY_path = Gain_Ref_path.replace('_std.mrc','_std.flipy.mrc')
-                FlipY_name = os.path.basename(FlipY_path)
-                FlipY = File(FlipY_name)
-                #convert Superres dm4 or tiff file to mrc
-                #dm2mrc usage: dm2mrc infile outfile
-                #tif2mrc usage: tif2mrc infile outfile
-                if gainref_extension=="tiff":
-                    logger.info("gain reference file extension {} ...".format(gainref_extension))
-                    tif2mrc_gainref_sr_job = Job("tif2mrc_gainref")
-                    tif2mrc_gainref_sr_job.add_args(Raw_Gain_Ref_SR, Gain_Ref_SR)
-                    tif2mrc_gainref_sr_job.add_inputs(Raw_Gain_Ref_SR)
-                    tif2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR, stage_out=True)
-                elif gainref_extension=="dm":
-                    logger.info("gain reference file extension {} ...".format(gainref_extension))
-                    dm2mrc_gainref_sr_job = Job("dm2mrc_gainref")
-                    dm2mrc_gainref_sr_job.add_args(Raw_Gain_Ref_SR, Gain_Ref_SR)
-                    dm2mrc_gainref_sr_job.add_inputs(Raw_Gain_Ref_SR)
-                    dm2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR, stage_out=True)
-                else:
-                    logger.info("Unknown gain reference file extension {} ...".format(gainref_extension))
-                    raise
-                #create standard resolution gain ref file from superres gain ref file
-                #newstack usage here (decrease the size of Super resolution image by factor of 2): newstack -bin 2 infile outfile
-                newstack_gainref_job = Job("newstack_gainref")
-                newstack_gainref_job.add_args("-bin", "2", Gain_Ref_SR, Gain_Ref)
-                newstack_gainref_job.add_inputs(Gain_Ref_SR)
-                newstack_gainref_job.add_outputs(Gain_Ref, stage_out=True)
-                #flip both gain reference files on y axis
-                #clip usage here (flip img on Y axis): clip flipy infile outfile
-                #std resolution
-                clip_gainref_job = Job("clip_gainref")
-                clip_gainref_job.add_args("flipy", Gain_Ref, FlipY)
-                clip_gainref_job.add_inputs(Gain_Ref)
-                clip_gainref_job.add_outputs(FlipY, stage_out=True)
-                #super resolution
-                clip_gainref_superres_job = Job("clip_gainref_superres")
-                clip_gainref_superres_job.add_args("flipy", Gain_Ref_SR, FlipY_SR)
-                clip_gainref_superres_job.add_inputs(Gain_Ref_SR)
-                clip_gainref_superres_job.add_outputs(FlipY_SR, stage_out=True)
-                if gainref_extension == "tiff":
-                    self.wf.add_jobs(tif2mrc_gainref_sr_job)
-                elif gainref_extension == "dm":
-                    self.wf.add_jobs(dm2mrc_gainref_sr_job)
-                else:
-                    raise
-                self.wf.add_jobs(newstack_gainref_job)
-                self.wf.add_jobs(clip_gainref_job)
-                self.wf.add_jobs(clip_gainref_superres_job)
-            #except:
-            #    logger.info("Raw_Gain_Ref_SR_path {} ...".format(Raw_Gain_Ref_SR_path))
+            Raw_Gain_Ref_SR_path = Raw_Gain_Ref_SR_path[0]
+            # get the extension
+            gainref_extension=Raw_Gain_Ref_SR_path.split('.')[-1]
+            
+            
+            Raw_Gain_Ref_SR_name = os.path.basename(Raw_Gain_Ref_SR_path)
+            logger.info("Found gain reference file {} ...".format(Raw_Gain_Ref_SR_name))
+            Raw_Gain_Ref_SR = File(Raw_Gain_Ref_SR_name)
+            Gain_Ref_SR_path = "%s_sr.%s"%(".".join(Raw_Gain_Ref_SR_path.split(".")[:-1]), "mrc")
+            Gain_Ref_SR_name = os.path.basename(Gain_Ref_SR_path)
+            Gain_Ref_SR = File(Gain_Ref_SR_name)
+            self.rc.add_replica("slurm", Raw_Gain_Ref_SR_name, "file://{}".format(Raw_Gain_Ref_SR_path))
+    
+            #define Gain reference output filename
+            #TODO: improve lines below
+            Gain_Ref_path = Gain_Ref_SR_path.replace('_sr.mrc','_std.mrc')
+            Gain_Ref_name = os.path.basename(Gain_Ref_path)
+            Gain_Ref = File(Gain_Ref_name)
+    
+            #define flip Y Super resolution output filename
+            #TODO: improve lines below
+            FlipY_SR_path = Gain_Ref_SR_path.replace('_sr.mrc','_sr.flipy.mrc')
+            #logger.info(" ... found {} ".format(FlipY_SR_path))
+            FlipY_SR_name = os.path.basename(FlipY_SR_path)
+            FlipY_SR = File(FlipY_SR_name)
+    
+            #define flip Y std resolution output filename
+            #TODO: improve lines below
+            FlipY_path = Gain_Ref_path.replace('_std.mrc','_std.flipy.mrc')
+            FlipY_name = os.path.basename(FlipY_path)
+            FlipY = File(FlipY_name)
+            #convert Superres dm4 or tiff file to mrc
+            #dm2mrc usage: dm2mrc infile outfile
+            #tif2mrc usage: tif2mrc infile outfile
+            if gainref_extension=="tiff":
+                logger.info("gain reference file extension {} ...".format(gainref_extension))
+                tif2mrc_gainref_sr_job = Job("tif2mrc_gainref")
+                tif2mrc_gainref_sr_job.add_args(Raw_Gain_Ref_SR, Gain_Ref_SR)
+                tif2mrc_gainref_sr_job.add_inputs(Raw_Gain_Ref_SR)
+                tif2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR, stage_out=True)
+            elif gainref_extension=="dm":
+                logger.info("gain reference file extension {} ...".format(gainref_extension))
+                dm2mrc_gainref_sr_job = Job("dm2mrc_gainref")
+                dm2mrc_gainref_sr_job.add_args(Raw_Gain_Ref_SR, Gain_Ref_SR)
+                dm2mrc_gainref_sr_job.add_inputs(Raw_Gain_Ref_SR)
+                dm2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR, stage_out=True)
+            else:
+                logger.info("Unknown gain reference file extension {} ...".format(gainref_extension))
+                raise
+            #create standard resolution gain ref file from superres gain ref file
+            #newstack usage here (decrease the size of Super resolution image by factor of 2): newstack -bin 2 infile outfile
+            newstack_gainref_job = Job("newstack_gainref")
+            newstack_gainref_job.add_args("-bin", "2", Gain_Ref_SR, Gain_Ref)
+            newstack_gainref_job.add_inputs(Gain_Ref_SR)
+            newstack_gainref_job.add_outputs(Gain_Ref, stage_out=True)
+            #flip both gain reference files on y axis
+            #clip usage here (flip img on Y axis): clip flipy infile outfile
+            #std resolution
+            clip_gainref_job = Job("clip_gainref")
+            clip_gainref_job.add_args("flipy", Gain_Ref, FlipY)
+            clip_gainref_job.add_inputs(Gain_Ref)
+            clip_gainref_job.add_outputs(FlipY, stage_out=True)
+            #super resolution
+            clip_gainref_superres_job = Job("clip_gainref_superres")
+            clip_gainref_superres_job.add_args("flipy", Gain_Ref_SR, FlipY_SR)
+            clip_gainref_superres_job.add_inputs(Gain_Ref_SR)
+            clip_gainref_superres_job.add_outputs(FlipY_SR, stage_out=True)
+            if gainref_extension == "tiff":
+                self.wf.add_jobs(tif2mrc_gainref_sr_job)
+            elif gainref_extension == "dm":
+                self.wf.add_jobs(dm2mrc_gainref_sr_job)
+            else:
+                raise
+            self.wf.add_jobs(newstack_gainref_job)
+            self.wf.add_jobs(clip_gainref_job)
+            self.wf.add_jobs(clip_gainref_superres_job)
         else:
             logger.info("Raw_Gain_Ref_SR_path {} from else...".format(Raw_Gain_Ref_SR_path))
             pass
-        #Try to find Defect Map file - it might not be a part of the dataset, 
-        #so we must take it into account.        
-        #define Defect Map input and output filename
+        #Try to find Defect Map file - it might not be a part of the dataset; file is not needed for now
         raw_defect_map_path=None
         Raw_Defect_Map_path=[]
         for i in self.inputs_dir:
@@ -418,35 +412,27 @@ class PipelineWorkflow:
             if len(raw_defect_map_path)>=1:
                 Raw_Defect_Map_path=raw_defect_map_path
                 break
-        #Raw_Defect_Map_path = self.find_files2(self.inputs_dir, self.rawdefectsmap)
         if len(Raw_Defect_Map_path) != 0:
-            try: 
-                Raw_Defect_Map_path = Raw_Defect_Map_path[0]
-                Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
-                logger.info("Found Defect Map file {} ...".format(Raw_Defect_Map_name))
-                Raw_Defect_Map = File(Raw_Defect_Map_name)
-                Defect_Map_path = "%s_sr.%s"%(".".join(Raw_Defect_Map_path.split(".")[:-1]), "mrc")
-                Defect_Map_name = os.path.basename(Defect_Map_path)
-                Defect_Map = File(Defect_Map_name)
-                self.rc.add_replica("slurm", Raw_Defect_Map_name, "file://{}".format(Raw_Defect_Map_path))
-                #we do this, but if it impacts the processing speed to much it can be disabled for now
-                #create defect map file
-                #dm2mrc usage: dm2mrc infile outfile
-                dm2mrc_defect_map_job = Job("dm2mrc_defect_map")
-                dm2mrc_defect_map_job.add_args(Raw_Defect_Map, Defect_Map)
-                dm2mrc_defect_map_job.add_inputs(Raw_Defect_Map)
-                dm2mrc_defect_map_job.add_outputs(Defect_Map, stage_out=True)
-                self.wf.add_jobs(dm2mrc_defect_map_job)
-            except: 
-                logger.info("Raw_Defect_Map_path {} ...".format(Raw_Defect_Map_path))
+            Raw_Defect_Map_path = Raw_Defect_Map_path[0]
+            Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
+            logger.info("Found Defect Map file {} ...".format(Raw_Defect_Map_name))
+            Raw_Defect_Map = File(Raw_Defect_Map_name)
+            Defect_Map_path = "%s_sr.%s"%(".".join(Raw_Defect_Map_path.split(".")[:-1]), "mrc")
+            Defect_Map_name = os.path.basename(Defect_Map_path)
+            Defect_Map = File(Defect_Map_name)
+            self.rc.add_replica("slurm", Raw_Defect_Map_name, "file://{}".format(Raw_Defect_Map_path))
+            #create defect map file
+            #dm2mrc usage: dm2mrc infile outfile
+            dm2mrc_defect_map_job = Job("dm2mrc_defect_map")
+            dm2mrc_defect_map_job.add_args(Raw_Defect_Map, Defect_Map)
+            dm2mrc_defect_map_job.add_inputs(Raw_Defect_Map)
+            dm2mrc_defect_map_job.add_outputs(Defect_Map, stage_out=True)
+            self.wf.add_jobs(dm2mrc_defect_map_job)
         else:
             logger.info("Raw_Defect_Map_path {} from else...".format(Raw_Defect_Map_path))
             pass
         
-        # for each _fractions.(tiff|mrc) in the Images-Disc1 dir 
-        #file_list = self.find_files(
-        #                    os.path.join(self.inputs_dir, "Images-Disc1"),
-        #                    "_fractions.tiff$")
+        # try to find where exactly raw files are. Done this way to speed-up the process
         for i in self.inputs_dir:
             raw_location=(os.path.join(i, "**"),
                             "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
@@ -457,10 +443,7 @@ class PipelineWorkflow:
                 self.raw_location = raw_location
                 break
                 
-        #file_list = self.find_files2(
-        #                    os.path.join(self.inputs_dir, "Images-Disc1","*","Data"),
-        #                    "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
-        #sort?
+        #sort? sort - to make it somewhat FIFO
         file_list.sort()
         #define filename extension
         self.basename_extension=file_list[0].split('.')[-1]
@@ -475,7 +458,6 @@ class PipelineWorkflow:
         if self.debug:
             # when debugging, only do a fraction of the files
             file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
-        
         else:
             # even for production, only process a part of the dataset (maybe change this later?)
             #
@@ -483,14 +465,10 @@ class PipelineWorkflow:
             pass
         
 
-        label_counter = 0
         for fraction_file_path in file_list:
-
             fraction_file_name = os.path.basename(fraction_file_path)
             fraction_file = File(fraction_file_name)
             self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))
-
-
             ##find and copy the jpeg file 
             ## 2021-07-23; TO; skipping temprarily due to the uncertain location of the file
             #jpeg_file_path_dirname=os.path.dirname(fraction_file_path)
@@ -510,12 +488,9 @@ class PipelineWorkflow:
             mrc_file_name="{}.mrc".format(basename)
             dw_file_name="{}_DW.mrc".format(basename)
             mc2_stdout_file_name="{}_DW.stdout.txt".format(basename)
-            mc2_stderr_file_name="{}_DW.stderr.txt".format(basename)
             mrc_file = File(mrc_file_name)
             dw_file = File(dw_file_name)
             mc2_stdout = File(mc2_stdout_file_name)
-            mc2_stderr = File(mc2_stderr_file_name)
-
 
             # MotionCor2
             #adjust for one of three different extensions: mrc, tiff or eer
@@ -543,13 +518,11 @@ class PipelineWorkflow:
                     "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 1 -Serial 0",
                     "-OutStack 0", "-SumRange 0 0")
                 motionCor_job.add_inputs(fraction_file)
-            
+
             motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
             motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
             motionCor_job.add_outputs(mc2_stdout, stage_out=True, register_replica=False)
-            #job.set_stdout(<str | file object>)
-
-            motionCor_job.add_outputs(mc2_stderr, stage_out=True, register_replica=False)
+            motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
             motionCor_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(motionCor_job)
 
@@ -640,7 +613,6 @@ class PipelineWorkflow:
             self.wf.add_jobs(slack_notify_job)
             
             self.no_of_processed+=1
-            label_counter+=1
             
 
 

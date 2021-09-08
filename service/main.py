@@ -188,18 +188,18 @@ async def session_status(user: str, session_id: str, api_key: APIKey = Depends(g
 async def start_processing(user: str,
                            session_id: str, 
                            api_key: APIKey = Depends(get_api_key),
-                           apix: float = 0.813,
-                           fmdose: float = 1.20,
-                           kev: int = 300,
-                           rawgainref: str = "gain-ref/*x1.m1.dm4",
-                           rawdefectsmap: str = "gain-ref/*Map.m1.dm4",
-                           basename_prefix: str = "FoilHole",
-                           basename_suffix: str = "fractions",
-                           basename_extension: str = "",
-                           throw: int = 1,
-                           trunc: int = 23,
-                           particle_size: int = 100,
-                           superresolution: bool = False ):
+                           apix: float,
+                           fmdose: float,
+                           kev: int,
+                           rawgainref: str,
+                           rawdefectsmap: str,
+                           basename_prefix: str,
+                           basename_suffix: str,
+                           basename_extension: str,
+                           throw: int,
+                           trunc: int,
+                           particle_size: int,
+                           superresolution: bool ):
     key = "{}/{}".format(user, session_id)
     if key in app.state.sessions:
         s = app.state.sessions[key]

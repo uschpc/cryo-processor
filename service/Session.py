@@ -117,18 +117,7 @@ class Session:
     
         return response
 
-    #trying to add params. in order:
-    #apix, pixel size
-    #fmdose, dose in e-/A^2 per frame
-    #kev, voltage
-    #particle_size, <-- future; stage 2
-    #rawgainref, ls like regex to pickup raw gain ref file
-    #basename_prefix, ls like regex to pickup basename prefix
-    #basename_suffix, ls like regex to pickup basename suffix (no underscores)
-    #basename_extension, ls like regex to pickup basename extension
-    #throw, how many frames discard from the top
-    #trunc, how many frames keep
-    #superresolution,
+    
     def start_processing(self,
                             apix,
                             fmdose,
@@ -142,18 +131,18 @@ class Session:
                             trunc,
                             particle_size,
                             superresolution):
-        self.apix = apix
-        self.fmdose = fmdose
-        self.kev = kev
-        self.rawgainref = rawgainref
-        self.rawdefectsmap = rawdefectsmap
-        self.basename_prefix = basename_prefix
-        self.basename_suffix = basename_suffix
-        self.basename_extension = basename_extension
-        self.throw=throw
-        self.trunc=trunc
-        self.particle_size=particle_size
-        self.superresolution = superresolution
+        self.apix = apix # pixel size
+        self.fmdose = fmdose # dose in e-/A^2 per frame
+        self.kev = kev # voltage
+        self.rawgainref = rawgainref # ls like regex to pickup raw gain ref file
+        self.rawdefectsmap = rawdefectsmap # ls like regex to pickup basename prefix
+        self.basename_prefix = basename_prefix # ls like regex to pickup basename prefix
+        self.basename_suffix = basename_suffix # ls like regex to pickup basename suffix (no underscores)
+        self.basename_extension = basename_extension # ls like regex to pickup basename extension
+        self.throw=throw # how many frames discard from the top
+        self.trunc=trunc # how many frames keep
+        self.particle_size=particle_size # <-- future; stage 2
+        self.superresolution = superresolution # bool
         log.info("apix: %s"%self.apix)
         log.info("fmdose: %s"%self.fmdose)
         log.info("kev: %s"%self.kev)
