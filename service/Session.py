@@ -213,6 +213,7 @@ class Session:
         try:
             status = wf.get_status()
         except:
+            log.info("unable to get status")
             pass
        
         # FIXME: improve this logic to match the web ui expectations 
