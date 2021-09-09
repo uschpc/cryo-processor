@@ -21,7 +21,7 @@ export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/motioncor2-1.2.3/bin:$PAT
 ##mc_stderr=$2
 ##shift
 ##shift
-
+nvidia-smi
 ##MotionCor2 "$@" >$mc_stdout 2>$mc_stderr
 MotionCor2 "$@"
 
