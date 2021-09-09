@@ -221,7 +221,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/motioncor2_wrapper.sh"),
             is_stageable=False
         )
-        motionCor2.add_pegasus_profile( cores="1",
+        motionCor2.add_pegasus_profile( cores="2",
                                         runtime="600",
                                         memory="4096",
                                         #glite_arguments=self.mc_glite_arguments
