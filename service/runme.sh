@@ -5,6 +5,7 @@ set -e
 # ensure we start in the right directory
 cd $(dirname $0)
 
+module load usc
 module load python/3.6.8
 module load openjdk/11.0.2
 
