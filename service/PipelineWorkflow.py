@@ -81,7 +81,8 @@ class PipelineWorkflow:
         self.props["pegasus.data.configuration"] = "sharedfs"
         self.props["pegasus.transfer.links"] = "True"
         self.props["pegasus.stageout.clusters"] = self.pgss_stgt_clusters
-        self.props["pegasus.transfer.refiner"] = "Bundle"
+        #self.props["pegasus.transfer.refiner"] = "Bundle" 
+        self.props["pegasus.transfer.refiner"] = "BalancedCluster"
         # debug queue means we can not put too many jobs in the queue
         # Help Pegasus developers by sharing performance data (optional)
         self.props["pegasus.monitord.encoding"] = "json"
