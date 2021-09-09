@@ -513,21 +513,21 @@ class PipelineWorkflow:
                 #case where we have gain referencee file
                 motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
                     mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5 -RotGain 2",
-                    "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu -Serial 0",
+                    "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
                     "-OutStack 0", "-SumRange 0 0")
                 motionCor_job.add_inputs(fraction_file, FlipY)
             else:
                 #case where we do not have gain referencee file
                 motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
                     mrc_file, "-Iter 7 -Tol 0.5 -RotGain 2",
-                    "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu -Serial 0",
+                    "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
                     "-OutStack 0", "-SumRange 0 0")
                 motionCor_job.add_inputs(fraction_file)
 
             motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
             motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
-            #motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
-            #motionCor_job.set_stderr(mc2_stderr, stage_out=True, register_replica=False)
+            motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
+            motionCor_job.set_stderr(mc2_stderr, stage_out=True, register_replica=False)
             motionCor_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(motionCor_job)
 
@@ -610,12 +610,12 @@ class PipelineWorkflow:
             # # self.wf.add_jobs(grep_wrapper_ctf_reso)
             
             #send notification to the slack channel
-            # slack_notify_job = Job("slack_notify")
-            # slack_notify_job.add_inputs(mc2_stdout)
-            # slack_notify_job.add_inputs(gctf_log_file)
-            # slack_notify_job.add_args(fraction_file_path, mc2_stdout, gctf_log_file)
-            # slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            # self.wf.add_jobs(slack_notify_job)
+            slack_notify_job = Job("slack_notify")
+            slack_notify_job.add_inputs(mc2_stdout)
+            slack_notify_job.add_inputs(gctf_log_file)
+            slack_notify_job.add_args(fraction_file_path, mc2_stdout, gctf_log_file)
+            slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            self.wf.add_jobs(slack_notify_job)
             
             self.no_of_processed+=1
             
