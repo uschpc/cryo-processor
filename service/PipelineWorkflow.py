@@ -521,7 +521,6 @@ class PipelineWorkflow:
 
             motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
             motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
-            motionCor_job.add_outputs(mc2_stdout, stage_out=True, register_replica=False)
             motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
             motionCor_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(motionCor_job)
