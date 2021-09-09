@@ -513,21 +513,21 @@ class PipelineWorkflow:
                 #case where we have gain referencee file
                 motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
                     mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5 -RotGain 2",
-                    "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 1 -Serial 0",
+                    "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu -Serial 0",
                     "-OutStack 0", "-SumRange 0 0")
                 motionCor_job.add_inputs(fraction_file, FlipY)
             else:
                 #case where we do not have gain referencee file
                 motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
                     mrc_file, "-Iter 7 -Tol 0.5 -RotGain 2",
-                    "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 1 -Serial 0",
+                    "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu -Serial 0",
                     "-OutStack 0", "-SumRange 0 0")
                 motionCor_job.add_inputs(fraction_file)
 
             motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
             motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
-            motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
-            motionCor_job.set_stderr(mc2_stderr, stage_out=True, register_replica=False)
+            #motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
+            #motionCor_job.set_stderr(mc2_stderr, stage_out=True, register_replica=False)
             motionCor_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(motionCor_job)
 
