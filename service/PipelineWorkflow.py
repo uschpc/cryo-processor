@@ -610,12 +610,12 @@ class PipelineWorkflow:
             # # self.wf.add_jobs(grep_wrapper_ctf_reso)
             
             #send notification to the slack channel
-            slack_notify_job = Job("slack_notify")
-            slack_notify_job.add_inputs(mc2_stdout)
-            slack_notify_job.add_inputs(gctf_log_file)
-            slack_notify_job.add_args(fraction_file_path, mc2_stdout, gctf_log_file)
-            slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            self.wf.add_jobs(slack_notify_job)
+            # slack_notify_job = Job("slack_notify")
+            # slack_notify_job.add_inputs(mc2_stdout)
+            # slack_notify_job.add_inputs(gctf_log_file)
+            # slack_notify_job.add_args(fraction_file_path, mc2_stdout, gctf_log_file)
+            # slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # self.wf.add_jobs(slack_notify_job)
             
             self.no_of_processed+=1
             
