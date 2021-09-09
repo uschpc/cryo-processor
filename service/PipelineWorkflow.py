@@ -488,9 +488,11 @@ class PipelineWorkflow:
             mrc_file_name="{}.mrc".format(basename)
             dw_file_name="{}_DW.mrc".format(basename)
             mc2_stdout_file_name="{}_DW.stdout.txt".format(basename)
+            mc2_stderr_file_name="{}_DW.stdout.txt".format(basename)
             mrc_file = File(mrc_file_name)
             dw_file = File(dw_file_name)
             mc2_stdout = File(mc2_stdout_file_name)
+            mc2_stderr = File(mc2_stderr_file_name)
 
             # MotionCor2
             #adjust for one of three different extensions: mrc, tiff or eer
@@ -522,6 +524,7 @@ class PipelineWorkflow:
             motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
             motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
             motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
+            motionCor_job.set_stdout(mc2_stderr, stage_out=True, register_replica=False)
             motionCor_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(motionCor_job)
 
