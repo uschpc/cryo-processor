@@ -488,7 +488,7 @@ class PipelineWorkflow:
             mrc_file_name="{}.mrc".format(basename)
             dw_file_name="{}_DW.mrc".format(basename)
             mc2_stdout_file_name="{}_DW.stdout.txt".format(basename)
-            mc2_stderr_file_name="{}_DW.stdout.txt".format(basename)
+            mc2_stderr_file_name="{}_DW.stderr.txt".format(basename)
             mrc_file = File(mrc_file_name)
             dw_file = File(dw_file_name)
             mc2_stdout = File(mc2_stdout_file_name)
