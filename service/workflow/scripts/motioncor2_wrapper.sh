@@ -17,13 +17,14 @@ export CUDA_ROOT=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/cuda-10.0.130-t6gcqr
 
 export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/motioncor2-1.2.3/bin:$PATH
 
-##mc_stdout=$1
-##mc_stderr=$2
-##shift
-##shift
+
+echo "Starting at `date`"
+echo "Running on hosts: $SLURM_NODELIST"
+echo "Running on $SLURM_NNODES nodes."
+echo "Running $SLURM_NTASKS tasks."
+echo "Current working directory is `pwd`"
 echo `hostname`
 echo `nvidia-smi`
-##MotionCor2 "$@" >$mc_stdout 2>$mc_stderr
 MotionCor2 "$@"
 
 exit $?
