@@ -225,7 +225,6 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.mc_glite_arguments
-                                        #glite_arguments="--gres=gpu:p100:2"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         gctf = Transformation(
@@ -238,7 +237,6 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.gctf_glite_arguments
-                                        #glite_arguments="--gres=gpu:p100:2"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         e2proc2d = Transformation(
@@ -613,9 +611,27 @@ class PipelineWorkflow:
             
             #send notification to the slack channel
             slack_notify_job = Job("slack_notify")
-            slack_notify_job.add_inputs(mc2_stdout)
-            slack_notify_job.add_inputs(gctf_log_file)
-            slack_notify_job.add_args(fraction_file_path, mc2_stdout, gctf_log_file)
+            #get infor from mc2_stdout
+            
+            fshifts_list=re.findall(".*?..\.\.\.\.( Frame\s\(.*?shift:.*?)\n*?",mc2_stdout.read()) 
+            
+
+
+            #shifts=`cat ${mc2_output} | grep "...... Frame"`
+            # get info from gctf_log_file
+            #resolution=`cat ${gctf_output} | grep RES_LIMIT | awk '{print $NF}'`
+            fresol_list=re.findall(".*RES_LIMIT.(\d+\.\d+).*",gctf_log_file.read())
+            
+            #slack_notify_job.add_inputs(mc2_stdout)
+            #slack_notify_job.add_inputs(gctf_log_file)
+            #message="Estimated resolution limit: $resolution\nMotion correction shifts:\n${shifts}"
+            if fresol_list!=[]:
+                resolution=fresol_list[0]
+            if fshifts_list!=[]:
+                fshifts='\n'.join(fshifts_list)
+            if fresol_list!=[] and fshifts_list!=[]:
+                message="Estimated resolution limit: {}\nMotion correction shifts:\n{}".format(resolution, fshifts)
+            slack_notify_job.add_args(fraction_file_path, message)
             slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(slack_notify_job)
             
@@ -726,3 +742,4 @@ class PipelineWorkflow:
         logger.info(" ... searching for {}".format(search_path))
         logger.info(" ... found {} files matching {}".format(len(found_files), regex))
         return found_files
+        

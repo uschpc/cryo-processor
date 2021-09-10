@@ -1,15 +1,17 @@
 #!/bin/bash
 img_file_path="$1"
-mc2_output="$2"
-gctf_output="$3"
+shift
+message="$@"
+#resolution="$2"
+#shifts="$3"
 
-resolution=`cat ${gctf_output} | grep RES_LIMIT | awk '{print $NF}'`
+#resolution=`cat ${gctf_output} | grep RES_LIMIT | awk '{print $NF}'`
 
 
-shifts=`cat ${mc2_output} | grep "...... Frame"`
+#shifts=`cat ${mc2_output} | grep "...... Frame"`
 
 
-message="Estimated resolution limit: $resolution\nMotion correction shifts:\n${shifts}"
+#message="Estimated resolution limit: $resolution\nMotion correction shifts:\n${shifts}"
 
 curl --data-urlencode "file=${filepath}" --data-urlencode "message=${message}" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'
 
