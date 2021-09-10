@@ -40,8 +40,7 @@ class PipelineWorkflow:
         self.outputs_dir = outputs_dir
         self.partition = partition
         self.account = account
-        self.mc_glite_arguments = mc_glite_arguments
-        self.gctf_glite_arguments = gctf_glite_arguments
+        self.glite_arguments = glite_arguments
         self.pgss_stgt_clusters = pgss_stgt_clusters
         self.maxjobs = maxjobs
         self.debug_maxjobs = debug_maxjobs
