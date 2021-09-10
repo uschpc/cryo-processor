@@ -614,25 +614,25 @@ class PipelineWorkflow:
             #get infor from mc2_stdout
             #logger.info(" attribs for File obj here {}".format(dir(mc2_stdout.lfn)))
             #logger.info(" attribs for File obj here {}".format(mc2_stdout.metadata.items()))
-            fshifts_list=re.findall(".*?..\.\.\.\.( Frame\s\(.*?shift:.*?)\n*?",open(mc2_stdout.lfn).read()) 
+            #fshifts_list=re.findall(".*?..\.\.\.\.( Frame\s\(.*?shift:.*?)\n*?",open(mc2_stdout.lfn).read()) 
             
 
 
             #shifts=`cat ${mc2_output} | grep "...... Frame"`
             # get info from gctf_log_file
             #resolution=`cat ${gctf_output} | grep RES_LIMIT | awk '{print $NF}'`
-            fresol_list=re.findall(".*RES_LIMIT.(\d+\.\d+).*",open(gctf_log_file.lfn).read())
+            #fresol_list=re.findall(".*RES_LIMIT.(\d+\.\d+).*",open(gctf_log_file.lfn).read())
             
             #slack_notify_job.add_inputs(mc2_stdout)
             #slack_notify_job.add_inputs(gctf_log_file)
             #message="Estimated resolution limit: $resolution\nMotion correction shifts:\n${shifts}"
-            if fresol_list!=[]:
-                resolution=fresol_list[0]
-            if fshifts_list!=[]:
-                fshifts='\n'.join(fshifts_list)
-            if fresol_list!=[] and fshifts_list!=[]:
-                message="Estimated resolution limit: {}\nMotion correction shifts:\n{}".format(resolution, fshifts)
-            slack_notify_job.add_args(fraction_file_path, message)
+            #if fresol_list!=[]:
+            #    resolution=fresol_list[0]
+            #if fshifts_list!=[]:
+            #    fshifts='\n'.join(fshifts_list)
+            #if fresol_list!=[] and fshifts_list!=[]:
+            #    message="Estimated resolution limit: {}\nMotion correction shifts:\n{}".format(resolution, fshifts)
+            slack_notify_job.add_args(fraction_file_path, gctf_log_file.lfn, mc2_stdout.lfn)
             slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(slack_notify_job)
             
