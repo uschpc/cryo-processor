@@ -29,7 +29,7 @@ class PipelineWorkflow:
     
 
     # --- Init ----------------------------------------------------------------
-    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=False, partition="debug", account="osinski_703", mc_glite_arguments="--gres=gpu:p100:2", gctf_glite_arguments="--gres=gpu:p100:2", maxjobs=100, debug_maxjobs=10, pgss_stgt_clusters=10, cluster_size=10, no_of_files_to_proc_in_cycle=-1):
+    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=False, partition="debug", account="osinski_703", glite_arguments="--gres=gpu:p100:2", maxjobs=100, debug_maxjobs=10, pgss_stgt_clusters=10, cluster_size=10, no_of_files_to_proc_in_cycle=-1):
         self.wf_name = "motioncor2"
         self.debug = debug
         logger.info("PipelineWorkflow init")
@@ -54,8 +54,7 @@ class PipelineWorkflow:
             logger.info("outputs_dir {}".format(self.outputs_dir))
             logger.info("partition {}".format(self.partition))
             logger.info("account {}".format(self.account))
-            logger.info("mc_glite_arguments {}".format(self.mc_glite_arguments))
-            logger.info("gctf_glite_arguments {}".format(self.gctf_glite_arguments))
+            logger.info("glite_arguments {}".format(self.glite_arguments))
             logger.info("pgss_stgt_clusters {}".format(self.pgss_stgt_clusters))
             logger.info("maxjobs {}".format(self.maxjobs))
             logger.info("debug_maxjobs {}".format(self.debug_maxjobs))
@@ -224,7 +223,7 @@ class PipelineWorkflow:
         motionCor2.add_pegasus_profile( cores="2",
                                         runtime="600",
                                         memory="4096",
-                                        glite_arguments=self.mc_glite_arguments
+                                        glite_arguments=self.glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         gctf = Transformation(
@@ -236,7 +235,7 @@ class PipelineWorkflow:
         gctf.add_pegasus_profile( cores="2",
                                         runtime="600",
                                         memory="4096",
-                                        glite_arguments=self.gctf_glite_arguments
+                                        glite_arguments=self.glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         e2proc2d = Transformation(
