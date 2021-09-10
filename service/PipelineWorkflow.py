@@ -612,7 +612,7 @@ class PipelineWorkflow:
             #send notification to the slack channel
             slack_notify_job = Job("slack_notify")
             #get infor from mc2_stdout
-            logger.info(" attribs for File obj here {}".format(dir(mc2_stdout))
+            logger.info(" attribs for File obj here {}".format(dir(mc2_stdout)))
             fshifts_list=re.findall(".*?..\.\.\.\.( Frame\s\(.*?shift:.*?)\n*?",mc2_stdout.read()) 
             
 
