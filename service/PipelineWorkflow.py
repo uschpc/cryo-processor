@@ -623,8 +623,8 @@ class PipelineWorkflow:
             #resolution=`cat ${gctf_output} | grep RES_LIMIT | awk '{print $NF}'`
             #fresol_list=re.findall(".*RES_LIMIT.(\d+\.\d+).*",open(gctf_log_file.lfn).read())
             
-            #slack_notify_job.add_inputs(mc2_stdout)
-            #slack_notify_job.add_inputs(gctf_log_file)
+            slack_notify_job.add_inputs(mc2_stdout)
+            slack_notify_job.add_inputs(gctf_log_file)
             #message="Estimated resolution limit: $resolution\nMotion correction shifts:\n${shifts}"
             #if fresol_list!=[]:
             #    resolution=fresol_list[0]
