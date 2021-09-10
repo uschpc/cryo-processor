@@ -28,12 +28,12 @@ export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/motioncor2-1.4.2/bin:$PAT
 
 
 #echo "Starting at `date`"
-#echo "Running on hosts: $SLURM_NODELIST"
-#echo "Running on $SLURM_NNODES nodes."
-#echo "Running $SLURM_NTASKS tasks."
-#echo "Current working directory is `pwd`"
-#echo `hostname`
-#echo `nvidia-smi`
+echo "Running on hosts: $SLURM_NODELIST"
+echo "Running on $SLURM_NNODES nodes."
+echo "Running $SLURM_NTASKS tasks."
+echo "Current working directory is `pwd`"
+echo `hostname`
+echo `nvidia-smi`
 MotionCor2 "$@"
 
 exit $?
