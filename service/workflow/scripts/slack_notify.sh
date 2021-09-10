@@ -8,21 +8,21 @@ slack_notify_out_fn="$4"
 
 resolution=`cat ${gctf_output_fn} | grep RES_LIMIT | awk '{print $NF}'`
 
-echo "${resolution}" >> slack_notify_out_fn
-echo "" >> slack_notify_out_fn
+echo "${resolution}" >> $slack_notify_out_fn
+echo "" >> $slack_notify_out_fn
 
 shifts=`cat ${mc2_output_fn} | grep "...... Frame"`
 
-echo "${shifts}" >> slack_notify_out_fn
-echo "" >> slack_notify_out_fn
+echo "${shifts}" >> $slack_notify_out_fn
+echo "" >> $slack_notify_out_fn
 
-message="Estimated resolution limit: ${resolution}\nMotion correction shifts:\n${shifts}"
+message="\"Estimated resolution limit: ${resolution}\nMotion correction shifts:\n${shifts}\""
 
-echo "${message}" >> slack_notify_out_fn
-echo "" >> slack_notify_out_fn
+echo "${message}" >> $slack_notify_out_fn
+echo "" >> $slack_notify_out_fn
 
-curl --data-urlencode "file=${filepath}" --data-urlencode "message=${message}" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'
-echo "curl --data-urlencode "file=${filepath}" --data-urlencode "message=${message}" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'" >> slack_notify_out_fn
+curl --data-urlencode "file=${filepath}" --data-urlencode "\"message=${message}\"" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'
+echo "curl --data-urlencode "file=${filepath}" --data-urlencode "message=${message}" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'" >> $slack_notify_out_fn
 
 exit $?
 
