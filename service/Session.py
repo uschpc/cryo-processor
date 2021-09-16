@@ -195,7 +195,7 @@ class Session:
         
         self._percent = 0
         if self._no_of_raw > 0:
-            self._percent = (float(self._no_of_processed) / self._no_of_raw) * 100.0
+            self._percent = round((float(self._no_of_processed) / self._no_of_raw) * 100.0)
 
         # get the status from Pegasus
         # {'dagname': 'motioncor2-0.dag',

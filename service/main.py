@@ -83,14 +83,20 @@ def main_loop():
         # future: <Future finished exception=RuntimeError('dictionary changed size during iteration',)>
         
         #log.info("Checking on SESSIONS {}".format(app.state.sessions))
-        #for sid, session in app.state.sessions:
+        to_del = []
         for sid, session in app.state.sessions.items():
             log.info("Checking on session {}".format(sid))
             session.update()
             log.info(pprint.pformat(session.get_status()))
-             
-            # save periodically?   
-            #save_state()
+
+            if not session.is_valid():
+                to_del.append(sid)
+        
+        # clean up expired sessions
+        for sid in to_del: del app.state.sessions[sid]
+
+        # save periodically?   
+        save_state()
 
         time.sleep(60)
 
