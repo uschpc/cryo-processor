@@ -118,11 +118,12 @@ class Session:
         return response
 
     
-    def start_processing(self, data):
+    def start_processing(self, apix, fmdose, kev, superresolution, **data):
         
-        self.apix = data[apix] # pixel size
-        self.fmdose = data[fmdose] # dose in e-/A^2 per frame
-        self.kev = data[kev] # voltage
+        self.apix = apix # pixel size
+        self.fmdose = fmdose # dose in e-/A^2 per frame
+        self.kev = kev # voltage
+        self.superresolution = uperresolution # bool
         try: self.rawgainref = data[rawgainref] # ls like regex to pickup raw gain ref file
         except: self.rawgainref=None
         try: self.rawdefectsmap = data[rawdefectsmap] # ls like regex to pickup basename prefix
@@ -139,10 +140,10 @@ class Session:
         except: self.trunc=None
         try: self.particle_size=data[particle_size] # <-- future; stage 2
         except: self.particle_size=None
-        self.superresolution = data[superresolution] # bool
         log.info("apix: %s"%self.apix)
         log.info("fmdose: %s"%self.fmdose)
         log.info("kev: %s"%self.kev)
+        log.info("superresolution: %s"%self.superresolution)
         if self.rawgainref!=None:
             log.info("rawgainref: %s"%self.rawgainref)
         if self.rawdefectsmap!=None:
@@ -159,7 +160,6 @@ class Session:
             log.info("trunc: %s"%self.trunc)
         if self.particle_size!=None:
             log.info("particle_size: %s"%self.particle_size)
-        log.info("superresolution: %s"%self.superresolution)
         self._state = self._STATE_PROCESSING
         self._next_processing_time = time.time()
     

@@ -222,8 +222,7 @@ async def start_processing(user: str,
         app.state.sessions[key] = s
 
     if not s.is_processing():
-        s.start_processing(
-            apix = apix,
+        s.start_processing(apix = apix,
             fmdose = fmdose,
             kev = kev,
             #rawgainref = rawgainref,
@@ -235,7 +234,7 @@ async def start_processing(user: str,
             #trunc = trunc,
             #particle_size = particle_size,
             superresolution = superresolution,
-             )
+            )
 
     return {"result": "ok"}
 
