@@ -191,26 +191,26 @@ async def session_status(user: str, session_id: str, api_key: APIKey = Depends(g
 
 
 @app.post("/{user}/session/{session_id}/start-processing")
-# async def start_processing(user: str,
-                           # session_id: str, 
-                           # apix: float,
-                           # fmdose: float,
-                           # kev: int,
-                           # #rawgainref: str,
-                           # #rawdefectsmap: str,
-                           # #basename_prefix: str,
-                           # #basename_suffix: str,
-                           # #basename_extension: str,
-                           # #throw: int,
-                           # #trunc: int,
-                           # #particle_size: int,
-                           # superresolution: bool,
-                           # api_key: APIKey = Depends(get_api_key)
-                           # ):
 async def start_processing(user: str,
                            session_id: str, 
+                           apix: float,
+                           fmdose: float,
+                           kev: int,
+                           #rawgainref: str,
+                           #rawdefectsmap: str,
+                           #basename_prefix: str,
+                           #basename_suffix: str,
+                           #basename_extension: str,
+                           #throw: int,
+                           #trunc: int,
+                           #particle_size: int,
+                           superresolution: bool,
                            api_key: APIKey = Depends(get_api_key)
-                           **kwargs ):
+                           ):
+# async def start_processing(user: str,
+                           # session_id: str, 
+                           # api_key: APIKey = Depends(get_api_key)
+                           # **kwargs ):
     key = "{}/{}".format(user, session_id)
     if key in app.state.sessions:
         s = app.state.sessions[key]
@@ -222,21 +222,20 @@ async def start_processing(user: str,
         app.state.sessions[key] = s
 
     if not s.is_processing():
-        s.start_processing( kwargs )
-        # s.start_processing(
-            # apix = apix,
-            # fmdose = fmdose,
-            # kev = kev,
-            # #rawgainref = rawgainref,
-            # #rawdefectsmap = rawdefectsmap,
-            # #basename_prefix = basename_prefix,
-            # #basename_suffix = basename_suffix,
-            # #basename_extension = basename_extension,
-            # #throw = throw,
-            # #trunc = trunc,
-            # #particle_size = particle_size,
-            # superresolution = superresolution,
-            # **kwargs )
+        s.start_processing(
+            apix = apix,
+            fmdose = fmdose,
+            kev = kev,
+            #rawgainref = rawgainref,
+            #rawdefectsmap = rawdefectsmap,
+            #basename_prefix = basename_prefix,
+            #basename_suffix = basename_suffix,
+            #basename_extension = basename_extension,
+            #throw = throw,
+            #trunc = trunc,
+            #particle_size = particle_size,
+            superresolution = superresolution,
+             )
 
     return {"result": "ok"}
 
