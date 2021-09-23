@@ -649,13 +649,20 @@ class PipelineWorkflow:
         self.fmdose = datum.fmdose
         self.kev = datum.kev
         #self.particle_size = particle_size
-        self.rawgainref = datum.rawgainref
-        self.rawdefectsmap = datum.rawdefectsmap
-        self.basename_prefix = datum.basename_prefix
-        self.basename_suffix = datum.basename_suffix
-        self.basename_extension = datum.basename_extension
-        self.throw=datum.throw
-        self.trunc=datum.trunc
+        try: self.rawgainref = datum.rawgainref
+        except: pass
+        try: self.rawdefectsmap = datum.rawdefectsmap
+        except: pass
+        try: self.basename_prefix = datum.basename_prefix
+        except: pass
+        try: self.basename_suffix = datum.basename_suffix
+        except: pass
+        try: self.basename_extension = datum.basename_extension
+        except: pass
+        try: self.throw=datum.throw
+        except: pass
+        try: self.trunc=datum.trunc
+        except: pass
         self.superresolution = datum.superresolution
 
     # --- Submit Workflow -----------------------------------------------------
