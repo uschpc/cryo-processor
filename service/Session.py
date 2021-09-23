@@ -118,31 +118,28 @@ class Session:
         return response
 
     
-    def start_processing(self,
-                            apix,
-                            fmdose,
-                            kev,
-                            rawgainref=None,
-                            rawdefectsmap=None,
-                            basename_prefix=None,
-                            basename_suffix=None,
-                            basename_extension=None,
-                            throw=None,
-                            trunc=None,
-                            particle_size=None,
-                            superresolution=False):
-        self.apix = apix # pixel size
-        self.fmdose = fmdose # dose in e-/A^2 per frame
-        self.kev = kev # voltage
-        self.rawgainref = rawgainref # ls like regex to pickup raw gain ref file
-        self.rawdefectsmap = rawdefectsmap # ls like regex to pickup basename prefix
-        self.basename_prefix = basename_prefix # ls like regex to pickup basename prefix
-        self.basename_suffix = basename_suffix # ls like regex to pickup basename suffix (no underscores)
-        self.basename_extension = basename_extension # ls like regex to pickup basename extension
-        self.throw=throw # how many frames discard from the top
-        self.trunc=trunc # how many frames keep
-        self.particle_size=particle_size # <-- future; stage 2
-        self.superresolution = superresolution # bool
+    def start_processing(self, data):
+        
+        self.apix = data[apix] # pixel size
+        self.fmdose = data[fmdose] # dose in e-/A^2 per frame
+        self.kev = data[kev] # voltage
+        try: self.rawgainref = data[rawgainref] # ls like regex to pickup raw gain ref file
+        except: self.rawgainref=None
+        try: self.rawdefectsmap = data[rawdefectsmap] # ls like regex to pickup basename prefix
+        except: self.rawdefectsmap=None
+        try: self.basename_prefix = data[basename_prefix] # ls like regex to pickup basename prefix
+        except: self.basename_prefix=None
+        try: self.basename_suffix = data[basename_suffix] # ls like regex to pickup basename suffix (no underscores)
+        except: self.basename_suffix=None
+        try: self.basename_extension = data[basename_extension] # ls like regex to pickup basename extension
+        except: self.basename_extension=None
+        try: self.throw=data[throw] # how many frames discard from the top
+        except: self.throw=None
+        try: self.trunc=data[trunc] # how many frames keep
+        except: self.trunc=None
+        try: self.particle_size=data[particle_size] # <-- future; stage 2
+        except: self.particle_size=None
+        self.superresolution = data[superresolution] # bool
         log.info("apix: %s"%self.apix)
         log.info("fmdose: %s"%self.fmdose)
         log.info("kev: %s"%self.kev)

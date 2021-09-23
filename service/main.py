@@ -205,8 +205,8 @@ async def session_status(user: str, session_id: str, api_key: APIKey = Depends(g
                            # #trunc: int,
                            # #particle_size: int,
                            # superresolution: bool,
-                           # api_key: APIKey = Depends(get_api_key),
-                           # **kwargs ):
+                           # api_key: APIKey = Depends(get_api_key)
+                           # ):
 async def start_processing( **kwargs ):
     for k,v in kwargs.items():
         pass
@@ -221,7 +221,7 @@ async def start_processing( **kwargs ):
         app.state.sessions[key] = s
 
     if not s.is_processing():
-        s.start_processing( **kwargs )
+        s.start_processing( kwargs )
         # s.start_processing(
             # apix = apix,
             # fmdose = fmdose,
