@@ -320,7 +320,7 @@ class PipelineWorkflow:
         logger.info("looking for gain reference")
         possible_gf_files_regexes=['*_gain.tiff','*.gain']
         #add user provided optional regex:
-        if self.rawgainre!=None:
+        if self.rawgainref!=None:
             possible_gf_files_regexes.append(self.rawgainref)
         for i in self.inputs_dir:
             for possible_gf in possible_gf_files_regexes:
