@@ -124,6 +124,10 @@ class Session:
         self.fmdose = fmdose # dose in e-/A^2 per frame
         self.kev = kev # voltage
         self.superresolution = superresolution # bool
+        log.info("apix: %s"%self.apix)
+        log.info("fmdose: %s"%self.fmdose)
+        log.info("kev: %s"%self.kev)
+        log.info("superresolution: %s"%self.superresolution)
         try: self.rawgainref = data[rawgainref] # ls like regex to pickup raw gain ref file
         except: self.rawgainref=None
         try: self.rawdefectsmap = data[rawdefectsmap] # ls like regex to pickup basename prefix
@@ -140,17 +144,13 @@ class Session:
         except: self.trunc=None
         try: self.particle_size=data[particle_size] # <-- future; stage 2
         except: self.particle_size=None
-        log.info("apix: %s"%self.apix)
-        log.info("fmdose: %s"%self.fmdose)
-        log.info("kev: %s"%self.kev)
-        log.info("superresolution: %s"%self.superresolution)
         if self.rawgainref!=None:
             log.info("rawgainref: %s"%self.rawgainref)
         if self.rawdefectsmap!=None:
             log.info("rawdefectsmap: %s"%self.rawdefectsmap)
         if self.basename_prefix!=None:
             log.info("basename_prefix: %s"%self.basename_prefix)
-        if self.basename_sufix!=None:
+        if self.basename_suffix!=None:
             log.info("basename_suffix: %s"%self.basename_suffix)
         if self.basename_extension!=None:
             log.info("basename_extension: %s"%self.basename_extension)
