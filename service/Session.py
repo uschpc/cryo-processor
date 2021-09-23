@@ -122,15 +122,15 @@ class Session:
                             apix,
                             fmdose,
                             kev,
-                            rawgainref,
-                            rawdefectsmap,
-                            basename_prefix,
-                            basename_suffix,
-                            basename_extension,
-                            throw,
-                            trunc,
-                            particle_size,
-                            superresolution):
+                            rawgainref=None,
+                            rawdefectsmap=None,
+                            basename_prefix=None,
+                            basename_suffix=None,
+                            basename_extension=None,
+                            throw=None,
+                            trunc=None,
+                            particle_size=None,
+                            superresolution=False):
         self.apix = apix # pixel size
         self.fmdose = fmdose # dose in e-/A^2 per frame
         self.kev = kev # voltage
@@ -146,14 +146,22 @@ class Session:
         log.info("apix: %s"%self.apix)
         log.info("fmdose: %s"%self.fmdose)
         log.info("kev: %s"%self.kev)
-        log.info("rawgainref: %s"%self.rawgainref)
-        log.info("rawdefectsmap: %s"%self.rawdefectsmap)
-        log.info("basename_prefix: %s"%self.basename_prefix)
-        log.info("basename_suffix: %s"%self.basename_suffix)
-        log.info("basename_extension: %s"%self.basename_extension)
-        log.info("throw: %s"%self.throw)
-        log.info("trunc: %s"%self.trunc)
-        log.info("particle_size: %s"%self.particle_size)
+        if self.rawgainref!=None:
+            log.info("rawgainref: %s"%self.rawgainref)
+        if self.rawdefectsmap!=None:
+            log.info("rawdefectsmap: %s"%self.rawdefectsmap)
+        if self.basename_prefix!=None:
+            log.info("basename_prefix: %s"%self.basename_prefix)
+        if self.basename_sufix!=None:
+            log.info("basename_suffix: %s"%self.basename_suffix)
+        if self.basename_extension!=None:
+            log.info("basename_extension: %s"%self.basename_extension)
+        if self.throw!=None:
+            log.info("throw: %s"%self.throw)
+        if self.trunc!=None:
+            log.info("trunc: %s"%self.trunc)
+        if self.particle_size!=None:
+            log.info("particle_size: %s"%self.particle_size)
         log.info("superresolution: %s"%self.superresolution)
         self._state = self._STATE_PROCESSING
         self._next_processing_time = time.time()

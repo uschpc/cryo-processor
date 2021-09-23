@@ -318,13 +318,20 @@ class PipelineWorkflow:
         raw_gain_ref_path=None
         Raw_Gain_Ref_SR_path=[]
         logger.info("looking for gain reference")
+        possible_gf_files_regexes=['*_gain.tiff','*.gain']
+        #add user provided optional regex:
+        if self.rawgainre!=None:
+            possible_gf_files_regexes.append(self.rawgainref)
         for i in self.inputs_dir:
-            logger.info("searching gain ref here: {} with {}".format(i, self.rawgainref))
-            raw_gain_ref_path = self.find_files2(os.path.join(i,"**"), self.rawgainref)
-            if len(raw_gain_ref_path)>=1:
-                Raw_Gain_Ref_SR_path=raw_gain_ref_path
-                break
-        #Raw_Gain_Ref_SR_path = self.find_files2(self.inputs_dir, self.rawgainref)
+            for possible_gf in possible_gf_files_regexes:
+                logger.info("searching gain ref here: {} with {} regex".format(i, possible_gf))
+                raw_gain_ref_path = self.find_files2(os.path.join(i,"**"), possible_gf)
+                if len(raw_gain_ref_path)>=1:
+                    Raw_Gain_Ref_SR_path=raw_gain_ref_path
+                    break
+            else:
+                continue
+            break
         if len(Raw_Gain_Ref_SR_path) != 0:
             Raw_Gain_Ref_SR_path = Raw_Gain_Ref_SR_path[0]
             # get the extension
@@ -406,13 +413,22 @@ class PipelineWorkflow:
             logger.info("Raw_Gain_Ref_SR_path {} from else...".format(Raw_Gain_Ref_SR_path))
             pass
         #Try to find Defect Map file - it might not be a part of the dataset; file is not needed for now
+        logger.info("looking for Defect Map")
+        possible_dm_files_regexes=['*Map.m1.dm4']
         raw_defect_map_path=None
         Raw_Defect_Map_path=[]
+        if self.rawdefectsmap!=None:
+            possible_dm_files_regexes.append(self.rawdefectsmap)
         for i in self.inputs_dir:
-            raw_defect_map_path = self.find_files2(os.path.join(i,"**"), self.rawdefectsmap)
-            if len(raw_defect_map_path)>=1:
-                Raw_Defect_Map_path=raw_defect_map_path
-                break
+            for possible_dm in possible_dm_files_regexes:
+                logger.info("searching defect map here: {} with {} regex".format(i, possible_dm))
+                raw_defect_map_path = self.find_files2(os.path.join(i,"**"), possible_dm)
+                if len(raw_defect_map_path)>=1:
+                    Raw_Defect_Map_path=raw_defect_map_path
+                    break
+            else:
+                continue
+            break
         if len(Raw_Defect_Map_path) != 0:
             Raw_Defect_Map_path = Raw_Defect_Map_path[0]
             Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
@@ -434,15 +450,22 @@ class PipelineWorkflow:
             pass
         
         # try to find where exactly raw files are. Done this way to speed-up the process
+        possible_raw_files_regexes=['FoilHole*fractions.tiff','FoilHole*fractions.mrc','FoilHole*EER.eer']
+        if self.basename_prefix!=None and self.basename_suffix!=None and self.basename_extension!=None:
+            possible_raw_files_regexes.append("%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
+        
         for i in self.inputs_dir:
-            raw_location=(os.path.join(i, "**"),
-                            "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
-            self.corrrect_input_dir=i
-            flist = self.find_files2(raw_location[0], raw_location[1])
-            if len(flist)>=1:
-                file_list=flist
-                self.raw_location = raw_location
-                break
+            for possible_raw_files in possible_raw_files_regexes:
+                raw_location=(os.path.join(i, "**"), possible_raw_files)
+                self.correct_input_dir=i
+                flist = self.find_files2(raw_location[0], raw_location[1])
+                if len(flist)>=1:
+                    file_list=flist
+                    self.raw_location = raw_location
+                    break
+            else:
+                continue
+            break
                 
         #sort? sort - to make it somewhat FIFO
         file_list.sort()
