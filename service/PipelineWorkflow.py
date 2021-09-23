@@ -531,18 +531,29 @@ class PipelineWorkflow:
                 sys.exit(1)
             
             if len(Raw_Gain_Ref_SR_path) != 0:
-                #case where we have gain referencee file
-                motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                    mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5 -RotGain 2",
-                    "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
-                    "-OutStack 0", "-SumRange 0 0")
+                #case where we have gain reference file
+                if self.throw!=None and self.trunc!=None:
+                    motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
+                        mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5 -RotGain 2",
+                        "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
+                        "-OutStack 0", "-SumRange 0 0")
+                else:
+                    motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
+                        mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5 -RotGain 2", "-PixSize", self.apix, "-FmDose", 
+                        self.fmdose, "-Gpu 0 -Serial 0", "-OutStack 0", "-SumRange 0 0")
+
                 motionCor_job.add_inputs(fraction_file, FlipY)
             else:
                 #case where we do not have gain referencee file
-                motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                    mrc_file, "-Iter 7 -Tol 0.5 -RotGain 2",
-                    "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
-                    "-OutStack 0", "-SumRange 0 0")
+                if self.throw!=None and self.trunc!=None:
+                    motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
+                        mrc_file, "-Iter 7 -Tol 0.5 -RotGain 2",
+                        "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
+                        "-OutStack 0", "-SumRange 0 0")
+                else:
+                    motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
+                        mrc_file, "-Iter 7 -Tol 0.5 -RotGain 2", "-PixSize", self.apix, "-FmDose", "-Gpu 0 -Serial 0",
+                        "-OutStack 0", "-SumRange 0 0")
                 motionCor_job.add_inputs(fraction_file)
 
             motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
