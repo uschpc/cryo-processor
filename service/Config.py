@@ -27,7 +27,7 @@ class Config:
     class __Config(configparser.ConfigParser):
 
         def __init__(self):
-            config_file_path = os.path.join(os.environ['HOME'], '.cryoem.conf')
+            config_file_path = os.path.join(os.environ['HOME'], '.cryoem-dev.conf')
             log.info('Reading config from {}'.format(config_file_path))
             configparser.ConfigParser.__init__(self, interpolation=EnvInterpolation())
             try:
