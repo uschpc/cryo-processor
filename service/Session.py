@@ -123,7 +123,7 @@ class Session:
         self.apix = apix # pixel size
         self.fmdose = fmdose # dose in e-/A^2 per frame
         self.kev = kev # voltage
-        self.superresolution = uperresolution # bool
+        self.superresolution = superresolution # bool
         try: self.rawgainref = data[rawgainref] # ls like regex to pickup raw gain ref file
         except: self.rawgainref=None
         try: self.rawdefectsmap = data[rawdefectsmap] # ls like regex to pickup basename prefix
