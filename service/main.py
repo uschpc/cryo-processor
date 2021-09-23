@@ -207,9 +207,10 @@ async def session_status(user: str, session_id: str, api_key: APIKey = Depends(g
                            # superresolution: bool,
                            # api_key: APIKey = Depends(get_api_key)
                            # ):
-async def start_processing( **kwargs ):
-    for k,v in kwargs.items():
-        pass
+async def start_processing(user: str,
+                           session_id: str, 
+                           api_key: APIKey = Depends(get_api_key)
+                           **kwargs ):
     key = "{}/{}".format(user, session_id)
     if key in app.state.sessions:
         s = app.state.sessions[key]
