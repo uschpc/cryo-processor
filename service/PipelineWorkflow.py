@@ -613,7 +613,8 @@ class PipelineWorkflow:
             self.wf.add_jobs(e2proc2d_job2)
             
             #imagemagick - stitch together resized jpg and ctf
-            magick_combined_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg"))
+            magick_combined_jpg_fn = dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg")
+            magick_combined_jpg_file = File(magick_combined_jpg_fn)
             magick_convert = Job("magick")
             magick_convert.add_inputs(dw_jpg_file)
             magick_convert.add_inputs(jpg_ctf_file)
@@ -647,7 +648,7 @@ class PipelineWorkflow:
             slack_notify_job.add_inputs(mc2_stdout)
             slack_notify_job.add_inputs(gctf_log_file)
             slack_notify_job.add_outputs(slack_notify_out, stage_out=True, register_replica=False)
-            slack_notify_job.add_args(fraction_file_path, gctf_log_file.lfn, mc2_stdout.lfn, slack_notify_out)
+            slack_notify_job.add_args(os.path.join(self.outputs_dir, magick_combined_jpg_fn), gctf_log_file.lfn, mc2_stdout.lfn, slack_notify_out)
             slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(slack_notify_job)
             
