@@ -110,6 +110,7 @@ class PipelineWorkflow:
         )
 
         shared_scratch_dir = os.path.join(self.wf_dir, "scratch")
+        self.shared_scratch_dir = shared_scratch_dir
         exec_site = (
             Site(exec_site_name)
             .add_profiles(Namespace.CONDOR, key="grid_resource", value="batch slurm")
@@ -648,7 +649,8 @@ class PipelineWorkflow:
             slack_notify_job.add_inputs(mc2_stdout)
             slack_notify_job.add_inputs(gctf_log_file)
             slack_notify_job.add_outputs(slack_notify_out, stage_out=True, register_replica=False)
-            slack_notify_job.add_args(os.path.join(self.outputs_dir, magick_combined_jpg_fn), gctf_log_file.lfn, mc2_stdout.lfn, slack_notify_out)
+            #slack_notify_job.add_args(os.path.join(self.outputs_dir, magick_combined_jpg_fn), gctf_log_file.lfn, mc2_stdout.lfn, slack_notify_out)
+            slack_notify_job.add_args(os.path.join(self.shared_scratch_dir, magick_combined_jpg_fn), gctf_log_file.lfn, mc2_stdout.lfn, slack_notify_out)
             slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(slack_notify_job)
             
