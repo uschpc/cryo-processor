@@ -472,6 +472,7 @@ class PipelineWorkflow:
         file_list.sort()
         #define filename extension
         self.basename_extension=file_list[0].split('.')[-1]
+        self.basename_suffix=file_list[0].split('.')[-2].split('_')[-1]
         
         #set the number of raw files
         self.no_of_raw=len(file_list)
@@ -650,7 +651,7 @@ class PipelineWorkflow:
             slack_notify_job.add_inputs(gctf_log_file)
             slack_notify_job.add_outputs(slack_notify_out, stage_out=True, register_replica=False)
             #slack_notify_job.add_args(os.path.join(self.outputs_dir, magick_combined_jpg_fn), gctf_log_file.lfn, mc2_stdout.lfn, slack_notify_out)
-            slack_notify_job.add_args(os.path.join(self.shared_scratch_dir, magick_combined_jpg_fn), gctf_log_file.lfn, mc2_stdout.lfn, slack_notify_out)
+            slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), gctf_log_file.lfn, mc2_stdout.lfn, slack_notify_out)
             slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(slack_notify_job)
             
