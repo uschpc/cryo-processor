@@ -76,6 +76,7 @@ def main_loop():
 
     # this is the main event loop for general use
     while app.state.keep_running:
+        log.info("---------------------------------------------------------------------")
         log.info("Waking up main thread")
 
         # check on all the tracked sessions
@@ -196,14 +197,14 @@ async def start_processing(user: str,
                            apix: float,
                            fmdose: float,
                            kev: int,
-                           #rawgainref: str,
-                           #rawdefectsmap: str,
-                           #basename_prefix: str,
-                           #basename_suffix: str,
-                           #basename_extension: str,
-                           #throw: int,
-                           #trunc: int,
-                           #particle_size: int,
+                           rawgainref: str,
+                           rawdefectsmap: str,
+                           basename_prefix: str,
+                           basename_suffix: str,
+                           basename_extension: str,
+                           throw: int,
+                           trunc: int,
+                           particle_size: int,
                            superresolution: bool,
                            api_key: APIKey = Depends(get_api_key)
                            ):
@@ -225,14 +226,14 @@ async def start_processing(user: str,
         s.start_processing(apix = apix,
             fmdose = fmdose,
             kev = kev,
-            #rawgainref = rawgainref,
-            #rawdefectsmap = rawdefectsmap,
-            #basename_prefix = basename_prefix,
-            #basename_suffix = basename_suffix,
-            #basename_extension = basename_extension,
-            #throw = throw,
-            #trunc = trunc,
-            #particle_size = particle_size,
+            rawgainref = rawgainref,
+            rawdefectsmap = rawdefectsmap,
+            basename_prefix = basename_prefix,
+            basename_suffix = basename_suffix,
+            basename_extension = basename_extension,
+            throw = throw,
+            trunc = trunc,
+            particle_size = particle_size,
             superresolution = superresolution,
             )
 

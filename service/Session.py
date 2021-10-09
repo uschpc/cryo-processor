@@ -25,6 +25,7 @@ class Session:
     # list of potenatial states for tracking
     _STATE_UNKNOWN = "unknown"
     _STATE_NEEDS_PROCESSING = "needs_processing"
+    _STATE_PROCESSING_START = "processing_start"
     _STATE_PROCESSING = "processing"
     _STATE_PROCESSING_COMPLETE = "processing_complete"
     _STATE_PROCESSING_FAILURE = "processing_failure"
@@ -59,7 +60,7 @@ class Session:
 
 
     def is_processing(self):
-        return self._state == self._STATE_PROCESSING
+        return self._state == self._STATE_PROCESSING_START or self._state == self._STATE_PROCESSING
 
 
     def get_state(self):
@@ -97,7 +98,7 @@ class Session:
         try:
             pf = self._find_files(os.path.join(self._session_dir, "processed"),"*DW.mrc")
             log.info("processed files are in: %s"%os.path.join(os.path.join(self._session_dir, "processed")))
-            log.info("No. of raw files %i"%len(pf))
+            log.info("No. of processed files %i"%len(pf))
             return len(pf)
         except Exception as e:
             log.info(e)
@@ -118,32 +119,38 @@ class Session:
         return response
 
     
-    def start_processing(self, apix, fmdose, kev, superresolution, **data):
+    def start_processing(self,
+                         apix,
+                         fmdose,
+                         kev,
+                         rawgainref,
+                         rawdefectsmap,
+                         basename_prefix,
+                         basename_suffix,
+                         basename_extension,
+                         throw,
+                         trunc,
+                         particle_size,
+                         superresolution):
         
         self.apix = apix # pixel size
         self.fmdose = fmdose # dose in e-/A^2 per frame
         self.kev = kev # voltage
+        self.superresolution = superresolution
+        self.rawgainref = rawgainref
+        self.rawdefectsmap = rawdefectsmap
+        self.basename_prefix = basename_prefix
+        self.basename_suffix = basename_suffix
+        self.basename_extension = basename_extension
+        self.throw = throw
+        self.trunc = trunc
+        self.particle_size = particle_size
         self.superresolution = superresolution # bool
         log.info("apix: %s"%self.apix)
         log.info("fmdose: %s"%self.fmdose)
         log.info("kev: %s"%self.kev)
         log.info("superresolution: %s"%self.superresolution)
-        try: self.rawgainref = data[rawgainref] # ls like regex to pickup raw gain ref file
-        except: self.rawgainref=None
-        try: self.rawdefectsmap = data[rawdefectsmap] # ls like regex to pickup basename prefix
-        except: self.rawdefectsmap=None
-        try: self.basename_prefix = data[basename_prefix] # ls like regex to pickup basename prefix
-        except: self.basename_prefix=None
-        try: self.basename_suffix = data[basename_suffix] # ls like regex to pickup basename suffix (no underscores)
-        except: self.basename_suffix=None
-        try: self.basename_extension = data[basename_extension] # ls like regex to pickup basename extension
-        except: self.basename_extension=None
-        try: self.throw=data[throw] # how many frames discard from the top
-        except: self.throw=None
-        try: self.trunc=data[trunc] # how many frames keep
-        except: self.trunc=None
-        try: self.particle_size=data[particle_size] # <-- future; stage 2
-        except: self.particle_size=None
+         
         if self.rawgainref!=None:
             log.info("rawgainref: %s"%self.rawgainref)
         if self.rawdefectsmap!=None:
@@ -160,7 +167,7 @@ class Session:
             log.info("trunc: %s"%self.trunc)
         if self.particle_size!=None:
             log.info("particle_size: %s"%self.particle_size)
-        self._state = self._STATE_PROCESSING
+        self._state = self._STATE_PROCESSING_START
         self._next_processing_time = time.time()
     
 
@@ -185,6 +192,8 @@ class Session:
         if self._state == self._STATE_UNKNOWN:
             self._update_processing()
         elif self._state == self._STATE_NEEDS_PROCESSING:
+            self._update_processing()
+        elif self._state == self._STATE_PROCESSING_START:
             self._update_processing()
         elif self._state == self._STATE_PROCESSING:
             self._update_processing()
@@ -217,34 +226,52 @@ class Session:
         wf._submit_dir = self._run_dir
         try:
             status = wf.get_status()
+            status = status['dags']['root']
         except:
-            log.info("unable to get status")
+            log.info("Unable to get workflow status")
+            status = None
             pass
        
-        # FIXME: improve this logic to match the web ui expectations 
+        # logic to match the web ui expectations 
         if status is None or "totals" not in status:
-            self._state = self._STATE_NEEDS_PROCESSING
             self._no_of_succeeded = 0
             self._no_of_failed = 0
         else:
-            self._state = self._STATE_PROCESSING
-            self._no_of_succeeded = status['dags']['root']['succeeded']
-            self._no_of_failed = status['dags']['root']['failed']
+            self._no_of_succeeded = status['succeeded']
+            self._no_of_failed = status['failed']
 
         # is the workflow already running?
         if status is not None:
+            if "state" in status:
+                log.info("Workflow status is: {}".format(status["state"]))
+
             if "state" in status and status["state"] == "Running":
                 return False
+
+            # skip this if we are asked to start a new wf
+            if self._state != self._STATE_PROCESSING_START:
+                if "state" in status and status["state"] == "Failure":
+                    self._next_processing_time = 0
+                    self._state = self._STATE_PROCESSING_FAILURE
+                    return False
+
+        # end condition
+        if (self._no_of_processed == self._no_of_raw):
+            self._next_processing_time = 0
+            self._state = self._STATE_PROCESSING_COMPLETE
+            return
  
         # time to submit a new one? 
         if self._next_processing_time > 0 and \
            self._next_processing_time < time.time():
-            self._next_processing_time = 0
+            # space the workflows a little bit in case of failure
+            self._next_processing_time = time.time() + 120
         else:
             return False
         
         # if we get here, it is time to submit a new workflow 
         log.info("A new workflow is required. Submitting now ...")
+        self._state = self._STATE_PROCESSING
 
         try:
             shutil.rmtree(self._run_dir)
