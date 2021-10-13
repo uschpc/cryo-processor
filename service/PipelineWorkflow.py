@@ -422,9 +422,9 @@ class PipelineWorkflow:
             possible_dm_files_regexes.append(self.rawdefectsmap)
         for i in self.inputs_dir:
             for possible_dm in possible_dm_files_regexes:
-                logger.info("searching defect map here: {} with {} regex".format(i, possible_dm))
                 raw_defect_map_path = self.find_files2(os.path.join(i,"**"), possible_dm)
                 if len(raw_defect_map_path)>=1:
+                    logger.info("searching defect map here: {} with {} regex".format(i, possible_dm))
                     Raw_Defect_Map_path=raw_defect_map_path
                     break
             else:
@@ -481,7 +481,7 @@ class PipelineWorkflow:
             #do all
             pass
         
-        if self.debug:
+        if self.no_of_files_to_proc_in_cycle != -1 and self.debug:
             # when debugging, only do a fraction of the files
             file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
         else:
