@@ -130,30 +130,30 @@ class Session:
         log.info("kev: %s"%self.kev)
         log.info("superresolution: %s"%self.superresolution)
         
-        self.rawgainref = data.get(rawgainref, default=None)
-        #try: self.rawgainref = data[rawgainref] # ls like regex to pickup raw gain ref file
-        #except: self.rawgainref = None
-        self.rawdefectsmap = data.get(rawdefectsmap, default=None)
-        #try: self.rawdefectsmap = data[rawdefectsmap] # ls like regex to pickup basename prefix
-        #except: self.rawdefectsmap = None
-        self.basename_prefix = data.get(basename_prefix, default=None)
-        #try: self.basename_prefix = data[basename_prefix] # ls like regex to pickup basename prefix
-        #except: self.basename_prefix = None
-        self.basename_suffix = data.get(basename_suffix, default=None)
-        #try: self.basename_suffix = data[basename_suffix] # ls like regex to pickup basename suffix (no underscores)
-        #except: self.basename_suffix = None
-        self.basename_extension = data.get(basename_extension, default=None)
-        #try: self.basename_extension = data[basename_extension] # ls like regex to pickup basename extension
-        #except: self.basename_extension = None
-        self.throw = data.get(throw, default=None)
-        #try: self.throw=data[throw] # how many frames discard from the top
-        #except: self.throw = None
-        self.trunc = data.get(trunc, default=None)
-        #try: self.trunc = data[trunc] # how many frames keep
-        #except: self.trunc=None
-        self.particle_size = data.get(particle_size, default=None)
-        #try: self.particle_size = data[particle_size] # <-- future; stage 2
-        #except: self.particle_size = None
+        #self.rawgainref = data.get(rawgainref, default=None)
+        try: self.rawgainref = data[rawgainref] # ls like regex to pickup raw gain ref file
+        except: self.rawgainref = None
+        #self.rawdefectsmap = data.get(rawdefectsmap, default=None)
+        try: self.rawdefectsmap = data[rawdefectsmap] # ls like regex to pickup basename prefix
+        except: self.rawdefectsmap = None
+        #self.basename_prefix = data.get(basename_prefix, default=None)
+        try: self.basename_prefix = data[basename_prefix] # ls like regex to pickup basename prefix
+        except: self.basename_prefix = None
+        #self.basename_suffix = data.get(basename_suffix, default=None)
+        try: self.basename_suffix = data[basename_suffix] # ls like regex to pickup basename suffix (no underscores)
+        except: self.basename_suffix = None
+        #self.basename_extension = data.get(basename_extension, default=None)
+        try: self.basename_extension = data[basename_extension] # ls like regex to pickup basename extension
+        except: self.basename_extension = None
+        #self.throw = data.get(throw, default=None)
+        try: self.throw=data[throw] # how many frames discard from the top
+        except: self.throw = None
+        #self.trunc = data.get(trunc, default=None)
+        try: self.trunc = data[trunc] # how many frames keep
+        except: self.trunc=None
+        #self.particle_size = data.get(particle_size, default=None)
+        try: self.particle_size = data[particle_size] # <-- future; stage 2
+        except: self.particle_size = None
         
         if self.rawgainref!=None:
             log.info("rawgainref: %s"%self.rawgainref)
