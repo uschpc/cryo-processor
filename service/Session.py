@@ -119,38 +119,33 @@ class Session:
         return response
 
     
-    def start_processing(self,
-                         apix,
-                         fmdose,
-                         kev,
-                         rawgainref,
-                         rawdefectsmap,
-                         basename_prefix,
-                         basename_suffix,
-                         basename_extension,
-                         throw,
-                         trunc,
-                         particle_size,
-                         superresolution):
+    def start_processing(self, apix, fmdose, kev, superresolution, **data):
         
         self.apix = apix # pixel size
         self.fmdose = fmdose # dose in e-/A^2 per frame
         self.kev = kev # voltage
-        self.superresolution = superresolution
-        self.rawgainref = rawgainref
-        self.rawdefectsmap = rawdefectsmap
-        self.basename_prefix = basename_prefix
-        self.basename_suffix = basename_suffix
-        self.basename_extension = basename_extension
-        self.throw = throw
-        self.trunc = trunc
-        self.particle_size = particle_size
         self.superresolution = superresolution # bool
         log.info("apix: %s"%self.apix)
         log.info("fmdose: %s"%self.fmdose)
         log.info("kev: %s"%self.kev)
         log.info("superresolution: %s"%self.superresolution)
-         
+        try: self.rawgainref = data[rawgainref] # ls like regex to pickup raw gain ref file
+        except: self.rawgainref=None
+        try: self.rawdefectsmap = data[rawdefectsmap] # ls like regex to pickup basename prefix
+        except: self.rawdefectsmap=None
+        try: self.basename_prefix = data[basename_prefix] # ls like regex to pickup basename prefix
+        except: self.basename_prefix=None
+        try: self.basename_suffix = data[basename_suffix] # ls like regex to pickup basename suffix (no underscores)
+        except: self.basename_suffix=None
+        try: self.basename_extension = data[basename_extension] # ls like regex to pickup basename extension
+        except: self.basename_extension=None
+        try: self.throw=data[throw] # how many frames discard from the top
+        except: self.throw=None
+        try: self.trunc=data[trunc] # how many frames keep
+        except: self.trunc=None
+        try: self.particle_size=data[particle_size] # <-- future; stage 2
+        except: self.particle_size=None
+        
         if self.rawgainref!=None:
             log.info("rawgainref: %s"%self.rawgainref)
         if self.rawdefectsmap!=None:
