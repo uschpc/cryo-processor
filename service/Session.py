@@ -36,7 +36,7 @@ class Session:
     _no_of_processed = 0
     _no_of_failed = 0
     _next_processing_time = 0
-    _no_of_raw = 0
+    _no_of_raw = -1
 
 
     def __init__(self, config, user, session_id):
