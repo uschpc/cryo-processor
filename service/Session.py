@@ -74,23 +74,44 @@ class Session:
 
     def count_raw_files(self):
         try:
-            for i in glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*")):
-                raw_location=(os.path.join(i, "**"),
-                        "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
-                correct_input_dir=i
-                flist = self._find_files(raw_location[0], raw_location[1])
-                if len(flist)>=1:
-                    file_list=flist
-                    self.raw_location = raw_location
-                    break
-            else:
-                flist = self._find_files(self.raw_location[0], self.raw_location[1])
+            possible_raw_files_regexes=['FoilHole*fractions.tiff','FoilHole*fractions.mrc','FoilHole*EER.eer']
+            if self.basename_prefix!=None and self.basename_suffix!=None and self.basename_extension!=None:
+                possible_raw_files_regexes.append("%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
+        
+            for i in self.inputs_dir:
+                for possible_raw_files in possible_raw_files_regexes:
+                    raw_location=(os.path.join(i, "**"), possible_raw_files)
+                    self.correct_input_dir=i
+                    flist = self.find_files2(raw_location[0], raw_location[1])
+                    if len(flist)>=1:
+                        file_list=flist
+                        self.raw_location = raw_location
+                        break
+                else:
+                    continue
+                break
+            
+            
+        
+            # for i in glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*")):
+                # raw_location=(os.path.join(i, "**"),
+                        # "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
+                # correct_input_dir=i
+                # flist = self._find_files(raw_location[0], raw_location[1])
+                # if len(flist)>=1:
+                    # file_list=flist
+                    # self.raw_location = raw_location
+                    # break
+            # else:
+                # flist = self._find_files(self.raw_location[0], self.raw_location[1])
+                
+                
             log.info("RAW files are in %s"%os.path.join(os.path.join(self._session_dir, "raw")))
             log.info("No. of raw files %i"%len(file_list))
             return len(file_list)
         except Exception as e:
             log.info(e)
-            log.info("self.raw_location is not set yet")
+            log.info("There is an issue with determining raw_location")
             return 0
       
 
