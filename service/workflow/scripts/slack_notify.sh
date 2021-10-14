@@ -12,23 +12,28 @@ PROGNAME=`basename $PROGNAME`          # base name of program
 
 
 
-resolution=`cat ${gctf_output_fn} | grep RES_LIMIT | awk '{print $NF}'`
+#resolution=`$PROGDIR/get_data.sh ctf_r $gctf_output_fn`
+#asti=resolution=`$PROGDIR/get_data.sh ctf_a $gctf_output_fn`
+#shifts=`$PROGDIR/get_data.sh mc $mc2_output_fn`
 
-echo "${resolution}" >> $slack_notify_out_fn
-echo "" >> $slack_notify_out_fn
+#echo "${resolution}" >> $slack_notify_out_fn
+#echo "" >> $slack_notify_out_fn
 
-shifts=`cat ${mc2_output_fn} | grep "...... Frame"`
+#shifts=`cat ${mc2_output_fn} | grep "...... Frame"`
 
-echo "${shifts}" >> $slack_notify_out_fn
-echo "" >> $slack_notify_out_fn
+#echo "${shifts}" >> $slack_notify_out_fn
+#echo "" >> $slack_notify_out_fn
 
-message="\"Estimated resolution limit: *${resolution}Å*\nMotion correction shifts:\n${shifts}\""
+#message="\"Estimated resolution limit: *${resolution}Å*\nMotion correction shifts:\n${shifts}\""
 
-echo "${message}" >> $slack_notify_out_fn
-echo "" >> $slack_notify_out_fn
+#echo "${message}" >> $slack_notify_out_fn
+#echo "" >> $slack_notify_out_fn
 
-curl --data-urlencode "file=${img_file_path}" --data-urlencode "message=$(printf 'Estimated resolution limit: *%sÅ*\nMotion correction shifts:\n```%s```\n' "${resolution}" "${shifts}")" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'
-echo "curl --data-urlencode \"file=${img_file_path}\" --data-urlencode \"message=\"${message}\"\" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'" >> $slack_notify_out_fn
+#curl --data-urlencode "file=${img_file_path}" --data-urlencode "message=$(printf 'Estimated resolution limit: *%sÅ*\nMotion correction shifts:\n```%s```\n' "${resolution}" "${shifts}")" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'
+
+curl --data-urlencode "file=${img_file_path}" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'
+
+#echo "curl --data-urlencode \"file=${img_file_path}\" --data-urlencode \"message=\"${message}\"\" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'" >> $slack_notify_out_fn
 
 exit $?
 
