@@ -592,7 +592,7 @@ class PipelineWorkflow:
             
             gctf_job = (
                 Job("gctf").add_args("--apix", self.apix, "--kV", self.kev, "--Cs", "2.7", "--ac", "0.1",
-                                     "--ctfstar", ctf_star_file, "--gid", "0", "--boxsize", "512", mrc_file)
+                                     "--ctfstar", ctf_star_file, "--gid", "0", "--boxsize", "1024", mrc_file)
             )
 
             gctf_job.add_inputs(mrc_file)
@@ -651,7 +651,7 @@ class PipelineWorkflow:
             magick_convert.add_inputs(gaussian_jpg_file)
             magick_convert.add_inputs(jpg_ctf_file)
             magick_convert.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
-            magick_convert.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
+            magick_convert.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x1024", magick_combined_jpg_file)
             magick_convert.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(magick_convert)
             
