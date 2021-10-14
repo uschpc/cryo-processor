@@ -54,6 +54,8 @@ class Session:
         self.basename_prefix = 'FoilHole'
         self.basename_suffix = 'fractions'
         self.basename_extension = 'tiff'
+        self.raw_location = ""
+        self.possible_raw_files = ""
 
     def is_valid(self):
         return os.path.exists(self._session_dir)
@@ -73,50 +75,57 @@ class Session:
 
 
     def count_raw_files(self):
-        try:
-            possible_raw_files_regexes=['FoilHole*fractions.tiff','FoilHole*fractions.mrc','FoilHole*EER.eer']
-            if self.basename_prefix!=None and self.basename_suffix!=None and self.basename_extension!=None:
-                possible_raw_files_regexes.append("%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
-        
-            for i in self.inputs_dir:
-                log.info("input dir %s"%i)
-                for possible_raw_files in possible_raw_files_regexes:
-                    log.info("Possible RAW regex %s"%possible_raw_files)
-                    raw_location=(os.path.join(i, "**"), possible_raw_files)
-                    self.correct_input_dir=i
-                    flist = self.find_files2(raw_location[0], raw_location[1])
-                    if len(flist)>=1:
-                        file_list=flist
-                        self.raw_location = raw_location
-                        log.info("RAW files are in %s"%raw_location)
-                        log.info("No. of raw files %i"%len(file_list))
-                        break
-                else:
-                    continue
-                break
+        if self.raw_location != "" and self.possible_raw_files != "":
+            log.info("using raw_location dir %s and %s as regex"%(self.raw_location,self.possible_raw_files))
+            flist = self.find_files2(raw_location[0], raw_location[1])
+            log.info("No. of raw files in (shortcut) %i"%len(flist))
+            return len(flist)
+        else:
+            try:
+                possible_raw_files_regexes=['FoilHole*fractions.tiff','FoilHole*fractions.mrc','FoilHole*EER.eer']
+                if self.basename_prefix!=None and self.basename_suffix!=None and self.basename_extension!=None:
+                    possible_raw_files_regexes.append("%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
             
-            
-        
-            # for i in glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*")):
-                # raw_location=(os.path.join(i, "**"),
-                        # "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
-                # correct_input_dir=i
-                # flist = self._find_files(raw_location[0], raw_location[1])
-                # if len(flist)>=1:
-                    # file_list=flist
-                    # self.raw_location = raw_location
-                    # break
-            # else:
-                # flist = self._find_files(self.raw_location[0], self.raw_location[1])
+                for i in self.rawdatadirs:
+                    log.info("input dir %s"%i)
+                    for possible_raw_files in possible_raw_files_regexes:
+                        log.info("Possible RAW regex %s"%possible_raw_files)
+                        raw_location=(os.path.join(i, "**"), possible_raw_files)
+                        self.correct_input_dir=i
+                        flist = self.find_files2(raw_location[0], raw_location[1])
+                        if len(flist)>=1:
+                            file_list=flist
+                            self.raw_location = raw_location
+                            self.possible_raw_files = possible_raw_files
+                            log.info("RAW files are in %s"%raw_location)
+                            log.info("No. of raw files %i"%len(file_list))
+                            break
+                    else:
+                        continue
+                    break
                 
                 
-            log.info("RAW files are in %s"%os.path.join(os.path.join(self._session_dir, "raw")))
-            log.info("No. of raw files %i"%len(file_list))
-            return len(file_list)
-        except Exception as e:
-            log.info(e)
-            log.info("There is an issue with determining raw_location")
-            return 0
+            
+                # for i in glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*")):
+                    # raw_location=(os.path.join(i, "**"),
+                            # "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
+                    # correct_input_dir=i
+                    # flist = self._find_files(raw_location[0], raw_location[1])
+                    # if len(flist)>=1:
+                        # file_list=flist
+                        # self.raw_location = raw_location
+                        # break
+                # else:
+                    # flist = self._find_files(self.raw_location[0], self.raw_location[1])
+                    
+                    
+                log.info("RAW files are in %s"%os.path.join(os.path.join(self._session_dir, "raw")))
+                log.info("No. of raw files %i"%len(file_list))
+                return len(file_list)
+            except Exception as e:
+                log.info(e)
+                log.info("There is an issue with determining raw_location")
+                return 0
       
 
     def count_processed_files(self):
@@ -310,10 +319,10 @@ class Session:
             shutil.rmtree(self._scratch_dir)
         except:
             pass
-        rawdatadirs=glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*"))
+        self.rawdatadirs=glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*"))
         self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
                                     self._wf_dir,
-                                    rawdatadirs,
+                                    self.rawdatadirs,
                                     os.path.join(self._session_dir, "processed"),
                                     debug=self._config.getboolean("general", "debug"),
                                     glite_arguments=self._config.get("params", "glite_arguments"),
