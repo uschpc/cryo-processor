@@ -48,6 +48,7 @@ class Session:
         self._wf_dir = os.path.join(self._session_dir, 'workflow')
         self._run_dir = os.path.join(self._wf_dir, 'motioncor2')
         self._scratch_dir = os.path.join(self._wf_dir, 'scratch')
+        self.rawdatadirs=glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*"))
         self._state = self._STATE_UNKNOWN
 
         # defaults to get us started
@@ -319,7 +320,7 @@ class Session:
             shutil.rmtree(self._scratch_dir)
         except:
             pass
-        self.rawdatadirs=glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*"))
+        
         self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
                                     self._wf_dir,
                                     self.rawdatadirs,
