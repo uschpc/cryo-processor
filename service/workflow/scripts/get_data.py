@@ -28,7 +28,7 @@ def get_avg_shifts(strdata):
         return "0 0"
 
 if __name__ == '__main__':
-    with open(sys.argv[2] as f):
+    with open(sys.argv[2]) as f:
         gf=f.read()
         if sys.argv[1]=="ctf_a":
             print("%s"%get_asti(gf))
