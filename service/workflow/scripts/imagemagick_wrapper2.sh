@@ -29,12 +29,22 @@ PROGNAME=`basename $PROGNAME`          # base name of program
 # shift
 
 resolution=`$PROGDIR/get_data.sh ctf_r $3`
-asti=resolution=`$PROGDIR/get_data.sh ctf_a $3`
+asti=`$PROGDIR/get_data.sh ctf_a $3`
 shifts=`$PROGDIR/get_data.sh mc $4`
 #dw_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn
 
+
+echo "$PROGDIR/get_data.sh ctf_r $3"
+echo $resolution
+echo "$PROGDIR/get_data.sh ctf_a $3"
+echo $asti
+echo "$PROGDIR/get_data.sh mc $4"
+echo $shifts
+
+
+
 magick convert +append $1 $2 -resize x1024 tmp.jpg
-magick convert tmp.jpg -font arial -fill yellow -pointsize 40 -gravity NorthEast -annotate +40+40 "Resolution: ${resolution}\nAstigmatism: ${asti}\nShifts: ${shifts/_/ }" $3
+magick convert tmp.jpg -font arial -fill yellow -pointsize 40 -gravity NorthEast -annotate +40+40 "R: ${resolution}\nA: ${asti}\nS: ${shifts/_/ }" $3
 #magick "$@"
 
 exit $?
