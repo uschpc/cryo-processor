@@ -348,7 +348,7 @@ class PipelineWorkflow:
             else:
                 continue
             break
-        if len(Raw_Gain_Ref_SR_path) != 0 and self.gainref_done = False:
+        if len(Raw_Gain_Ref_SR_path) != 0 and self.gainref_done == False:
             Raw_Gain_Ref_SR_path = Raw_Gain_Ref_SR_path[0]
             # get the extension
             gainref_extension=Raw_Gain_Ref_SR_path.split('.')[-1]
@@ -446,7 +446,7 @@ class PipelineWorkflow:
             else:
                 continue
             break
-        if len(Raw_Defect_Map_path) != 0 and self.defmap_done = False:
+        if len(Raw_Defect_Map_path) != 0 and self.defmap_done == False:
             Raw_Defect_Map_path = Raw_Defect_Map_path[0]
             Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
             logger.info("Found Defect Map file {} ...".format(Raw_Defect_Map_name))
