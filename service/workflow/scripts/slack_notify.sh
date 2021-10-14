@@ -16,12 +16,12 @@ shifts=`cat ${mc2_output_fn} | grep "...... Frame"`
 echo "${shifts}" >> $slack_notify_out_fn
 echo "" >> $slack_notify_out_fn
 
-message="\"Estimated resolution limit: ${resolution}\nMotion correction shifts:\n${shifts}\""
+message="\"Estimated resolution limit: *${resolution}*\nMotion correction shifts:\n${shifts}\""
 
 echo "${message}" >> $slack_notify_out_fn
 echo "" >> $slack_notify_out_fn
 
-curl --data-urlencode "file=${img_file_path}" --data-urlencode "message=\"$(printf 'Estimated resolution limit: %s\nMotion correction shifts:\n%s\n' "${resolution}" "${shifts}")\"" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'
+curl --data-urlencode "file=${img_file_path}" --data-urlencode "message=\"$(printf 'Estimated resolution limit: *%s*\nMotion correction shifts:\n%s\n' "${resolution}" "${shifts}")\"" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'
 echo "curl --data-urlencode \"file=${img_file_path}\" --data-urlencode \"message=\"${message}\"\" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'" >> $slack_notify_out_fn
 
 exit $?
