@@ -682,11 +682,20 @@ class PipelineWorkflow:
             #imagemagick - stitch together resized jpg and add text
             magick_combined_jpg_fn = dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg")
             magick_combined_jpg_file = File(magick_combined_jpg_fn)
+            
+            
+            
             magick_convert = Job("magick2")
             magick_convert.add_inputs(gaussian_jpg_file)
             magick_convert.add_inputs(jpg_ctf_file)
+            magick_convert.add_inputs(gctf_log_file)
+            magick_convert.add_inputs(mc2_stdout)
+            
+            
             magick_convert.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
-            magick_convert.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x1024", magick_combined_jpg_file)
+
+            #magick_convert.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x1024", magick_combined_jpg_file)
+            magick_convert.add_args(dw_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn)
             magick_convert.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(magick_convert)
             
