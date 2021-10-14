@@ -549,12 +549,12 @@ class PipelineWorkflow:
                 #case where we have gain reference file
                 if self.throw!=None and self.trunc!=None:
                     motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                        mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5 -RotGain 2",
+                        mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5",
                         "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
                         "-OutStack 0", "-SumRange 0 0")
                 else:
                     motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                        mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5 -RotGain 2", "-PixSize", self.apix, "-FmDose", 
+                        mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5", "-PixSize", self.apix, "-FmDose", 
                         self.fmdose, "-Gpu 0 -Serial 0", "-OutStack 0", "-SumRange 0 0")
 
                 motionCor_job.add_inputs(fraction_file, FlipY)
@@ -562,12 +562,12 @@ class PipelineWorkflow:
                 #case where we do not have gain referencee file
                 if self.throw!=None and self.trunc!=None:
                     motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                        mrc_file, "-Iter 7 -Tol 0.5 -RotGain 2",
+                        mrc_file, "-Iter 7 -Tol 0.5",
                         "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
                         "-OutStack 0", "-SumRange 0 0")
                 else:
                     motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                        mrc_file, "-Iter 7 -Tol 0.5 -RotGain 2", "-PixSize", self.apix, "-FmDose", "-Gpu 0 -Serial 0",
+                        mrc_file, "-Iter 7 -Tol 0.5", "-PixSize", self.apix, "-FmDose", "-Gpu 0 -Serial 0",
                         "-OutStack 0", "-SumRange 0 0")
                 motionCor_job.add_inputs(fraction_file)
 
