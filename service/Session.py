@@ -79,13 +79,17 @@ class Session:
                 possible_raw_files_regexes.append("%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
         
             for i in self.inputs_dir:
+                log.info("input dir %s"%i)
                 for possible_raw_files in possible_raw_files_regexes:
+                    log.info("Possible RAW regex %s"%possible_raw_files)
                     raw_location=(os.path.join(i, "**"), possible_raw_files)
                     self.correct_input_dir=i
                     flist = self.find_files2(raw_location[0], raw_location[1])
                     if len(flist)>=1:
                         file_list=flist
                         self.raw_location = raw_location
+                        log.info("RAW files are in %s"%raw_location)
+                        log.info("No. of raw files %i"%len(file_list))
                         break
                 else:
                     continue
@@ -290,7 +294,7 @@ class Session:
         if self._next_processing_time > 0 and \
            self._next_processing_time < time.time():
             # space the workflows a little bit in case of failure
-            self._next_processing_time = time.time() + 120
+            self._next_processing_time = time.time() + 60
         else:
             return False
         

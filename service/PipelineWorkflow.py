@@ -62,7 +62,9 @@ class PipelineWorkflow:
         
         self.no_of_processed = 0
         self.no_of_raw = 0
-        self.processed = []
+        self.gainref_done = False
+        self.defmap_done = False
+        #self.processed = []
         
 
     # --- Write files in directory --------------------------------------------
@@ -346,7 +348,7 @@ class PipelineWorkflow:
             else:
                 continue
             break
-        if len(Raw_Gain_Ref_SR_path) != 0:
+        if len(Raw_Gain_Ref_SR_path) != 0 and self.gainref_done = False:
             Raw_Gain_Ref_SR_path = Raw_Gain_Ref_SR_path[0]
             # get the extension
             gainref_extension=Raw_Gain_Ref_SR_path.split('.')[-1]
@@ -423,6 +425,7 @@ class PipelineWorkflow:
             self.wf.add_jobs(newstack_gainref_job)
             self.wf.add_jobs(clip_gainref_job)
             self.wf.add_jobs(clip_gainref_superres_job)
+            self.gainref_done = True
         else:
             logger.info("Raw_Gain_Ref_SR_path {} from else...".format(Raw_Gain_Ref_SR_path))
             pass
@@ -443,7 +446,7 @@ class PipelineWorkflow:
             else:
                 continue
             break
-        if len(Raw_Defect_Map_path) != 0:
+        if len(Raw_Defect_Map_path) != 0 and self.defmap_done = False:
             Raw_Defect_Map_path = Raw_Defect_Map_path[0]
             Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
             logger.info("Found Defect Map file {} ...".format(Raw_Defect_Map_name))
@@ -459,6 +462,7 @@ class PipelineWorkflow:
             dm2mrc_defect_map_job.add_inputs(Raw_Defect_Map)
             dm2mrc_defect_map_job.add_outputs(Defect_Map, stage_out=True)
             self.wf.add_jobs(dm2mrc_defect_map_job)
+            self.defmap_done = True
         else:
             logger.info("Raw_Defect_Map_path {} from else...".format(Raw_Defect_Map_path))
             pass
@@ -548,16 +552,34 @@ class PipelineWorkflow:
             if len(Raw_Gain_Ref_SR_path) != 0:
                 #case where we have gain reference file
                 if self.throw!=None and self.trunc!=None:
-                    motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                        mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5",
-                        "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
-                        "-OutStack 0", "-SumRange 0 0")
+                    # case for k3
+                    if self.kev == "300":
+                        motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
+                            mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5",
+                            "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
+                            "-OutStack 0", "-SumRange 0 0")
+                        motionCor_job.add_inputs(fraction_file, FlipY)
+                    # case for f4
+                    elif self.kev == "200":
+                        motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
+                            mrc_file, "-Gain", Gain_Ref,"-Iter 7 -Tol 0.5",
+                            "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
+                            "-OutStack 0", "-SumRange 0 0")
+                        motionCor_job.add_inputs(fraction_file, Gain_Ref)
                 else:
-                    motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                        mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5", "-PixSize", self.apix, "-FmDose", 
-                        self.fmdose, "-Gpu 0 -Serial 0", "-OutStack 0", "-SumRange 0 0")
+                    # case for k3
+                    if self.kev == "300":
+                        motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
+                            mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5", "-PixSize", self.apix, "-FmDose", 
+                            self.fmdose, "-Gpu 0 -Serial 0", "-OutStack 0", "-SumRange 0 0")
+                        motionCor_job.add_inputs(fraction_file, FlipY)
+                    # case for f4
+                    elif self.kev == "200":
+                        motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
+                            mrc_file, "-Gain", Gain_Ref,"-Iter 7 -Tol 0.5", "-PixSize", self.apix, "-FmDose", 
+                            self.fmdose, "-Gpu 0 -Serial 0", "-OutStack 0", "-SumRange 0 0")
+                        motionCor_job.add_inputs(fraction_file, Gain_Ref)
 
-                motionCor_job.add_inputs(fraction_file, FlipY)
             else:
                 #case where we do not have gain referencee file
                 if self.throw!=None and self.trunc!=None:
