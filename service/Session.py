@@ -98,7 +98,7 @@ class Session:
                         file_list=flist
                         self.raw_location = raw_location
                         self.possible_raw_files = possible_raw_files
-                        log.info("RAW files are in %s"%raw_location)
+                        log.info("RAW files are in %s"%os.path.join(raw_location[0],raw_location[1]))
                         log.info("No. of raw files %i"%len(file_list))
                         break
                 else:
