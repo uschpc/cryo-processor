@@ -17,7 +17,10 @@ export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/gctf-1.18/bin:$PATH
 #provide old cuda libs for gctf to work with newer cuda on a40
 export LD_LIBRARY_PATH=/home1/cryoemadmin/software/gctf_libs_from_c10.1.243_to_work_with_c11.2.0_on_a40:$LD_LIBRARY_PATH
 
+#debug
 #ldd `which gctf`
+echo `hostname`
+echo
 
 gctf "$@"
 
