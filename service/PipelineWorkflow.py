@@ -573,8 +573,8 @@ class PipelineWorkflow:
                         
             gctf_stdout_file_name=mrc_file_name.replace(".mrc","_gctf_stdout.txt")
             gctf_stderr_file_name=mrc_file_name.replace(".mrc","_gctf_stderr.txt")
-            gctf_stdout = File(mc2_stdout_file_name)
-            gctf_stderr = File(mc2_stderr_file_name)
+            gctf_stdout = File(gctf_stdout_file_name)
+            gctf_stderr = File(gctf_stderr_file_name)
             
             
             gctf_job = (
