@@ -571,6 +571,11 @@ class PipelineWorkflow:
             ctf_file = File(mrc_file_name.replace(".mrc",".ctf"))
             gctf_log_file = File(mrc_file_name.replace(".mrc","_gctf.log"))
                         
+            gctf_stdout_file_name=mrc_file_name.replace(".mrc","_gctf_stdout.txt")
+            gctf_stderr_file_name=mrc_file_name.replace(".mrc","_gctf_stderr.txt")
+            gctf_stdout = File(mc2_stdout_file_name)
+            gctf_stderr = File(mc2_stderr_file_name)
+            
             
             gctf_job = (
                 Job("gctf").add_args("--apix", self.apix, "--kV", self.kev, "--Cs", "2.7", "--ac", "0.1",
@@ -582,6 +587,8 @@ class PipelineWorkflow:
             #gctf_job.add_outputs(ctf_pf_file, stage_out=True, register_replica=True)
             gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=False)
             gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
+            gctf_job.set_stdout(gctf_stdout, stage_out=True, register_replica=False)
+            gctf_job.set_stderr(gctf_stderr, stage_out=True, register_replica=False)
             gctf_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(gctf_job)
 
