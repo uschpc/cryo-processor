@@ -33,13 +33,14 @@ asti=`$PROGDIR/get_data.sh ctf_a $3`
 shifts=`$PROGDIR/get_data.sh mc $4`
 #dw_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn
 
+fout=$4
 
-echo "$PROGDIR/get_data.sh ctf_r $3"
-echo $resolution
-echo "$PROGDIR/get_data.sh ctf_a $3"
-echo $asti
-echo "$PROGDIR/get_data.sh mc $4"
-echo $shifts
+echo "$PROGDIR/get_data.sh ctf_r $3" >> $fout
+echo $resolution  >> $fout
+echo "$PROGDIR/get_data.sh ctf_a $3"  >> $fout
+echo $asti  >> $fout
+echo "$PROGDIR/get_data.sh mc $4"  >> $fout
+echo $shifts  >> $fout
 
 
 
