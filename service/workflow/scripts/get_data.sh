@@ -19,7 +19,7 @@ PROGNAME=`basename $PROGNAME`          # base name of program
 #ctf_r: "resolution"
 #ctf_a: "astigmatism"
 #mc: "avg shifts"
-echo $PROGNAME
-echo $PROGDIR
+#echo $PROGNAME
+#echo $PROGDIR
 
 python3 $PROGDIR/get_data.py $1 $2
