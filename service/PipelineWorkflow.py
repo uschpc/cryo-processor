@@ -257,7 +257,18 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/imagemagick_wrapper.sh"),
             is_stageable=False
         )
-        magick.add_pegasus_profile( cores="1",
+        magick.add_pegasus_profile( cores="2",
+                                        runtime="300",
+                                        memory="2048"
+        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+
+        magick2 = Transformation(
+            "magick2",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/imagemagick_wrapper2.sh"),
+            is_stageable=False
+        )
+        magick.add_pegasus_profile( cores="2",
                                         runtime="300",
                                         memory="2048"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
@@ -268,7 +279,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/gaussian.sh"),
             is_stageable=False
         )
-        gaussian.add_pegasus_profile( cores="1",
+        gaussian.add_pegasus_profile( cores="2",
                                         runtime="300",
                                         memory="2048"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
@@ -309,6 +320,7 @@ class PipelineWorkflow:
         self.tc.add_transformations(gctf)
         self.tc.add_transformations(e2proc2d)
         self.tc.add_transformations(magick)
+        self.tc.add_transformations(magick2)
         self.tc.add_transformations(gaussian)
         self.tc.add_transformations(grep_wrapper)
         self.tc.add_transformations(slack_notify)
@@ -666,10 +678,11 @@ class PipelineWorkflow:
             self.wf.add_jobs(gaussian_filter)
             
 
-            #imagemagick - stitch together resized jpg and ctf
+
+            #imagemagick - stitch together resized jpg and add text
             magick_combined_jpg_fn = dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg")
             magick_combined_jpg_file = File(magick_combined_jpg_fn)
-            magick_convert = Job("magick")
+            magick_convert = Job("magick2")
             magick_convert.add_inputs(gaussian_jpg_file)
             magick_convert.add_inputs(jpg_ctf_file)
             magick_convert.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
