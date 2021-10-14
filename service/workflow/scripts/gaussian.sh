@@ -112,8 +112,8 @@ export XDG_DATA_DIRS=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/gtkplus-3.20.10-
 # set default params
 #"-k high -m 30 -w 1"
 width=1
-mix=40
-kind="high"
+mix=50
+kind=low
 
 # set directory for temporary files
 dir="."    # suggestions are dir="." or dir="/tmp"
@@ -275,6 +275,9 @@ if convert -quiet "$infile" +repage "$tmpA"
 fi
 
 #process the image
+width=1
+mix=50
+kind=low
 if [ "$kind" = "low" ]
 	then
 	convert $tmpA -blur 0x$width $tmp0
