@@ -259,7 +259,19 @@ class PipelineWorkflow:
                                         runtime="300",
                                         memory="2048"
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
-        
+
+        gaussian = Transformation(
+            "gaussian",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/gaussian.sh"),
+            is_stageable=False
+        )
+        gaussian.add_pegasus_profile( cores="1",
+                                        runtime="300",
+                                        memory="2048"
+        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+
+
         grep_wrapper = Transformation(
             "grep_wrapper",
             site=exec_site_name,
@@ -295,6 +307,7 @@ class PipelineWorkflow:
         self.tc.add_transformations(gctf)
         self.tc.add_transformations(e2proc2d)
         self.tc.add_transformations(magick)
+        self.tc.add_transformations(gaussian)
         self.tc.add_transformations(grep_wrapper)
         self.tc.add_transformations(slack_notify)
 
@@ -620,12 +633,22 @@ class PipelineWorkflow:
             e2proc2d_job2.add_args(ctf_file, jpg_ctf_file)
             e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(e2proc2d_job2)
+
+            # make an image file that makes particles more visible using filters
+            gaussian_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg",".filtered.jpg"))
+            gaussian_filter = Job("gaussian")
+            gaussian_filter.add_inputs(magick_jpg_file)
+            gaussian_filter.add_outputs(gaussian_jpg_file, stage_out=True, register_replica=False)
+            gaussian_filter.add_args(magick_jpg_file, gaussian_jpg_file)
+            gaussian_filter.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            self.wf.add_jobs(gaussian_filter)
             
+
             #imagemagick - stitch together resized jpg and ctf
             magick_combined_jpg_fn = dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg")
             magick_combined_jpg_file = File(magick_combined_jpg_fn)
             magick_convert = Job("magick")
-            magick_convert.add_inputs(dw_jpg_file)
+            magick_convert.add_inputs(gaussian_jpg_file)
             magick_convert.add_inputs(jpg_ctf_file)
             magick_convert.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
             magick_convert.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
