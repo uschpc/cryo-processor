@@ -6,6 +6,12 @@ slack_notify_out_fn=$4
 #resolution="$2"
 #shifts="$3"
 
+PROGNAME=`type $0 | awk '{print $3}'`  # search for executable on path
+PROGDIR=`dirname $PROGNAME`            # extract directory of program
+PROGNAME=`basename $PROGNAME`          # base name of program
+
+
+
 resolution=`cat ${gctf_output_fn} | grep RES_LIMIT | awk '{print $NF}'`
 
 echo "${resolution}" >> $slack_notify_out_fn
