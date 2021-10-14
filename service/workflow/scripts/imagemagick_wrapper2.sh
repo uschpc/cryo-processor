@@ -34,7 +34,7 @@ shifts=`$PROGDIR/get_data.sh mc $4`
 #dw_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn
 
 magick convert +append $1 $2 -resize x1024 tmp.jpg
-magick convert tmp.jpg -font arial -fill yellow -pointsize 40 -gravity NorthEast -annotate +25+25 "Resolution: $resolution\nAstigmatism: $asti\nShifts: $shifts" $3
+magick convert tmp.jpg -font arial -fill yellow -pointsize 40 -gravity NorthEast -annotate +25+25 "Resolution: $resolution\nAstigmatism: $asti\nShifts: ${shifts/_/ }" $3
 #magick "$@"
 
 exit $?
