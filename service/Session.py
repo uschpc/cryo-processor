@@ -78,7 +78,7 @@ class Session:
     def count_raw_files(self):
         if self.raw_location != "" and self.possible_raw_files != "":
             log.info("using raw_location dir %s and %s as regex"%(self.raw_location,self.possible_raw_files))
-            flist = self.find_files2(raw_location[0], raw_location[1])
+            flist = self.find_files(raw_location[0], raw_location[1])
             log.info("No. of raw files in (shortcut) %i"%len(flist))
             return len(flist)
         else:
@@ -93,7 +93,7 @@ class Session:
                         log.info("Possible RAW regex %s"%possible_raw_files)
                         raw_location=(os.path.join(i, "**"), possible_raw_files)
                         self.correct_input_dir=i
-                        flist = self.find_files2(raw_location[0], raw_location[1])
+                        flist = self.find_files(raw_location[0], raw_location[1])
                         if len(flist)>=1:
                             file_list=flist
                             self.raw_location = raw_location
