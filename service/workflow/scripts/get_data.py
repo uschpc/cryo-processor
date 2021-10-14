@@ -15,8 +15,6 @@ def get_reso(strdata):
     else:
         return "0"
 def get_avg_shifts(strdata):
-            avg_shifts=""
-            with open(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), mc2_stdout.lfn) as f):
     all_shifts=re.findall('\.\.\.\.\.\.\s+Frame\s+\(.*?\)\s+shift:\s+(.*?\..*?)\s+(.*?\..*?)\n',f.read())
     if all_shifts != []:
         #calculate avg_shifts
