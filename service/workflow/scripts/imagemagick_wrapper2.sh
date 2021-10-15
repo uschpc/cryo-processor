@@ -42,7 +42,7 @@ shifts="`$PROGDIR/get_data.sh mc $5`"
 #echo "$PROGDIR/get_data.sh mc $5"  >> $fout
 #echo $shifts  >> $fout
 
-magick convert +append $1 $2 -resize x1024 - | magick convert - -font DejaVu-Sans -fill YellowGreen -pointsize 80 -interline-spacing 12 -gravity NorthWest -annotate +40+40 "R: ${resolution}Å" -annotate +40+140 "A: ${asti}" -annotate +40+240 "S: ${shifts/_/ }" $3
+magick convert +append $1 $2 -resize x1024 - | magick convert - -font DejaVu-Sans -fill yellow3 -pointsize 80 -interline-spacing 12 -gravity NorthWest -annotate +40+40 "R: ${resolution}Å" -annotate +40+140 "A: ${asti}" -annotate +40+240 "S: ${shifts/_/ }" $3
 #magick "$@"
 
 exit $?
