@@ -33,21 +33,21 @@ asti="`$PROGDIR/get_data.sh ctf_a $4`"
 shifts="`$PROGDIR/get_data.sh mc $5`"
 #dw_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn
 
-fout=$6
+#fout=$6
 
-echo "$PROGDIR/get_data.sh ctf_r $4" >> $fout
-echo $resolution  >> $fout
-echo "$PROGDIR/get_data.sh ctf_a $4"  >> $fout
-echo $asti  >> $fout
-echo "$PROGDIR/get_data.sh mc $5"  >> $fout
-echo $shifts  >> $fout
+#echo "$PROGDIR/get_data.sh ctf_r $4" >> $fout
+#echo $resolution  >> $fout
+#echo "$PROGDIR/get_data.sh ctf_a $4"  >> $fout
+#echo $asti  >> $fout
+#echo "$PROGDIR/get_data.sh mc $5"  >> $fout
+#echo $shifts  >> $fout
 
 #-annotate +40+40
 
 
 # magick convert +append $1 $2 -resize x1024 tmp.jpg
 # magick convert tmp.jpg -font arial -fill yellow -pointsize 80 -interline-spacing 12 -gravity NorthEast label:"R: ${resolution}\nA: ${asti}\nS: ${shifts/_/ }" $3
-magick convert +append $1 $2 -resize x1024 -font arial -fill yellow -pointsize 80 -interline-spacing 12 -gravity NorthEast label:"R: ${resolution}\nA: ${asti}\nS: ${shifts/_/ }" $3
+magick convert +append $1 $2 -resize x1024 -font arial -fill yellow -pointsize 40 -interline-spacing 12 -gravity NorthEast label:"R: ${resolution}\nA: ${asti}\nS: ${shifts/_/ }" $3
 
 #magick "$@"
 
