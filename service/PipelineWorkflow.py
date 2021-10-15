@@ -645,7 +645,8 @@ class PipelineWorkflow:
             e2proc2d_job1 = Job("e2proc2d")            
             e2proc2d_job1.add_inputs(dw_file)
             e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
-            e2proc2d_job1.add_args("--average", dw_file, dw_jpg_file)
+            #e2proc2d_job1.add_args("--average", dw_file, dw_jpg_file)
+            e2proc2d_job1.add_args("--process=filter.lowpass.gauss:cutoff_freq=0.1", dw_file, dw_jpg_file)
             e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(e2proc2d_job1)
             
@@ -668,14 +669,14 @@ class PipelineWorkflow:
             e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(e2proc2d_job2)
 
-            # make an image file that makes particles more visible using filters
-            gaussian_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg",".filtered.jpg"))
-            gaussian_filter = Job("gaussian")
-            gaussian_filter.add_inputs(magick_jpg_file)
-            gaussian_filter.add_outputs(gaussian_jpg_file, stage_out=True, register_replica=False)
-            gaussian_filter.add_args(magick_jpg_file, gaussian_jpg_file)
-            gaussian_filter.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            self.wf.add_jobs(gaussian_filter)
+            # # make an image file that makes particles more visible using filters
+            # gaussian_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg",".filtered.jpg"))
+            # gaussian_filter = Job("gaussian")
+            # gaussian_filter.add_inputs(magick_jpg_file)
+            # gaussian_filter.add_outputs(gaussian_jpg_file, stage_out=True, register_replica=False)
+            # gaussian_filter.add_args(magick_jpg_file, gaussian_jpg_file)
+            # gaussian_filter.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # self.wf.add_jobs(gaussian_filter)
             
 
 
@@ -687,7 +688,7 @@ class PipelineWorkflow:
             
             
             magick_convert = Job("magick2")
-            magick_convert.add_inputs(gaussian_jpg_file)
+            magick_convert.add_inputs(magick_jpg_file)
             magick_convert.add_inputs(jpg_ctf_file)
             magick_convert.add_inputs(gctf_log_file)
             magick_convert.add_inputs(mc2_stdout)
@@ -697,7 +698,7 @@ class PipelineWorkflow:
             #magick_convert.add_outputs(magick_combined_jpg_out, stage_out=True, register_replica=False)
             #magick_convert.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x1024", magick_combined_jpg_file)
             #magick_convert.add_args(dw_jpg_file, jpg_ctf_file, magick_combined_jpg_file, os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), gctf_log_file.lfn), os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), mc2_stdout.lfn), magick_combined_jpg_out)
-            magick_convert.add_args(gaussian_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn)
+            magick_convert.add_args(magick_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn)
             magick_convert.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(magick_convert)
             
