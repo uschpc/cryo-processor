@@ -42,10 +42,11 @@ echo $asti  >> $fout
 echo "$PROGDIR/get_data.sh mc $4"  >> $fout
 echo $shifts  >> $fout
 
+#-annotate +40+40
 
 
 magick convert +append $1 $2 -resize x1024 tmp.jpg
-magick convert tmp.jpg -font arial -fill yellow -pointsize 80 -gravity NorthEast -annotate +40+40 "R: ${resolution}\nA: ${asti}\nS: ${shifts/_/ }" $3
+magick convert tmp.jpg -font arial -fill yellow -pointsize 80 -interline-spacing 12 -gravity NorthEast label:"R: ${resolution}\nA: ${asti}\nS: ${shifts/_/ }" $3
 #magick "$@"
 
 exit $?
