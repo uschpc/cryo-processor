@@ -646,7 +646,7 @@ class PipelineWorkflow:
             e2proc2d_job1.add_inputs(dw_file)
             e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
             #e2proc2d_job1.add_args("--average", dw_file, dw_jpg_file)
-            e2proc2d_job1.add_args("--process=filter.lowpass.gauss:cutoff_freq=0.1", dw_file, dw_jpg_file)
+            e2proc2d_job1.add_args("--process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane", dw_file, dw_jpg_file)
             e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(e2proc2d_job1)
             
