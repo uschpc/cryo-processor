@@ -112,7 +112,7 @@ export XDG_DATA_DIRS=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/gtkplus-3.20.10-
 # set default params
 #"-k high -m 30 -w 1"
 width=1
-mix=60
+mix=100
 kind=high
 
 # set directory for temporary files
@@ -276,7 +276,7 @@ fi
 
 #process the image
 width=1
-mix=60
+mix=100
 kind=high
 if [ "$kind" = "low" ]
 	then
