@@ -1,14 +1,15 @@
 #!/bin/bash
 img_file_path=$1
-gctf_output_fn=$2
-mc2_output_fn=$3
-slack_notify_out_fn=$4
+#gctf_output_fn=$2
+#mc2_output_fn=$3
+#slack_notify_out_fn=$4
+#slack_notify_out_fn=$4
 #resolution="$2"
 #shifts="$3"
 
-PROGNAME=`type $0 | awk '{print $3}'`  # search for executable on path
-PROGDIR=`dirname $PROGNAME`            # extract directory of program
-PROGNAME=`basename $PROGNAME`          # base name of program
+#PROGNAME=`type $0 | awk '{print $3}'`  # search for executable on path
+#PROGDIR=`dirname $PROGNAME`            # extract directory of program
+#PROGNAME=`basename $PROGNAME`          # base name of program
 
 
 
