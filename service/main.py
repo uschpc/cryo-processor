@@ -156,7 +156,7 @@ async def shutdown():
             "content": {
                 "application/json": {
                     "example": {
-                        "sessions": [{"session_id": "K3_2-20210322121212"}]
+                        "sessions": [{"session_id": "20211010_USC_osinski_K3_samplename"}]
                     }
                 }
             }

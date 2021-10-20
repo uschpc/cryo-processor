@@ -15,10 +15,12 @@ log = logging.getLogger('cryoem')
 
 
 class Session:
-
+    #CF project_id
+    _project_id = None
+    
     # USC netid
     _user = None
-
+    
     # session as the directory is named under /cryoem1/test/cryo-pegasus-test/[project_id]/[user]/[session_id]
     _session_id = None
  
@@ -47,6 +49,7 @@ class Session:
         self._session_dir = os.path.join(config.get('general', 'session_dir'), self._project_id, self._user, self._session_id)
         log.info("using _session_dir dir %s"%(self._session_dir))
         self._wf_dir = os.path.join(self._session_dir, 'workflow')
+        self._processed_dir = os.path.join(self._session_dir, 'processed')
         self._run_dir = os.path.join(self._wf_dir, 'motioncor2')
         self._scratch_dir = os.path.join(self._wf_dir, 'scratch')
         self.rawdatadirs=glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*"))
@@ -134,8 +137,8 @@ class Session:
 
     def count_processed_files(self):
         try:
-            pf = self._find_files(os.path.join(self._session_dir, "processed"),"*DW.mrc")
-            log.info("processed files are in: %s"%os.path.join(os.path.join(self._session_dir, "processed")))
+            pf = self._find_files(self._processed_dir,"*DW.mrc")
+            log.info("processed files are in: %s"%self._processed_dir)
             log.info("No. of processed files %i"%len(pf))
             return len(pf)
         except Exception as e:
@@ -332,7 +335,7 @@ class Session:
         self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
                                     self._wf_dir,
                                     self.rawdatadirs,
-                                    os.path.join(self._session_dir, "processed"),
+                                    self._processed_dir,
                                     debug=self._config.getboolean("general", "debug"),
                                     glite_arguments=self._config.get("params", "glite_arguments"),
                                     maxjobs=self._config.get("params", "maxjobs"),
