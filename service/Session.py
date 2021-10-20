@@ -266,7 +266,7 @@ class Session:
         # 'unready': 0}
         wf = Workflow("motioncor2")
         wf._submit_dir = self._run_dir
-        log.info("Workflow wf._submit_dir is: {}".format(status["wf._submit_dir"]))
+        log.info("Workflow wf._submit_dir is: {}".format(wf._submit_dir))
         try:
             status = wf.get_status()
             status = status['dags']['root']
