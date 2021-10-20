@@ -105,7 +105,7 @@ def main_loop():
 
 
 def load_state():
-    sfilename = os.path.join(os.environ['HOME'], '.cryoem.state')
+    sfilename = os.path.join(os.environ['HOME'], '.cryoem-dev.state')
     if os.path.exists(sfilename):
         with open(sfilename) as f:
             j = json.load(open(sfilename))
