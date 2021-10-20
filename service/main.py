@@ -185,7 +185,7 @@ async def session_status(project_id: str, user: str, session_id: str, api_key: A
     else:
         s = Session(config, project_id, user, session_id)
         if not s.is_valid():
-            # should this be a 404?
+            # should this be a 404? TO: "no"
             return {"state": "no_such_session"}
         app.state.sessions[key] = s
 
@@ -210,10 +210,7 @@ async def start_processing(project_id: str,
                            superresolution: bool,
                            api_key: APIKey = Depends(get_api_key)
                            ):
-# async def start_processing(user: str,
-                           # session_id: str, 
-                           # api_key: APIKey = Depends(get_api_key)
-                           # **kwargs ):
+
     key = "{}/{}/{}".format(project_id, user, session_id)
     if key in app.state.sessions:
         s = app.state.sessions[key]

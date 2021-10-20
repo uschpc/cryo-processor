@@ -442,6 +442,7 @@ class PipelineWorkflow:
         else:
             logger.info("FAILED: Raw_Gain_Ref_SR_path {} from else...".format(Raw_Gain_Ref_SR_path))
             pass
+        
         #Try to find Defect Map file - it might not be a part of the dataset; file is not needed for now
         logger.info("looking for Defect Map")
         possible_dm_files_regexes=['*Map.m1.dm4']
@@ -800,6 +801,10 @@ class PipelineWorkflow:
         self.create_workflow()
    
         self.write()
+        
+        logger.info("os.getcwd() {}".format(os.getcwd()))
+        logger.info("self.wf_name {}".format(self.wf_name))
+        
 
         self.wf.plan(submit=True,
                      sites=["slurm"],
