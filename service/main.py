@@ -117,7 +117,7 @@ def save_state():
     j = {}
     for sid, session in app.state.sessions.items():
         j[sid] = session.get_state()
-    with open(os.path.join(os.environ['HOME'], '.cryoem.state'), 'w') as f:
+    with open(os.path.join(os.environ['HOME'], '.cryoem-dev.state'), 'w') as f:
         json.dump(j, f)
 
 
