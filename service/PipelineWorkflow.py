@@ -522,7 +522,7 @@ class PipelineWorkflow:
         
 
         for fraction_file_path in file_list:
-            logger.info("fraction_file_path {}".format(fraction_file_path))
+            #logger.info("fraction_file_path {}".format(fraction_file_path))
             fraction_file_name = os.path.basename(fraction_file_path)
             fraction_file = File(fraction_file_name)
             self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))
