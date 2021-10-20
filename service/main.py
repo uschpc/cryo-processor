@@ -149,7 +149,7 @@ async def shutdown():
     app.state.keep_running = False
 
 
-@app.get("/{user}/sessions",
+@app.get("/{project_id}/{user}/sessions",
     responses={
         200: {
             "description": "Success",
@@ -163,13 +163,13 @@ async def shutdown():
         }
     }
 )
-async def sessions(user: str, api_key: APIKey = Depends(get_api_key)):
+async def sessions(project_id: str, user: str, api_key: APIKey = Depends(get_api_key)):
     
     log.info("In sessions(), id is {}".format(id(app.state.sessions)))
 
     response = {"sessions": []}
 
-    for d in os.listdir(os.path.join(config.get('general', 'session_dir'), user)):
+    for d in os.listdir(os.path.join(config.get('general', 'session_dir'), project_id, user)):
         response["sessions"].append({"session_id": d})
 
     return response
