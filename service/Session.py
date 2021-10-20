@@ -19,7 +19,7 @@ class Session:
     # USC netid
     _user = None
 
-    # session as the directory is named under /project/cryoem/sessions/[user]/[session_id]
+    # session as the directory is named under /project/cryoem/sessions/[project_id]/[user]/[session_id]
     _session_id = None
  
     # list of potenatial states for tracking
@@ -39,11 +39,12 @@ class Session:
     _no_of_raw = 0
 
 
-    def __init__(self, config, user, session_id):
+    def __init__(self, config, project_id, user, session_id):
         self._config = config
+        self._project_id = project_id
         self._user = user
         self._session_id = session_id
-        self._session_dir = os.path.join(config.get('general', 'session_dir'), self._user, self._session_id)
+        self._session_dir = os.path.join(config.get('general', 'session_dir'), self._project_id, self._user, self._session_id)
 
         self._wf_dir = os.path.join(self._session_dir, 'workflow')
         self._run_dir = os.path.join(self._wf_dir, 'motioncor2')
@@ -68,6 +69,7 @@ class Session:
 
     def get_state(self):
         return {
+            "project_id": self._project_id
             "user": self._user,
             "session_id": self._session_id,
             "state": self._state,

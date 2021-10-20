@@ -110,7 +110,7 @@ def load_state():
         with open(sfilename) as f:
             j = json.load(open(sfilename))
             for sid, session in j.items():
-                app.state.sessions[sid] = Session(config, session["user"], session["session_id"])
+                app.state.sessions[sid] = Session(config, session["project_id"], session["user"], session["session_id"])
 
 
 def save_state():
@@ -175,14 +175,14 @@ async def sessions(user: str, api_key: APIKey = Depends(get_api_key)):
     return response
 
 
-@app.get("/{user}/session/{session_id}")
-async def session_status(user: str, session_id: str, api_key: APIKey = Depends(get_api_key)):
+@app.get("{project_id}/{user}/session/{session_id}")
+async def session_status(project_id: str, user: str, session_id: str, api_key: APIKey = Depends(get_api_key)):
     
-    key = "{}/{}".format(user, session_id)
+    key = "{}/{}/{}".format(project_id, user, session_id)
     if key in app.state.sessions:
         s = app.state.sessions[key]
     else:
-        s = Session(config, user, session_id)
+        s = Session(config, project_id, user, session_id)
         if not s.is_valid():
             # should this be a 404?
             return {"state": "no_such_session"}
@@ -191,8 +191,9 @@ async def session_status(user: str, session_id: str, api_key: APIKey = Depends(g
     return s.get_status()
 
 
-@app.post("/{user}/session/{session_id}/start-processing")
-async def start_processing(user: str,
+@app.post("/{project_id}/{user}/session/{session_id}/start-processing")
+async def start_processing(project_id: str,
+                           user: str,
                            session_id: str, 
                            apix: float,
                            fmdose: float,
@@ -212,11 +213,11 @@ async def start_processing(user: str,
                            # session_id: str, 
                            # api_key: APIKey = Depends(get_api_key)
                            # **kwargs ):
-    key = "{}/{}".format(user, session_id)
+    key = "{}/{}/{}".format(project_id, user, session_id)
     if key in app.state.sessions:
         s = app.state.sessions[key]
     else:
-        s = Session(config, user, session_id)
+        s = Session(config, project_id, user, session_id)
         if not s.is_valid():
             # should this be a 404?
             return {"results": "no_such_session"}
@@ -240,15 +241,16 @@ async def start_processing(user: str,
     return {"result": "ok"}
 
 
-@app.post("/{user}/session/{session_id}/stop-processing")
-async def stop_processing(user: str,
+@app.post("/{project_id}/{user}/session/{session_id}/stop-processing")
+async def stop_processing(project_id: str,
+                          user: str,
                           session_id: str,
                           api_key: APIKey = Depends(get_api_key)):
-    key = "{}/{}".format(user, session_id)
+    key = "{}/{}/{}".format(project_id, user, session_id)
     if key in app.state.sessions:
         s = app.state.sessions[key]
     else:
-        s = Session(config, user, session_id)
+        s = Session(config, project_id, user, session_id)
         if not s.is_valid():
             # should this be a 404?
             return {"results": "no_such_session"}
