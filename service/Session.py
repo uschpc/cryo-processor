@@ -69,7 +69,7 @@ class Session:
 
     def get_state(self):
         return {
-            "project_id": self._project_id
+            "project_id": self._project_id,
             "user": self._user,
             "session_id": self._session_id,
             "state": self._state,
