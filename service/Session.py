@@ -19,7 +19,7 @@ class Session:
     # USC netid
     _user = None
 
-    # session as the directory is named under /project/cryoem/sessions/[project_id]/[user]/[session_id]
+    # session as the directory is named under /cryoem1/test/cryo-pegasus-test/[project_id]/[user]/[session_id]
     _session_id = None
  
     # list of potenatial states for tracking
@@ -50,6 +50,7 @@ class Session:
         self._run_dir = os.path.join(self._wf_dir, 'motioncor2')
         self._scratch_dir = os.path.join(self._wf_dir, 'scratch')
         self.rawdatadirs=glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*"))
+        log.info("using rawdatadirs dirs %s"%(' '.join(self.rawdatadirs)))
         self._state = self._STATE_UNKNOWN
 
         # defaults to get us started
@@ -265,6 +266,7 @@ class Session:
         # 'unready': 0}
         wf = Workflow("motioncor2")
         wf._submit_dir = self._run_dir
+        log.info("Workflow wf._submit_dir is: {}".format(status["wf._submit_dir"]))
         try:
             status = wf.get_status()
             status = status['dags']['root']
@@ -315,12 +317,16 @@ class Session:
         self._state = self._STATE_PROCESSING
 
         try:
+            log.info("removing run_dir: {}".format(self._run_dir))
             shutil.rmtree(self._run_dir)
         except:
+            log.info("FAILED: removing run_dir: {}".format(self._run_dir))
             pass
         try:
+            log.info("removing _scratch_dir: {}".format(self._scratch_dir))
             shutil.rmtree(self._scratch_dir)
         except:
+            log.info("FAILED: removing _scratch_dir: {}".format(self._scratch_dir))
             pass
         
         self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),

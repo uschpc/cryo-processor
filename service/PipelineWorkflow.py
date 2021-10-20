@@ -361,6 +361,7 @@ class PipelineWorkflow:
                 continue
             break
         if len(Raw_Gain_Ref_SR_path) != 0 and self.gainref_done == False:
+            logger.info("processing Raw_Gain_Ref_SR_path: {}".format(Raw_Gain_Ref_SR_path))
             Raw_Gain_Ref_SR_path = Raw_Gain_Ref_SR_path[0]
             # get the extension
             gainref_extension=Raw_Gain_Ref_SR_path.split('.')[-1]
@@ -439,7 +440,7 @@ class PipelineWorkflow:
             self.wf.add_jobs(clip_gainref_superres_job)
             self.gainref_done = True
         else:
-            logger.info("Raw_Gain_Ref_SR_path {} from else...".format(Raw_Gain_Ref_SR_path))
+            logger.info("FAILED: Raw_Gain_Ref_SR_path {} from else...".format(Raw_Gain_Ref_SR_path))
             pass
         #Try to find Defect Map file - it might not be a part of the dataset; file is not needed for now
         logger.info("looking for Defect Map")
@@ -521,6 +522,7 @@ class PipelineWorkflow:
         
 
         for fraction_file_path in file_list:
+            logger.info("fraction_file_path {}".format(fraction_file_path))
             fraction_file_name = os.path.basename(fraction_file_path)
             fraction_file = File(fraction_file_name)
             self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))

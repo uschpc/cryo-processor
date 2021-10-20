@@ -170,6 +170,7 @@ async def sessions(project_id: str, user: str, api_key: APIKey = Depends(get_api
     response = {"sessions": []}
 
     for d in os.listdir(os.path.join(config.get('general', 'session_dir'), project_id, user)):
+        log.info("In sessions(), x id is {}".format(id(app.state.sessions)))
         response["sessions"].append({"session_id": d})
 
     return response
