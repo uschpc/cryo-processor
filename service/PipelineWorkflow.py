@@ -248,7 +248,7 @@ class PipelineWorkflow:
         )
         e2proc2d.add_pegasus_profile(cores="1",
                                      runtime="600",
-                                     memory="4096"
+                                     memory="4096",
                                      #
                                      glite_arguments=self.glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
@@ -261,7 +261,7 @@ class PipelineWorkflow:
         )
         magick.add_pegasus_profile( cores="2",
                                         runtime="300",
-                                        memory="2048"
+                                        memory="2048",
                                         #
                                         glite_arguments=self.glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
@@ -274,7 +274,7 @@ class PipelineWorkflow:
         )
         magick.add_pegasus_profile( cores="2",
                                         runtime="300",
-                                        memory="2048"
+                                        memory="2048",
                                         #
                                         glite_arguments=self.glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
@@ -287,7 +287,7 @@ class PipelineWorkflow:
         )
         gaussian.add_pegasus_profile( cores="2",
                                         runtime="300",
-                                        memory="2048"
+                                        memory="2048",
                                         #
                                         glite_arguments=self.glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
@@ -301,7 +301,7 @@ class PipelineWorkflow:
         )
         grep_wrapper.add_pegasus_profile( cores="1",
                                         runtime="300",
-                                        memory="2048"
+                                        memory="2048",
                                         #
                                         glite_arguments=self.glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
@@ -314,7 +314,7 @@ class PipelineWorkflow:
         )
         slack_notify.add_pegasus_profile( cores="1",
                                         runtime="300",
-                                        memory="2048"
+                                        memory="2048",
                                         #
                                         glite_arguments=self.glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
