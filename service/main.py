@@ -176,7 +176,7 @@ async def sessions(project_id: str, user: str, api_key: APIKey = Depends(get_api
     return response
 
 
-@app.get("{project_id}/{user}/session/{session_id}")
+@app.get("/{project_id}/{user}/session/{session_id}")
 async def session_status(project_id: str, user: str, session_id: str, api_key: APIKey = Depends(get_api_key)):
     
     key = "{}/{}/{}".format(project_id, user, session_id)
