@@ -45,7 +45,7 @@ class Session:
         self._user = user
         self._session_id = session_id
         self._session_dir = os.path.join(config.get('general', 'session_dir'), self._project_id, self._user, self._session_id)
-
+        log.info("using _session_dir dir %s"%(self._session_dir))
         self._wf_dir = os.path.join(self._session_dir, 'workflow')
         self._run_dir = os.path.join(self._wf_dir, 'motioncor2')
         self._scratch_dir = os.path.join(self._wf_dir, 'scratch')
