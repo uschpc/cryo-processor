@@ -114,13 +114,26 @@ class PipelineWorkflow:
 
         shared_scratch_dir = os.path.join(self.wf_dir, "scratch")
         self.shared_scratch_dir = shared_scratch_dir
+        # exec_site = (
+            # Site(exec_site_name)
+            # .add_profiles(Namespace.CONDOR, key="grid_resource", value="batch slurm")
+            # .add_profiles(Namespace.PEGASUS, key="style", value="glite")
+            # .add_profiles(Namespace.PEGASUS, key="project", value=self.account)
+            # .add_profiles(Namespace.PEGASUS, key="auxillary.local", value=True)
+            # .add_profiles(Namespace.PEGASUS, key="glite.arguments", value=self.glite_for_cryoem_partition)
+            # .add_profiles(Namespace.ENV, key="PEGASUS_HOME", value=os.environ["PEGASUS_HOME"])
+            # .add_directories(
+                # Directory(Directory.SHARED_SCRATCH, shared_scratch_dir).add_file_servers(
+                    # FileServer("file://" + shared_scratch_dir, Operation.ALL)
+                # )
+            # )
+        # )
         exec_site = (
             Site(exec_site_name)
             .add_profiles(Namespace.CONDOR, key="grid_resource", value="batch slurm")
             .add_profiles(Namespace.PEGASUS, key="style", value="glite")
             .add_profiles(Namespace.PEGASUS, key="project", value=self.account)
             .add_profiles(Namespace.PEGASUS, key="auxillary.local", value=True)
-            .add_profiles(Namespace.PEGASUS, key="glite.arguments", value=self.glite_for_cryoem_partition)
             .add_profiles(Namespace.ENV, key="PEGASUS_HOME", value=os.environ["PEGASUS_HOME"])
             .add_directories(
                 Directory(Directory.SHARED_SCRATCH, shared_scratch_dir).add_file_servers(
