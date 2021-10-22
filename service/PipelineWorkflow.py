@@ -630,126 +630,122 @@ class PipelineWorkflow:
             motionCor_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
             self.wf.add_jobs(motionCor_job)
 
-            # gctf
-            ctf_star_file = File(mrc_file_name.replace(".mrc",".star"))
-            #ctf_pf_file = File(mrc_file_name.replace(".mrc","_pf.mrc"))
-            ctf_file = File(mrc_file_name.replace(".mrc",".ctf"))
-            gctf_log_file = File(mrc_file_name.replace(".mrc","_gctf.log"))
+            # # gctf
+            # ctf_star_file = File(mrc_file_name.replace(".mrc",".star"))
+            # #ctf_pf_file = File(mrc_file_name.replace(".mrc","_pf.mrc"))
+            # ctf_file = File(mrc_file_name.replace(".mrc",".ctf"))
+            # gctf_log_file = File(mrc_file_name.replace(".mrc","_gctf.log"))
                         
-            gctf_stdout_file_name=mrc_file_name.replace(".mrc","_gctf_stdout.txt")
-            gctf_stderr_file_name=mrc_file_name.replace(".mrc","_gctf_stderr.txt")
-            gctf_stdout = File(gctf_stdout_file_name)
-            gctf_stderr = File(gctf_stderr_file_name)
+            # gctf_stdout_file_name=mrc_file_name.replace(".mrc","_gctf_stdout.txt")
+            # gctf_stderr_file_name=mrc_file_name.replace(".mrc","_gctf_stderr.txt")
+            # gctf_stdout = File(gctf_stdout_file_name)
+            # gctf_stderr = File(gctf_stderr_file_name)
             
             
-            gctf_job = (
-                Job("gctf").add_args("--apix", self.apix, "--kV", self.kev, "--Cs", "2.7", "--ac", "0.1",
-                                     "--ctfstar", ctf_star_file, "--gid", "0", "--boxsize", "1024", mrc_file)
-            )
+            # gctf_job = (
+                # Job("gctf").add_args("--apix", self.apix, "--kV", self.kev, "--Cs", "2.7", "--ac", "0.1",
+                                     # "--ctfstar", ctf_star_file, "--gid", "0", "--boxsize", "1024", mrc_file)
+            # )
 
-            gctf_job.add_inputs(mrc_file)
-            gctf_job.add_outputs(ctf_star_file, stage_out=True, register_replica=False)
-            #gctf_job.add_outputs(ctf_pf_file, stage_out=True, register_replica=True)
-            gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=False)
-            gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
-            gctf_job.set_stdout(gctf_stdout, stage_out=True, register_replica=False)
-            gctf_job.set_stderr(gctf_stderr, stage_out=True, register_replica=False)
-            gctf_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            self.wf.add_jobs(gctf_job)
+            # gctf_job.add_inputs(mrc_file)
+            # gctf_job.add_outputs(ctf_star_file, stage_out=True, register_replica=False)
+            # #gctf_job.add_outputs(ctf_pf_file, stage_out=True, register_replica=True)
+            # gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=False)
+            # gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
+            # gctf_job.set_stdout(gctf_stdout, stage_out=True, register_replica=False)
+            # gctf_job.set_stderr(gctf_stderr, stage_out=True, register_replica=False)
+            # gctf_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # self.wf.add_jobs(gctf_job)
 
-            # e2proc2d - motion-corrected to jpg, then resize to 20% size
-            dw_jpg_name = dw_file_name.replace("_DW.mrc","_DW_fs.jpg")
-            dw_jpg_file = File(dw_jpg_name)
-            e2proc2d_job1 = Job("e2proc2d")            
-            e2proc2d_job1.add_inputs(dw_file)
-            e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
-            #e2proc2d_job1.add_args("--average", dw_file, dw_jpg_file)
-            e2proc2d_job1.add_args("--process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane", dw_file, dw_jpg_file)
-            e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            self.wf.add_jobs(e2proc2d_job1)
+            # # e2proc2d - motion-corrected to jpg, then resize to 20% size
+            # dw_jpg_name = dw_file_name.replace("_DW.mrc","_DW_fs.jpg")
+            # dw_jpg_file = File(dw_jpg_name)
+            # e2proc2d_job1 = Job("e2proc2d")            
+            # e2proc2d_job1.add_inputs(dw_file)
+            # e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
+            # #e2proc2d_job1.add_args("--average", dw_file, dw_jpg_file)
+            # e2proc2d_job1.add_args("--process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane", dw_file, dw_jpg_file)
+            # e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # self.wf.add_jobs(e2proc2d_job1)
             
-            #imagemagick - resize the input jpg from about 5k to 1k px
-            magick_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg",".jpg"))
-            magick_resize = Job("magick")
-            magick_resize.add_inputs(dw_jpg_file)
-            magick_resize.add_outputs(magick_jpg_file, stage_out=True, register_replica=False)
-            magick_resize.add_args("convert", "-resize", '20%', dw_jpg_file, magick_jpg_file)
-            magick_resize.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            self.wf.add_jobs(magick_resize)
+            # #imagemagick - resize the input jpg from about 5k to 1k px
+            # magick_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg",".jpg"))
+            # magick_resize = Job("magick")
+            # magick_resize.add_inputs(dw_jpg_file)
+            # magick_resize.add_outputs(magick_jpg_file, stage_out=True, register_replica=False)
+            # magick_resize.add_args("convert", "-resize", '20%', dw_jpg_file, magick_jpg_file)
+            # magick_resize.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # self.wf.add_jobs(magick_resize)
             
             
-            # e2proc2d - ctf to jpg
-            jpg_ctf_file = File(mrc_file_name.replace(".mrc","_ctf.jpg"))
-            e2proc2d_job2 = Job("e2proc2d")            
-            e2proc2d_job2.add_inputs(ctf_file)
-            e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True, register_replica=False)
-            e2proc2d_job2.add_args(ctf_file, jpg_ctf_file)
-            e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            self.wf.add_jobs(e2proc2d_job2)
+            # # e2proc2d - ctf to jpg
+            # jpg_ctf_file = File(mrc_file_name.replace(".mrc","_ctf.jpg"))
+            # e2proc2d_job2 = Job("e2proc2d")            
+            # e2proc2d_job2.add_inputs(ctf_file)
+            # e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True, register_replica=False)
+            # e2proc2d_job2.add_args(ctf_file, jpg_ctf_file)
+            # e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # self.wf.add_jobs(e2proc2d_job2)
 
-            # # make an image file that makes particles more visible using filters
-            # gaussian_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg",".filtered.jpg"))
-            # gaussian_filter = Job("gaussian")
-            # gaussian_filter.add_inputs(magick_jpg_file)
-            # gaussian_filter.add_outputs(gaussian_jpg_file, stage_out=True, register_replica=False)
-            # gaussian_filter.add_args(magick_jpg_file, gaussian_jpg_file)
-            # gaussian_filter.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            # self.wf.add_jobs(gaussian_filter)
+            # # # make an image file that makes particles more visible using filters
+            # # gaussian_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg",".filtered.jpg"))
+            # # gaussian_filter = Job("gaussian")
+            # # gaussian_filter.add_inputs(magick_jpg_file)
+            # # gaussian_filter.add_outputs(gaussian_jpg_file, stage_out=True, register_replica=False)
+            # # gaussian_filter.add_args(magick_jpg_file, gaussian_jpg_file)
+            # # gaussian_filter.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # # self.wf.add_jobs(gaussian_filter)
             
 
 
-            #imagemagick - stitch together resized jpg and add text
-            magick_combined_jpg_fn = dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg")
-            magick_combined_jpg_file = File(magick_combined_jpg_fn)
-            #magick_combined_jpg_out_fn = dw_jpg_name.replace("_DW_fs.jpg","_combined.txt")
-            #magick_combined_jpg_out=File(magick_combined_jpg_out_fn)
+            # #imagemagick - stitch together resized jpg and add text
+            # magick_combined_jpg_fn = dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg")
+            # magick_combined_jpg_file = File(magick_combined_jpg_fn)
+            # #magick_combined_jpg_out_fn = dw_jpg_name.replace("_DW_fs.jpg","_combined.txt")
+            # #magick_combined_jpg_out=File(magick_combined_jpg_out_fn)
+            # magick_convert = Job("magick2")
+            # magick_convert.add_inputs(magick_jpg_file)
+            # magick_convert.add_inputs(jpg_ctf_file)
+            # magick_convert.add_inputs(gctf_log_file)
+            # magick_convert.add_inputs(mc2_stdout)
+            # magick_convert.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
+            # #magick_convert.add_outputs(magick_combined_jpg_out, stage_out=True, register_replica=False)
+            # #magick_convert.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x1024", magick_combined_jpg_file)
+            # #magick_convert.add_args(dw_jpg_file, jpg_ctf_file, magick_combined_jpg_file, os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), gctf_log_file.lfn), os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), mc2_stdout.lfn), magick_combined_jpg_out)
+            # magick_convert.add_args(magick_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn)
+            # magick_convert.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # self.wf.add_jobs(magick_convert)
             
+            # # # #prepare text output - shifts from motioncor2
+            # # # magick_combined_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg"))
+            # # # grep_wrapper_shifts = Job("grep_wrapper")
+            # # # grep_wrapper_shifts.add_inputs(mc2_stdout)
+            # # # grep_wrapper_shifts.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
+            # # # grep_wrapper_shifts.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
+            # # # grep_wrapper_shifts.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # # # self.wf.add_jobs(grep_wrapper_shifts)
             
-            magick_convert = Job("magick2")
-            magick_convert.add_inputs(magick_jpg_file)
-            magick_convert.add_inputs(jpg_ctf_file)
-            magick_convert.add_inputs(gctf_log_file)
-            magick_convert.add_inputs(mc2_stdout)
-                        
-            magick_convert.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
-
-            #magick_convert.add_outputs(magick_combined_jpg_out, stage_out=True, register_replica=False)
-            #magick_convert.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x1024", magick_combined_jpg_file)
-            #magick_convert.add_args(dw_jpg_file, jpg_ctf_file, magick_combined_jpg_file, os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), gctf_log_file.lfn), os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), mc2_stdout.lfn), magick_combined_jpg_out)
-            magick_convert.add_args(magick_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn)
-            magick_convert.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            self.wf.add_jobs(magick_convert)
+            # # # #prepare text output - estimated resolution from ctf
+            # # # magick_combined_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg"))
+            # # # grep_wrapper_ctf_reso = Job("grep_wrapper")
+            # # # grep_wrapper_ctf_reso.add_inputs(mc2_stdout)
+            # # # grep_wrapper_ctf_reso.add_inputs(jpg_ctf_file)
+            # # # grep_wrapper_ctf_reso.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
+            # # # grep_wrapper_ctf_reso.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
+            # # # grep_wrapper_ctf_reso.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # # # self.wf.add_jobs(grep_wrapper_ctf_reso)
             
-            # # #prepare text output - shifts from motioncor2
-            # # magick_combined_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg"))
-            # # grep_wrapper_shifts = Job("grep_wrapper")
-            # # grep_wrapper_shifts.add_inputs(mc2_stdout)
-            # # grep_wrapper_shifts.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
-            # # grep_wrapper_shifts.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
-            # # grep_wrapper_shifts.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            # # self.wf.add_jobs(grep_wrapper_shifts)
-            
-            # # #prepare text output - estimated resolution from ctf
-            # # magick_combined_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg"))
-            # # grep_wrapper_ctf_reso = Job("grep_wrapper")
-            # # grep_wrapper_ctf_reso.add_inputs(mc2_stdout)
-            # # grep_wrapper_ctf_reso.add_inputs(jpg_ctf_file)
-            # # grep_wrapper_ctf_reso.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
-            # # grep_wrapper_ctf_reso.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
-            # # grep_wrapper_ctf_reso.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            # # self.wf.add_jobs(grep_wrapper_ctf_reso)
-            
-            #send notification to the slack channel
-            slack_notify_out=File(mrc_file_name.replace(".mrc","_slack_msg.txt"))
-            slack_notify_job = Job("slack_notify")
-            #slack_notify_job.add_inputs(mc2_stdout)
-            #slack_notify_job.add_inputs(gctf_log_file)
-            slack_notify_job.add_inputs(magick_combined_jpg_file)
-            slack_notify_job.add_outputs(slack_notify_out, stage_out=True, register_replica=False)
-            #slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), gctf_log_file.lfn, mc2_stdout.lfn, slack_notify_out)
-            slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), slack_notify_out)
-            slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            self.wf.add_jobs(slack_notify_job)
+            # #send notification to the slack channel
+            # slack_notify_out=File(mrc_file_name.replace(".mrc","_slack_msg.txt"))
+            # slack_notify_job = Job("slack_notify")
+            # #slack_notify_job.add_inputs(mc2_stdout)
+            # #slack_notify_job.add_inputs(gctf_log_file)
+            # slack_notify_job.add_inputs(magick_combined_jpg_file)
+            # slack_notify_job.add_outputs(slack_notify_out, stage_out=True, register_replica=False)
+            # #slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), gctf_log_file.lfn, mc2_stdout.lfn, slack_notify_out)
+            # slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), slack_notify_out)
+            # slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            # self.wf.add_jobs(slack_notify_job)
             
             self.no_of_processed+=1
             
