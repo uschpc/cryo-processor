@@ -29,7 +29,7 @@ class PipelineWorkflow:
     
 
     # --- Init ----------------------------------------------------------------
-    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=False, partition="debug", account="osinski_703", glite_arguments="--gres=gpu:p100:2", maxjobs=100, debug_maxjobs=10, pgss_stgt_clusters=10, cluster_size=10, no_of_files_to_proc_in_cycle=-1):
+    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=False, partition="debug", account="osinski_703", glite_arguments="--gres=gpu:p100:2", gctf_glite_arguments="", maxjobs=100, debug_maxjobs=10, pgss_stgt_clusters=10, cluster_size=10, no_of_files_to_proc_in_cycle=-1):
         self.wf_name = "motioncor2"
         self.debug = debug
         logger.info("PipelineWorkflow init")
@@ -41,6 +41,7 @@ class PipelineWorkflow:
         self.partition = partition
         self.account = account
         self.glite_arguments = glite_arguments
+        self.gctf_glite_arguments = gctf_glite_arguments
         self.glite_for_cryoem_partition = "--nodelist=e17-[20-24],d23-[11-12]"
         self.pgss_stgt_clusters = pgss_stgt_clusters
         self.maxjobs = maxjobs
@@ -252,7 +253,7 @@ class PipelineWorkflow:
         gctf.add_pegasus_profile( cores="2",
                                         runtime="600",
                                         memory="4096",
-                                        glite_arguments=self.glite_arguments
+                                        glite_arguments=self.gctf_glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         e2proc2d = Transformation(
@@ -536,6 +537,7 @@ class PipelineWorkflow:
             #file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
             pass
         
+        loger.info("Currently processing {} files. Processed list length is {}".format(file_list, self.processed_files_list)
 
         for fraction_file_path in file_list:
             #logger.info("fraction_file_path {}".format(fraction_file_path))
@@ -627,7 +629,7 @@ class PipelineWorkflow:
             motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
             motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
             motionCor_job.set_stderr(mc2_stderr, stage_out=True, register_replica=False)
-            motionCor_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            motionCor_job.add_profiles(Namespace.PEGASUS, "label", "mc-{}".format(fraction_file_name))
             self.wf.add_jobs(motionCor_job)
 
             # gctf
@@ -654,7 +656,7 @@ class PipelineWorkflow:
             gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
             gctf_job.set_stdout(gctf_stdout, stage_out=True, register_replica=False)
             gctf_job.set_stderr(gctf_stderr, stage_out=True, register_replica=False)
-            gctf_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            gctf_job.add_profiles(Namespace.PEGASUS, "label", "gctf-{}".format(fraction_file_name))
             self.wf.add_jobs(gctf_job)
 
             # e2proc2d - motion-corrected to jpg, then resize to 20% size
@@ -665,7 +667,7 @@ class PipelineWorkflow:
             e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
             #e2proc2d_job1.add_args("--average", dw_file, dw_jpg_file)
             e2proc2d_job1.add_args("--process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane", dw_file, dw_jpg_file)
-            e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "img-{}".format(fraction_file_name))
             self.wf.add_jobs(e2proc2d_job1)
             
             #imagemagick - resize the input jpg from about 5k to 1k px
@@ -674,7 +676,7 @@ class PipelineWorkflow:
             magick_resize.add_inputs(dw_jpg_file)
             magick_resize.add_outputs(magick_jpg_file, stage_out=True, register_replica=False)
             magick_resize.add_args("convert", "-resize", '20%', dw_jpg_file, magick_jpg_file)
-            magick_resize.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            magick_resize.add_profiles(Namespace.PEGASUS, "label", "img-{}".format(fraction_file_name))
             self.wf.add_jobs(magick_resize)
             
             
@@ -684,7 +686,7 @@ class PipelineWorkflow:
             e2proc2d_job2.add_inputs(ctf_file)
             e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True, register_replica=False)
             e2proc2d_job2.add_args(ctf_file, jpg_ctf_file)
-            e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "img-{}".format(fraction_file_name))
             self.wf.add_jobs(e2proc2d_job2)
 
             # # make an image file that makes particles more visible using filters
@@ -713,7 +715,7 @@ class PipelineWorkflow:
             #magick_convert.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x1024", magick_combined_jpg_file)
             #magick_convert.add_args(dw_jpg_file, jpg_ctf_file, magick_combined_jpg_file, os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), gctf_log_file.lfn), os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), mc2_stdout.lfn), magick_combined_jpg_out)
             magick_convert.add_args(magick_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn)
-            magick_convert.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            magick_convert.add_profiles(Namespace.PEGASUS, "label", "img-{}".format(fraction_file_name))
             self.wf.add_jobs(magick_convert)
             
             # # #prepare text output - shifts from motioncor2
@@ -744,7 +746,7 @@ class PipelineWorkflow:
             slack_notify_job.add_outputs(slack_notify_out, stage_out=True, register_replica=False)
             #slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), gctf_log_file.lfn, mc2_stdout.lfn, slack_notify_out)
             slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), slack_notify_out)
-            slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
+            slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "img-{}".format(fraction_file_name))
             self.wf.add_jobs(slack_notify_job)
             
             self.no_of_processed+=1
@@ -755,6 +757,7 @@ class PipelineWorkflow:
         self.apix = datum.apix
         self.fmdose = datum.fmdose
         self.kev = datum.kev
+        self.processed_files_list= datum.processed_files_list
         #self.particle_size = particle_size
         try: self.rawgainref = datum.rawgainref
         except: pass

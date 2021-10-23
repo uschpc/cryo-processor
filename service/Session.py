@@ -21,7 +21,7 @@ class Session:
     # USC netid
     _user = None
     
-    # session as the directory is named under /cryoem1/test/cryo-pegasus-test/[project_id]/[user]/[session_id]
+    # session as the directory is named under /cryoem1/test/cryo-pegasus-test/[project_id]/sessions/[user]/[session_id]
     _session_id = None
  
     # list of potenatial states for tracking
@@ -46,7 +46,7 @@ class Session:
         self._project_id = project_id
         self._user = user
         self._session_id = session_id
-        self._session_dir = os.path.join(config.get('general', 'session_dir'), self._project_id, self._user, self._session_id)
+        self._session_dir = os.path.join(config.get('general', 'session_dir'), self._project_id, "sessions", self._user, self._session_id)
         log.info("using _session_dir dir %s"%(self._session_dir))
         self._wf_dir = os.path.join(self._session_dir, 'workflow')
         self._processed_dir = os.path.join(self._session_dir, 'processed')
@@ -54,6 +54,9 @@ class Session:
         self._scratch_dir = os.path.join(self._wf_dir, 'scratch')
         self.rawdatadirs=glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*"))
         log.info("using rawdatadirs dirs %s"%(' '.join(self.rawdatadirs)))
+        #pass below to the workflow to not iterate over processed files
+        self.processed_files_list=[]
+        
         self._state = self._STATE_UNKNOWN
 
         # defaults to get us started
@@ -140,6 +143,7 @@ class Session:
             pf = self._find_files(self._processed_dir,"*DW.mrc")
             log.info("processed files are in: %s"%self._processed_dir)
             log.info("No. of processed files %i"%len(pf))
+            self.processed_files_list=pf
             return len(pf)
         except Exception as e:
             log.info(e)
@@ -338,6 +342,7 @@ class Session:
                                     self._processed_dir,
                                     debug=self._config.getboolean("general", "debug"),
                                     glite_arguments=self._config.get("params", "glite_arguments"),
+                                    gctf_glite_arguments=self._config.get("params", "gctf_glite_arguments"),
                                     maxjobs=self._config.get("params", "maxjobs"),
                                     debug_maxjobs=self._config.get("params", "debug_maxjobs"),
                                     partition=self._config.get("params", "partition"),
