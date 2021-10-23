@@ -538,7 +538,7 @@ class PipelineWorkflow:
             # pass
         
         #set file list to be equal to no_of_files_to_proc_in_cycle based on self.processed_files_list
-        if self.no_of_files_to_proc_in_cycle != -1
+        if self.no_of_files_to_proc_in_cycle != -1:
             file_list = [x for x in file_list if x not in self.processed_files_list][:self.no_of_files_to_proc_in_cycle]
         elif self.no_of_files_to_proc_in_cycle ==-1:
             #ignore no_of_files_to_proc_in_cycle and do all at once
