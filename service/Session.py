@@ -37,6 +37,7 @@ class Session:
     _percent = -1
     _no_of_processed = 0
     _no_of_failed = 0
+    _percent_current_cycle = 0
     _next_processing_time = 0
     _no_of_raw = 0
 
@@ -156,6 +157,7 @@ class Session:
         response = {
             "state": self._state,
             "percent_done": self._percent,
+            "percent done current cycle": self._percent_current_cycle,
             "failed_jobs": self._no_of_failed,
             "processed_files": self._no_of_processed,
             "raw_files": self._no_of_raw
@@ -286,9 +288,11 @@ class Session:
         if status is None or "totals" not in status:
             self._no_of_succeeded = 0
             self._no_of_failed = 0
+            self._percent_current_cycle
         else:
             self._no_of_succeeded = status['succeeded']
             self._no_of_failed = status['failed']
+            self._percent_current_cycle = status["percent_done"]
 
         # is the workflow already running?
         if status is not None:
@@ -315,7 +319,7 @@ class Session:
         if self._next_processing_time > 0 and \
            self._next_processing_time < time.time():
             # space the workflows a little bit in case of failure
-            self._next_processing_time = time.time() + 60
+            self._next_processing_time = time.time() + 120
         else:
             return False
         

@@ -539,8 +539,8 @@ class PipelineWorkflow:
         
         #set file list to be equal to no_of_files_to_proc_in_cycle based on self.processed_files_list
         if self.no_of_files_to_proc_in_cycle != -1:
-            #file_list = [x for x in file_list if x not in self.processed_files_list][:self.no_of_files_to_proc_in_cycle]
-            pass
+            file_list = [x for x in file_list if x not in self.processed_files_list][:self.no_of_files_to_proc_in_cycle]
+            #pass
             # for x in self.processed_files_list: 
                 # file_list.append(x)
         elif self.no_of_files_to_proc_in_cycle ==-1:
@@ -551,7 +551,7 @@ class PipelineWorkflow:
             pass
         
         logger.info("Currently processing {} files. Processed list length is {}".format(len(file_list), len(self.processed_files_list)))
-        logger.info("Currently processing {} files. Processed list length is {}".format("\n".join(file_list), len(self.processed_files_list)))
+        #logger.info("Currently processing {} files. Processed list length is {}".format("\n".join(file_list), len(self.processed_files_list)))
         for fraction_file_path in file_list:
             #logger.info("fraction_file_path {}".format(fraction_file_path))
             fraction_file_name = os.path.basename(fraction_file_path)
@@ -642,7 +642,8 @@ class PipelineWorkflow:
             motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
             motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
             motionCor_job.set_stderr(mc2_stderr, stage_out=True, register_replica=False)
-            motionCor_job.add_profiles(Namespace.PEGASUS, "label", "mc-{}".format(fraction_file_name))
+            #motionCor_job.add_profiles(Namespace.PEGASUS, "label", "mc-{}".format(fraction_file_name))
+            motionCor_job.add_profiles(Namespace.PEGASUS, "label", "mc2")
             self.wf.add_jobs(motionCor_job)
 
             # gctf
@@ -669,7 +670,8 @@ class PipelineWorkflow:
             gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
             gctf_job.set_stdout(gctf_stdout, stage_out=True, register_replica=False)
             gctf_job.set_stderr(gctf_stderr, stage_out=True, register_replica=False)
-            gctf_job.add_profiles(Namespace.PEGASUS, "label", "gctf-{}".format(fraction_file_name))
+            #gctf_job.add_profiles(Namespace.PEGASUS, "label", "gctf-{}".format(fraction_file_name))
+            gctf_job.add_profiles(Namespace.PEGASUS, "label", "gctf")
             self.wf.add_jobs(gctf_job)
 
             # e2proc2d - motion-corrected to jpg, then resize to 20% size
