@@ -524,17 +524,27 @@ class PipelineWorkflow:
         #set the number of raw files
         self.no_of_raw=len(file_list)
         
-        if self.no_of_files_to_proc_in_cycle != -1 and not self.debug:
-            #do all
-            pass
+        # if self.no_of_files_to_proc_in_cycle != -1 and not self.debug:
+            # #do all
+            # pass
         
-        if self.no_of_files_to_proc_in_cycle != -1 and self.debug:
-            # when debugging, only do a fraction of the files
-            file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
+        # if self.no_of_files_to_proc_in_cycle != -1 and self.debug:
+            # # when debugging, only do a fraction of the files
+            # file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
+        # else:
+            # # even for production, only process a part of the dataset (maybe change this later?)
+            # #
+            # #file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
+            # pass
+        
+        #set file list to be equal to no_of_files_to_proc_in_cycle based on self.processed_files_list
+        if self.no_of_files_to_proc_in_cycle != -1
+            file_list = [x for x in file_list if x not in self.processed_files_list][:self.no_of_files_to_proc_in_cycle]
+        elif self.no_of_files_to_proc_in_cycle ==-1:
+            #ignore no_of_files_to_proc_in_cycle and do all at once
+            pass
         else:
-            # even for production, only process a part of the dataset (maybe change this later?)
-            #
-            #file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
+            loger.info("Cannot get file list")
             pass
         
         loger.info("Currently processing {} files. Processed list length is {}".format(file_list, self.processed_files_list)
