@@ -547,7 +547,7 @@ class PipelineWorkflow:
             loger.info("Cannot get file list")
             pass
         
-        loger.info("Currently processing {} files. Processed list length is {}".format(file_list, self.processed_files_list)
+        logger.info("Currently processing {} files. Processed list length is {}".format(file_list, self.processed_files_list))
 
         for fraction_file_path in file_list:
             #logger.info("fraction_file_path {}".format(fraction_file_path))
