@@ -157,7 +157,7 @@ class Session:
         response = {
             "state": self._state,
             "percent_done": self._percent,
-            "percent done current cycle": self._percent_current_cycle,
+            "percent_current_cycle": self._percent_current_cycle,
             "failed_jobs": self._no_of_failed,
             "processed_files": self._no_of_processed,
             "raw_files": self._no_of_raw
@@ -292,7 +292,7 @@ class Session:
         else:
             self._no_of_succeeded = status['succeeded']
             self._no_of_failed = status['failed']
-            self._percent_current_cycle = status["percent_done"]
+            self._percent_current_cycle = status["percent"]
 
         # is the workflow already running?
         if status is not None:
