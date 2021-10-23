@@ -540,6 +540,9 @@ class PipelineWorkflow:
         #set file list to be equal to no_of_files_to_proc_in_cycle based on self.processed_files_list
         if self.no_of_files_to_proc_in_cycle != -1:
             file_list = [x for x in file_list if x not in self.processed_files_list][:self.no_of_files_to_proc_in_cycle]
+            
+            for x in self.processed_files_list: 
+                file_list.append(x)
         elif self.no_of_files_to_proc_in_cycle ==-1:
             #ignore no_of_files_to_proc_in_cycle and do all at once
             pass
@@ -548,7 +551,7 @@ class PipelineWorkflow:
             pass
         
         logger.info("Currently processing {} files. Processed list length is {}".format(len(file_list), len(self.processed_files_list)))
-
+        logger.info("Currently processing {} files. Processed list length is {}".format("\n".join(file_list), len(self.processed_files_list)))
         for fraction_file_path in file_list:
             #logger.info("fraction_file_path {}".format(fraction_file_path))
             fraction_file_name = os.path.basename(fraction_file_path)
