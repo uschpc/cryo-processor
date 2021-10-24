@@ -557,7 +557,7 @@ class PipelineWorkflow:
         self.basename_suffix=self._file_list_to_process[0].split('.')[-2].split('_')[-1]
         #for fraction_file_path in file_list:
         for fraction_file_path in self._file_list_to_process:
-            logger.info("fraction_file_path {}".format(fraction_file_path))
+            #logger.info("fraction_file_path {}".format(fraction_file_path))
             fraction_file_name = os.path.basename(fraction_file_path)
             fraction_file = File(fraction_file_name)
             self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))
