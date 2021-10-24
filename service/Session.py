@@ -462,14 +462,17 @@ class Session:
             
             #again
             self._file_list.sort()
+            self._file_list_to_process=[]
             for x in self._file_list:
                 if x not in self._sent_for_processing:
                     self._file_list_to_process.append(x)
             self._file_list_to_process=self._file_list_to_process[:self._config.getint("params", "no_of_files_to_proc_in_cycle")]
+            log.info("self._file_list_to_process: len {}".format(len(self._file_list_to_process)))
+            log.info("self._sent_for_processing BEFOR: len {}".format(len(self._sent_for_processing)))
             for x in self._file_list_to_process:
                 if x not in self._sent_for_processing:
                     self._sent_for_processing.append(x)
-            
+            log.info("self._sent_for_processing AFTER: len {}".format(len(self._sent_for_processing)))
             
             
             
