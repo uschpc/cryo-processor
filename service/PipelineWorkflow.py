@@ -356,11 +356,6 @@ class PipelineWorkflow:
     def create_workflow(self):
         self.wf = Workflow(self.wf_name, infer_dependencies=True)
         
-        #tho lines below can probably be removed - TO will check for it
-        #raw_prefix="raw_"
-        #mc_prefix = "mc_"
-        
-        
         # #Try to find Gain reference file - it might not be a part of the dataset, 
         # #so we must take it into account.
         # #define Gain reference Super resolution input and output filename
@@ -382,25 +377,8 @@ class PipelineWorkflow:
             # else:
                 # continue
             # break
-        if self._gainref_done == True:
-            #set variables and that is it
-            Gain_Ref_SR_name=os.path.basename(self.gr_sr)
-            Gain_Ref_SR = File(Gain_Ref_SR_name)
-            self.rc.add_replica("slurm", Gain_Ref_SR_name, self.gr_sr)
-            
-            FlipY_SR_name = os.path.basename(self.gr_sr_flipy)
-            FlipY_SR = File(FlipY_SR_name)
-            self.rc.add_replica("slurm", FlipY_SR_name, self.gr_sr_flipy)
-            
-            Gain_Ref_name=os.path.basename(self.gr_std)
-            Gain_Ref = File(Gain_Ref_name)
-            self.rc.add_replica("slurm", Gain_Ref_name, self.gr_std)
-            
-            FlipY_name=os.path.basename(self.gr_std_flipy)
-            FlipY = File(FlipY_name)
-            self.rc.add_replica("slurm", FlipY_name, self.gr_std_flipy)
-            
-            
+
+
         if len(self._gain_ref_fn) != 0 and self._gainref_done == False:
             logger.info("processing self._gain_ref_fn[0]: {}".format(self._gain_ref_fn[0]))
             Raw_Gain_Ref_SR_path = self._gain_ref_fn[0]
@@ -480,8 +458,25 @@ class PipelineWorkflow:
             self.wf.add_jobs(clip_gainref_job)
             self.wf.add_jobs(clip_gainref_superres_job)
             #self.gainref_done = True
+        elif self._gainref_done == True:
+            #set variables and that is it
+            Gain_Ref_SR_name=os.path.basename(self.gr_sr)
+            Gain_Ref_SR = File(Gain_Ref_SR_name)
+            self.rc.add_replica("slurm", Gain_Ref_SR_name, self.gr_sr)
+            
+            FlipY_SR_name = os.path.basename(self.gr_sr_flipy)
+            FlipY_SR = File(FlipY_SR_name)
+            self.rc.add_replica("slurm", FlipY_SR_name, self.gr_sr_flipy)
+            
+            Gain_Ref_name=os.path.basename(self.gr_std)
+            Gain_Ref = File(Gain_Ref_name)
+            self.rc.add_replica("slurm", Gain_Ref_name, self.gr_std)
+            
+            FlipY_name=os.path.basename(self.gr_std_flipy)
+            FlipY = File(FlipY_name)
+            self.rc.add_replica("slurm", FlipY_name, self.gr_std_flipy)
         else:
-            logger.info("FAILED: self._gain_ref_fn {} from else...".format(self._gain_ref_fn))
+            logger.info("FAILED: gain ref not found")
             sys.exit()
             pass
         
@@ -502,11 +497,7 @@ class PipelineWorkflow:
             # else:
                 # continue
             # break
-        if self._defect_map_done == True:
-            #set variables and that is it
-            Defect_Map_name=os.path.basename(self.dmf)
-            Defect_Map = File(Defect_Map_name)
-            self.rc.add_replica("slurm", Defect_Map, self.dmf)
+
             
         if len(self._defect_map_fn) != 0 and self._defect_map_done == False:
             Raw_Defect_Map_path = self._defect_map_fn[0]
@@ -525,8 +516,13 @@ class PipelineWorkflow:
             dm2mrc_defect_map_job.add_outputs(Defect_Map, stage_out=True)
             self.wf.add_jobs(dm2mrc_defect_map_job)
             #self.defmap_done = True
+        elif self._defect_map_done == True:
+            #set variables and that is it
+            Defect_Map_name=os.path.basename(self.dmf)
+            Defect_Map = File(Defect_Map_name)
+            self.rc.add_replica("slurm", Defect_Map, self.dmf)
         else:
-            logger.info("Raw_Defect_Map_path {} from else...".format(self._defect_map_fn))
+            logger.info("Raw_Defect_Map_path not found")
             pass
         
         # # try to find where exactly raw files are. Done this way to speed-up the process
@@ -630,7 +626,7 @@ class PipelineWorkflow:
                 logger.info("Unknown image extension - %s"%self.basename_extension)
                 sys.exit(1)
             
-            if len(Raw_Gain_Ref_SR_path) != 0:
+            if len(Gain_Ref_SR_name) != 0:
                 #case where we have gain reference file
                 if self.throw!=None and self.trunc!=None:
                     # case for k3
@@ -809,7 +805,8 @@ class PipelineWorkflow:
         self.fmdose = datum.fmdose
         self.kev = datum.kev
         self._gainref_done = datum._gainref_done
-        self._gain_ref_fn = datum._gain_ref_fn
+        try: self._gain_ref_fn = datum._gain_ref_fn
+        except: pass
         self._defect_map_done = datum._defect_map_done
         self._defect_map_fn = datum._defect_map_fn
         self._processed_files_list = datum._processed_files_list

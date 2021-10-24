@@ -441,6 +441,7 @@ class Session:
             #get a list of raw files, and create a new list that does not include already processed files, then take no_of_files_to_proc_in_cycle elements and pass to the workflow
             #prepare a list of files that have not been processed yet
             processed_list_corenames=[os.path.basename(x).replace('_DW.mrc','') for x in self._processed_files_list]
+            log.info("processed_list_corenames: {}".format(processed_list_corenames))
             #list to process
             fext=self._file_list[0].split('.')[-1]
             
@@ -453,6 +454,7 @@ class Session:
             #self._file_list_to_process = [os.path.basename(x) for x in self._file_list if os.path.basename(x) not in self._processed_files_list]
             #take first no_of_files_to_proc_in_cycle elements
             self._file_list_to_process=self._file_list_to_process[:self._config.getint("params", "no_of_files_to_proc_in_cycle")]
+            log.info("self._file_list_to_process: {}".format(self._file_list_to_process))
         except Exception as e:
             log.exception(e)
         try:
