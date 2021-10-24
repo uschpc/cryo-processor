@@ -497,32 +497,32 @@ class PipelineWorkflow:
             logger.info("Raw_Defect_Map_path {} from else...".format(Raw_Defect_Map_path))
             pass
         
-        # try to find where exactly raw files are. Done this way to speed-up the process
-        possible_raw_files_regexes=['FoilHole*fractions.tiff','FoilHole*fractions.mrc','FoilHole*EER.eer']
-        if self.basename_prefix!=None and self.basename_suffix!=None and self.basename_extension!=None:
-            possible_raw_files_regexes.append("%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
+        # # try to find where exactly raw files are. Done this way to speed-up the process
+        # possible_raw_files_regexes=['FoilHole*fractions.tiff','FoilHole*fractions.mrc','FoilHole*EER.eer']
+        # if self.basename_prefix!=None and self.basename_suffix!=None and self.basename_extension!=None:
+            # possible_raw_files_regexes.append("%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
         
-        for i in self.inputs_dir:
-            for possible_raw_files in possible_raw_files_regexes:
-                raw_location=(os.path.join(i, "**"), possible_raw_files)
-                self.correct_input_dir=i
-                flist = self.find_files2(raw_location[0], raw_location[1])
-                if len(flist)>=1:
-                    file_list=flist
-                    self.raw_location = raw_location
-                    break
-            else:
-                continue
-            break
+        # for i in self.inputs_dir:
+            # for possible_raw_files in possible_raw_files_regexes:
+                # raw_location=(os.path.join(i, "**"), possible_raw_files)
+                # self.correct_input_dir=i
+                # flist = self.find_files2(raw_location[0], raw_location[1])
+                # if len(flist)>=1:
+                    # file_list=flist
+                    # self.raw_location = raw_location
+                    # break
+            # else:
+                # continue
+            # break
                 
-        #sort? sort - to make it somewhat FIFO
-        file_list.sort()
-        #define filename extension
-        self.basename_extension=file_list[0].split('.')[-1]
-        self.basename_suffix=file_list[0].split('.')[-2].split('_')[-1]
+        # #sort? sort - to make it somewhat FIFO
+        # file_list.sort()
+        # #define filename extension
+        # self.basename_extension=file_list[0].split('.')[-1]
+        # self.basename_suffix=file_list[0].split('.')[-2].split('_')[-1]
         
-        #set the number of raw files
-        self.no_of_raw=len(file_list)
+        # #set the number of raw files
+        # self.no_of_raw=len(file_list)
         
         # if self.no_of_files_to_proc_in_cycle != -1 and not self.debug:
             # #do all
@@ -538,21 +538,22 @@ class PipelineWorkflow:
             # pass
         
         #set file list to be equal to no_of_files_to_proc_in_cycle based on self.processed_files_list
-        if self.no_of_files_to_proc_in_cycle != -1:
-            file_list = [x for x in file_list if x not in self.processed_files_list][:self.no_of_files_to_proc_in_cycle]
-            #pass
-            # for x in self.processed_files_list: 
-                # file_list.append(x)
-        elif self.no_of_files_to_proc_in_cycle ==-1:
-            #ignore no_of_files_to_proc_in_cycle and do all at once
-            pass
-        else:
-            loger.info("Cannot get file list")
-            pass
+        # if self.no_of_files_to_proc_in_cycle != -1:
+            # file_list = [x for x in file_list if x not in self.processed_files_list][:self.no_of_files_to_proc_in_cycle]
+            # #pass
+            # # for x in self.processed_files_list: 
+                # # file_list.append(x)
+        # elif self.no_of_files_to_proc_in_cycle ==-1:
+            # #ignore no_of_files_to_proc_in_cycle and do all at once
+            # pass
+        # else:
+            # loger.info("Cannot get file list")
+            # pass
         
-        logger.info("Currently processing {} files. Processed list length is {}".format(len(file_list), len(self.processed_files_list)))
+        logger.info("Currently processing {} files. Processed list length is {}".format(len(self._file_list_to_process), len(self._processed_files_list)))
         #logger.info("Currently processing {} files. Processed list length is {}".format("\n".join(file_list), len(self.processed_files_list)))
-        for fraction_file_path in file_list:
+        #for fraction_file_path in file_list:
+        for fraction_file_path in self._file_list_to_process:
             #logger.info("fraction_file_path {}".format(fraction_file_path))
             fraction_file_name = os.path.basename(fraction_file_path)
             fraction_file = File(fraction_file_name)
@@ -772,7 +773,8 @@ class PipelineWorkflow:
         self.apix = datum.apix
         self.fmdose = datum.fmdose
         self.kev = datum.kev
-        self.processed_files_list= datum.processed_files_list
+        self._processed_files_list = datum._processed_files_list
+        self._file_list_to_process = datum._file_list_to_process
         #self.particle_size = particle_size
         try: self.rawgainref = datum.rawgainref
         except: pass

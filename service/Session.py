@@ -55,8 +55,7 @@ class Session:
         self._scratch_dir = os.path.join(self._wf_dir, 'scratch')
         self.rawdatadirs=glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*"))
         log.info("using rawdatadirs dirs %s"%(' '.join(self.rawdatadirs)))
-        #pass below to the workflow to not iterate over processed files
-        self.processed_files_list=[]
+
         
         self._state = self._STATE_UNKNOWN
 
@@ -66,6 +65,16 @@ class Session:
         self.basename_extension = 'tiff'
         self.raw_location = ""
         self.possible_raw_files = ""
+        
+        #handling files for processing moved here
+        #list of raw files (read from processed directory)
+        self._file_list = []
+        #list of already processed files to not process them again (read from processed directory)
+        self._processed_files_list = []
+        #list of files to process in a cycle
+        self._file_list_to_process = []
+        
+        
 
     def is_valid(self):
         return os.path.exists(self._session_dir)
@@ -88,9 +97,9 @@ class Session:
     def count_raw_files(self):
         if self.raw_location != "" and self.possible_raw_files != "":
             log.info("using raw_location dir %s and %s as regex"%(self.raw_location,self.possible_raw_files))
-            flist = self._find_files(self.raw_location[0], self.raw_location[1])
+            self._file_list = self._find_files(self.raw_location[0], self.raw_location[1])
             log.info("No. of raw files in (shortcut) %i"%len(flist))
-            return len(flist)
+            return len(self._file_list)
         else:
             try:
                 possible_raw_files_regexes=['FoilHole*fractions.tiff','FoilHole*fractions.mrc','FoilHole*EER.eer']
@@ -105,11 +114,11 @@ class Session:
                         self.correct_input_dir=i
                         flist = self._find_files(raw_location[0], raw_location[1])
                         if len(flist)>=1:
-                            file_list=flist
+                            self._file_list=flist
                             self.raw_location = raw_location
                             self.possible_raw_files = possible_raw_files
                             log.info("RAW files are in %s"%os.path.join(raw_location[0],raw_location[1]))
-                            log.info("No. of raw files %i"%len(file_list))
+                            log.info("No. of raw files %i"%len(self._file_list))
                             break
                     else:
                         continue
@@ -131,8 +140,8 @@ class Session:
                     
                     
                 log.info("RAW files are in %s"%os.path.join(os.path.join(self._session_dir, "raw")))
-                log.info("No. of raw files %i"%len(file_list))
-                return len(file_list)
+                log.info("No. of raw files %i"%len(self._file_list))
+                return len(self._file_list)
             except Exception as e:
                 log.info(e)
                 log.info("There is an issue with determining raw_location")
@@ -144,7 +153,7 @@ class Session:
             pf = self._find_files(self._processed_dir,"*DW.mrc")
             log.info("processed files are in: %s"%self._processed_dir)
             log.info("No. of processed files %i"%len(pf))
-            self.processed_files_list=pf
+            self._processed_files_list=pf
             return len(pf)
         except Exception as e:
             log.info(e)
@@ -156,7 +165,7 @@ class Session:
     
         response = {
             "state": self._state,
-            "percent_done": self._percent,
+            "percent_done_total": self._percent,
             "percent_current_cycle": self._percent_current_cycle,
             "failed_jobs": self._no_of_failed,
             "processed_files": self._no_of_processed,
@@ -355,6 +364,12 @@ class Session:
                                     cluster_size=self._config.get("params", "cluster_size"),
                                     no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
                                     )
+        try:
+            #prepare a list of files for processing
+            #get a list of raw files, and create a new list that does not include already processed files, then take no_of_files_to_proc_in_cycle elements and pass to the workflow
+            self._file_list_to_process = [x for x in self._file_list if x not in self._processed_files_list][:self._config.getint("params", "no_of_files_to_proc_in_cycle")]
+        except Exception as e:
+            log.exception(e)
         try:
             self.wf.set_params(self)
         except Exception as e:
