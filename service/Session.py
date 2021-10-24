@@ -301,7 +301,8 @@ class Session:
         else:
             self._no_of_succeeded = status['succeeded']
             self._no_of_failed = status['failed']
-            self._percent_current_cycle = status['dags']['root']['percent_done']
+            #self._percent_current_cycle = status['dags']['root']['percent_done']
+            self._percent_current_cycle = status['totals']['percent_done']
 
         # is the workflow already running?
         if status is not None:
