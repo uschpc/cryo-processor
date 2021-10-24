@@ -294,7 +294,7 @@ class Session:
         try:
             status = wf.get_status()
             status = status['dags']['root']
-            log.info("status {}".format(status))
+            log.info("1-status {}".format(status))
         except:
             log.info("Unable to get workflow status")
             status = None
@@ -306,6 +306,7 @@ class Session:
             self._no_of_failed = 0
             self._percent_current_cycle = 0
         else:
+            log.info("2-status {}".format(status))
             self._no_of_succeeded = status['succeeded']
             self._no_of_failed = status['failed']
             #self._percent_current_cycle = status['dags']['root']['percent_done']
