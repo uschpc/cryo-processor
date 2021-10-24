@@ -98,7 +98,7 @@ class Session:
         if self.raw_location != "" and self.possible_raw_files != "":
             log.info("using raw_location dir %s and %s as regex"%(self.raw_location,self.possible_raw_files))
             self._file_list = self._find_files(self.raw_location[0], self.raw_location[1])
-            log.info("No. of raw files in (shortcut) %i"%len(flist))
+            log.info("No. of raw files in (shortcut) %i"%len(self._file_list))
             return len(self._file_list)
         else:
             try:
