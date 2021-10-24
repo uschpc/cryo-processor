@@ -526,7 +526,7 @@ class PipelineWorkflow:
             self.wf.add_jobs(dm2mrc_defect_map_job)
             #self.defmap_done = True
         else:
-            logger.info("Raw_Defect_Map_path {} from else...".format(Raw_Defect_Map_path))
+            logger.info("Raw_Defect_Map_path {} from else...".format(self._defect_map_fn))
             pass
         
         # # try to find where exactly raw files are. Done this way to speed-up the process
