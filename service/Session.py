@@ -294,6 +294,7 @@ class Session:
         try:
             status = wf.get_status()
             status = status['dags']['root']
+            log.info("status {}".format(status))
         except:
             log.info("Unable to get workflow status")
             status = None
