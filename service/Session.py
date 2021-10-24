@@ -387,8 +387,8 @@ class Session:
                 #Try to find Gain reference file - it might not be a part of the dataset, 
                 #so we must take it into account.
                 #define Gain reference Super resolution input and output filename
-                logger.info("self.rawdatadirs {}".format(self.rawdatadirs))
-                logger.info("looking for gain reference")
+                log.info("self.rawdatadirs {}".format(self.rawdatadirs))
+                log.info("looking for gain reference")
                 possible_gf_files_regexes=['*_gain.tiff','*.gain']
                 #add user provided optional regex:
                 if self.rawgainref!=None:
@@ -396,7 +396,7 @@ class Session:
                 raw_gain_ref_path=None
                 for i in self.rawdatadirs:
                     for possible_gf in possible_gf_files_regexes:
-                        logger.info("searching gain ref here: {} with {} regex".format(i, possible_gf))
+                        log.info("searching gain ref here: {} with {} regex".format(i, possible_gf))
                         raw_gain_ref_path = self._find_files(os.path.join(i,"**"), possible_gf)
                         if len(raw_gain_ref_path)>=1:
                             self._gain_ref_fn=raw_gain_ref_path
@@ -412,7 +412,7 @@ class Session:
                 self._defect_map_done = True
             if self._defect_map_done == False:
                 #Try to find Defect Map file - it might not be a part of the dataset; file is not needed for now
-                logger.info("looking for Defect Map")
+                log.info("looking for Defect Map")
                 possible_dm_files_regexes=['*Map.m1.dm4']
                 raw_defect_map_path=None
                 if self.rawdefectsmap!=None:
@@ -428,7 +428,7 @@ class Session:
                     for possible_dm in possible_dm_files_regexes:
                         raw_defect_map_path = self._find_files(os.path.join(i,"**"), possible_dm)
                         if len(raw_defect_map_path)>=1:
-                            logger.info("searching defect map here: {} with {} regex".format(i, possible_dm))
+                            log.info("searching defect map here: {} with {} regex".format(i, possible_dm))
                             self._defect_map_fn=raw_defect_map_path
                             break
                     else:
@@ -487,6 +487,6 @@ class Session:
         '''
 
         found_files=glob.glob(regex, recursive=True)
-        logger.info(" ... searching for {}".format(search_path))
-        logger.info(" ... found {} files matching {}".format(len(found_files), regex))
+        log.info(" ... searching for {}".format(search_path))
+        log.info(" ... found {} files matching {}".format(len(found_files), regex))
         return found_files

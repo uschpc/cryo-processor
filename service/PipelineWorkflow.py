@@ -481,7 +481,8 @@ class PipelineWorkflow:
             self.wf.add_jobs(clip_gainref_superres_job)
             #self.gainref_done = True
         else:
-            logger.info("FAILED: Raw_Gain_Ref_SR_path {} from else...".format(Raw_Gain_Ref_SR_path))
+            logger.info("FAILED: self._gain_ref_fn {} from else...".format(self._gain_ref_fn))
+            sys.exit()
             pass
         
         # #Try to find Defect Map file - it might not be a part of the dataset; file is not needed for now
