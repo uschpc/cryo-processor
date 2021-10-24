@@ -301,7 +301,8 @@ class Session:
             pass
        
         # logic to match the web ui expectations 
-        if status is None or "totals" not in status:
+        #if status is None or "totals" not in status:
+        if status is None:
             self._no_of_succeeded = 0
             self._no_of_failed = 0
             self._percent_current_cycle = 0
