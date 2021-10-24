@@ -262,9 +262,10 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/e2proc2d_wrapper.sh"),
             is_stageable=False
         )
-        e2proc2d.add_pegasus_profile(cores="1",
-                                     runtime="600",
+        e2proc2d.add_pegasus_profile(cores="2",
+                                     runtime="300",
                                      memory="4096",
+                                     glite_arguments=self.gctf_glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         magick = Transformation(
@@ -275,7 +276,8 @@ class PipelineWorkflow:
         )
         magick.add_pegasus_profile( cores="2",
                                         runtime="300",
-                                        memory="2048",
+                                        memory="4096",
+                                        glite_arguments=self.gctf_glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         magick2 = Transformation(
@@ -286,7 +288,8 @@ class PipelineWorkflow:
         )
         magick.add_pegasus_profile( cores="2",
                                         runtime="300",
-                                        memory="2048",
+                                        memory="4096",
+                                        glite_arguments=self.gctf_glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         gaussian = Transformation(
@@ -297,7 +300,8 @@ class PipelineWorkflow:
         )
         gaussian.add_pegasus_profile( cores="2",
                                         runtime="300",
-                                        memory="2048",
+                                        memory="4096",
+                                        glite_arguments=self.gctf_glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
 
@@ -307,9 +311,10 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/grep_wrapper.sh"),
             is_stageable=False
         )
-        grep_wrapper.add_pegasus_profile( cores="1",
+        grep_wrapper.add_pegasus_profile( cores="2",
                                         runtime="300",
-                                        memory="2048",
+                                        memory="4096",
+                                        glite_arguments=self.gctf_glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         
         slack_notify = Transformation(
@@ -318,9 +323,10 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/slack_notify.sh"),
             is_stageable=False
         )
-        slack_notify.add_pegasus_profile( cores="1",
+        slack_notify.add_pegasus_profile( cores="2",
                                         runtime="300",
-                                        memory="2048",
+                                        memory="4096",
+                                        glite_arguments=self.gctf_glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         
         #dealing with gain reference and similar
