@@ -444,8 +444,8 @@ class Session:
             log.info("processed_list_corenames: {}".format(processed_list_corenames))
             #list to process
             fext=self._file_list[0].split('.')[-1]
-            
-            file_dict_corenames=dict([(os.path.basename(x).replace('.%s'%fext,''),x) for x in self._file_list])
+            bsuf=self._file_list[0].split('.')[-2].split('_')[-1]
+            file_dict_corenames=dict([(os.path.basename(x).replace('_%s.%s'%(bsuf,fext),''),x) for x in self._file_list])
             #create a list of files to process 
             for x in file_dict_corenames.keys():
                 if x not in processed_list_corenames:
