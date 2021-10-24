@@ -361,30 +361,49 @@ class PipelineWorkflow:
         #mc_prefix = "mc_"
         
         
-        #Try to find Gain reference file - it might not be a part of the dataset, 
-        #so we must take it into account.
-        #define Gain reference Super resolution input and output filename
-        logger.info("self.inputs_dir {}".format(self.inputs_dir))
-        raw_gain_ref_path=None
-        Raw_Gain_Ref_SR_path=[]
-        logger.info("looking for gain reference")
-        possible_gf_files_regexes=['*_gain.tiff','*.gain']
-        #add user provided optional regex:
-        if self.rawgainref!=None:
-            possible_gf_files_regexes.append(self.rawgainref)
-        for i in self.inputs_dir:
-            for possible_gf in possible_gf_files_regexes:
-                logger.info("searching gain ref here: {} with {} regex".format(i, possible_gf))
-                raw_gain_ref_path = self.find_files2(os.path.join(i,"**"), possible_gf)
-                if len(raw_gain_ref_path)>=1:
-                    Raw_Gain_Ref_SR_path=raw_gain_ref_path
-                    break
-            else:
-                continue
-            break
-        if len(Raw_Gain_Ref_SR_path) != 0 and self.gainref_done == False:
+        # #Try to find Gain reference file - it might not be a part of the dataset, 
+        # #so we must take it into account.
+        # #define Gain reference Super resolution input and output filename
+        # logger.info("self.inputs_dir {}".format(self.inputs_dir))
+        # raw_gain_ref_path=None
+        # Raw_Gain_Ref_SR_path=[]
+        # logger.info("looking for gain reference")
+        # possible_gf_files_regexes=['*_gain.tiff','*.gain']
+        # #add user provided optional regex:
+        # if self.rawgainref!=None:
+            # possible_gf_files_regexes.append(self.rawgainref)
+        # for i in self.inputs_dir:
+            # for possible_gf in possible_gf_files_regexes:
+                # logger.info("searching gain ref here: {} with {} regex".format(i, possible_gf))
+                # raw_gain_ref_path = self.find_files2(os.path.join(i,"**"), possible_gf)
+                # if len(raw_gain_ref_path)>=1:
+                    # Raw_Gain_Ref_SR_path=raw_gain_ref_path
+                    # break
+            # else:
+                # continue
+            # break
+        if self._gainref_done == True:
+            #set variables and that is it
+            Gain_Ref_SR_name=os.path.basename(self.gr_sr)
+            Gain_Ref_SR = File(Gain_Ref_SR_name)
+            self.rc.add_replica("slurm", Gain_Ref_SR_name, self.gr_sr)
+            
+            FlipY_SR_name = os.path.basename(self.gr_sr_flipy)
+            FlipY_SR = File(FlipY_SR_name)
+            self.rc.add_replica("slurm", FlipY_SR_name, self.gr_sr_flipy)
+            
+            Gain_Ref_name=os.path.basename(self.gr_std)
+            Gain_Ref = File(Gain_Ref_name)
+            self.rc.add_replica("slurm", Gain_Ref_name, self.gr_std)
+            
+            FlipY_name=os.path.basename(self.gr_std_flipy)
+            FlipY = File(FlipY_name)
+            self.rc.add_replica("slurm", FlipY_name, self.gr_std_flipy)
+            
+            
+        if len(self._gain_ref_fn) != 0 and self._gainref_done == False:
             logger.info("processing Raw_Gain_Ref_SR_path: {}".format(Raw_Gain_Ref_SR_path))
-            Raw_Gain_Ref_SR_path = Raw_Gain_Ref_SR_path[0]
+            Raw_Gain_Ref_SR_path = self._gain_ref_fn[0]
             # get the extension
             gainref_extension=Raw_Gain_Ref_SR_path.split('.')[-1]
             
@@ -460,30 +479,36 @@ class PipelineWorkflow:
             self.wf.add_jobs(newstack_gainref_job)
             self.wf.add_jobs(clip_gainref_job)
             self.wf.add_jobs(clip_gainref_superres_job)
-            self.gainref_done = True
+            #self.gainref_done = True
         else:
             logger.info("FAILED: Raw_Gain_Ref_SR_path {} from else...".format(Raw_Gain_Ref_SR_path))
             pass
         
-        #Try to find Defect Map file - it might not be a part of the dataset; file is not needed for now
-        logger.info("looking for Defect Map")
-        possible_dm_files_regexes=['*Map.m1.dm4']
-        raw_defect_map_path=None
-        Raw_Defect_Map_path=[]
-        if self.rawdefectsmap!=None:
-            possible_dm_files_regexes.append(self.rawdefectsmap)
-        for i in self.inputs_dir:
-            for possible_dm in possible_dm_files_regexes:
-                raw_defect_map_path = self.find_files2(os.path.join(i,"**"), possible_dm)
-                if len(raw_defect_map_path)>=1:
-                    logger.info("searching defect map here: {} with {} regex".format(i, possible_dm))
-                    Raw_Defect_Map_path=raw_defect_map_path
-                    break
-            else:
-                continue
-            break
-        if len(Raw_Defect_Map_path) != 0 and self.defmap_done == False:
-            Raw_Defect_Map_path = Raw_Defect_Map_path[0]
+        # #Try to find Defect Map file - it might not be a part of the dataset; file is not needed for now
+        # logger.info("looking for Defect Map")
+        # possible_dm_files_regexes=['*Map.m1.dm4']
+        # raw_defect_map_path=None
+        # Raw_Defect_Map_path=[]
+        # if self.rawdefectsmap!=None:
+            # possible_dm_files_regexes.append(self.rawdefectsmap)
+        # for i in self.inputs_dir:
+            # for possible_dm in possible_dm_files_regexes:
+                # raw_defect_map_path = self.find_files2(os.path.join(i,"**"), possible_dm)
+                # if len(raw_defect_map_path)>=1:
+                    # logger.info("searching defect map here: {} with {} regex".format(i, possible_dm))
+                    # Raw_Defect_Map_path=raw_defect_map_path
+                    # break
+            # else:
+                # continue
+            # break
+        if self._defect_map_done == True:
+            #set variables and that is it
+            Defect_Map_name=os.path.basename(self.dmf)
+            Defect_Map = File(Defect_Map_name)
+            self.rc.add_replica("slurm", Defect_Map, self.dmf)
+            
+        if len(self._defect_map_fn) != 0 and self._defect_map_done == False:
+            Raw_Defect_Map_path = self._defect_map_fn[0]
             Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
             logger.info("Found Defect Map file {} ...".format(Raw_Defect_Map_name))
             Raw_Defect_Map = File(Raw_Defect_Map_name)
@@ -498,7 +523,7 @@ class PipelineWorkflow:
             dm2mrc_defect_map_job.add_inputs(Raw_Defect_Map)
             dm2mrc_defect_map_job.add_outputs(Defect_Map, stage_out=True)
             self.wf.add_jobs(dm2mrc_defect_map_job)
-            self.defmap_done = True
+            #self.defmap_done = True
         else:
             logger.info("Raw_Defect_Map_path {} from else...".format(Raw_Defect_Map_path))
             pass
@@ -782,9 +807,21 @@ class PipelineWorkflow:
         self.apix = datum.apix
         self.fmdose = datum.fmdose
         self.kev = datum.kev
+        self._gainref_done = datum._gainref_done
+        self._gain_ref_fn = datum._gain_ref_fn
+        self._defect_map_done = datum._defect_map_done
+        self._defect_map_fn = datum._defect_map_fn
         self._processed_files_list = datum._processed_files_list
         self._file_list_to_process = datum._file_list_to_process
         #self.particle_size = particle_size
+        try:
+            self.gr_sr_flipy = datum.gr_sr_flipy
+            self.gr_sr = datum.gr_sr
+            self.gr_std_flipy = datum.gr_std_flipy
+            self.gr_std = datum.gr_std
+        except: pass        
+        try: self.dmf = datum.dmf
+        except: pass
         try: self.rawgainref = datum.rawgainref
         except: pass
         try: self.rawdefectsmap = datum.rawdefectsmap

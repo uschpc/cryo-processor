@@ -67,6 +67,10 @@ class Session:
         self.possible_raw_files = ""
         
         #handling files for processing moved here
+        self._gainref_done = False
+        self._gain_ref_fn = []
+        self._defect_map_done = False
+        self._defect_map_fn = []
         #list of raw files (read from processed directory)
         self._file_list = []
         #list of already processed files to not process them again (read from processed directory)
@@ -366,11 +370,89 @@ class Session:
                                     no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
                                     )
         try:
+            #prepare gain reference jobs (to ensure we are doing it only once)
+            #check if there is one already, if not process
+            #check if gainrref was processed already
+            gr_sr_flipy = self.find_files2(self._processed_dir, '*_sr.flipy.mrc')
+            gr_sr = self.find_files2(self._processed_dir, '*_sr.mrc')
+            gr_std_flipy = self.find_files2(self._processed_dir, '*_std.flipy.mrc')
+            gr_std = self.find_files2(self._processed_dir, '*_std.mrc')
+            if len(gr_sr_flipy) != 0 and len(gr_sr) != 0 and len(gr_std_flipy) != 0 and len(gr_std) != 0:
+                self.gr_sr_flipy = gr_sr_flipy[0]
+                self.gr_sr = gr_sr[0]
+                self.gr_std_flipy = gr_std_flipy[0]
+                self.gr_std = gr_std[0]
+                self._gainref_done = True
+            if self._gainref_done == False:
+                #Try to find Gain reference file - it might not be a part of the dataset, 
+                #so we must take it into account.
+                #define Gain reference Super resolution input and output filename
+                logger.info("self.rawdatadirs {}".format(self.rawdatadirs))
+                logger.info("looking for gain reference")
+                possible_gf_files_regexes=['*_gain.tiff','*.gain']
+                #add user provided optional regex:
+                if self.rawgainref!=None:
+                    possible_gf_files_regexes.append(self.rawgainref)
+                raw_gain_ref_path=None
+                for i in self.rawdatadirs:
+                    for possible_gf in possible_gf_files_regexes:
+                        logger.info("searching gain ref here: {} with {} regex".format(i, possible_gf))
+                        raw_gain_ref_path = self.find_files2(os.path.join(i,"**"), possible_gf)
+                        if len(raw_gain_ref_path)>=1:
+                            self._gain_ref_fn=raw_gain_ref_path
+                            break
+                    else:
+                        continue
+                    break
+            #prepare defect map jobs (to ensure we are doing it only once)
+            #check if there is one already, if not process     
+            dmf = self.find_files2(self._processed_dir, '*Map.m1.mrc')
+            if len(dmf) != 0:
+                self.dmf = dmf[0]
+                self._defect_map_done = True
+            if self._defect_map_done == False:
+                #Try to find Defect Map file - it might not be a part of the dataset; file is not needed for now
+                logger.info("looking for Defect Map")
+                possible_dm_files_regexes=['*Map.m1.dm4']
+                raw_defect_map_path=None
+                if self.rawdefectsmap!=None:
+                    possible_dm_files_regexes.append(self.rawdefectsmap)
+                #check if dm was processed already
+                for possible_dm in possible_dm_files_regexes:
+                    raw_defect_map_path = self.find_files2(os.path.join(self._processed_dir,"**"), possible_dm)
+                    if len(raw_defect_map_path)>=1:
+                        self._defect_map_fn=raw_defect_map_path
+                        break
+                raw_defect_map_path=None
+                for i in self.rawdatadirs:
+                    for possible_dm in possible_dm_files_regexes:
+                        raw_defect_map_path = self.find_files2(os.path.join(i,"**"), possible_dm)
+                        if len(raw_defect_map_path)>=1:
+                            logger.info("searching defect map here: {} with {} regex".format(i, possible_dm))
+                            self._defect_map_fn=raw_defect_map_path
+                            break
+                    else:
+                        continue
+                    break
             #prepare a list of files for processing
+            #list of files should be here from first status check and counting raw files
             #ensure the list order (oldest files should be first after sort)
             self._file_list.sort()
             #get a list of raw files, and create a new list that does not include already processed files, then take no_of_files_to_proc_in_cycle elements and pass to the workflow
-            self._file_list_to_process = [x for x in self._file_list if x not in self._processed_files_list][:self._config.getint("params", "no_of_files_to_proc_in_cycle")]
+            #prepare a list of files that have not been processed yet
+            processed_list_corenames=[os.path.basename(x).replace('_DW.mrc','') for x in self._processed_files_list]
+            #list to process
+            fext=self._file_list[0].split('.')[-1]
+            
+            file_dict_corenames=dict([(os.path.basename(x).replace('.%s'%fext,''),x) for x in self._file_list])
+            #create a list of files to process 
+            for x in file_dict_corenames.keys():
+                if x not in processed_list_corenames:
+                    self._file_list_to_process.append(file_dict_corenames[x])
+            
+            #self._file_list_to_process = [os.path.basename(x) for x in self._file_list if os.path.basename(x) not in self._processed_files_list]
+            #take first no_of_files_to_proc_in_cycle elements
+            self._file_list_to_process=self._file_list_to_process[:self._config.getint("params", "no_of_files_to_proc_in_cycle")]
         except Exception as e:
             log.exception(e)
         try:
