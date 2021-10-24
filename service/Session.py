@@ -301,7 +301,7 @@ class Session:
         else:
             self._no_of_succeeded = status['succeeded']
             self._no_of_failed = status['failed']
-            self._percent_current_cycle = status["percent_done"]
+            self._percent_current_cycle = status['dags']['root']['percent_done']
 
         # is the workflow already running?
         if status is not None:
@@ -366,6 +366,8 @@ class Session:
                                     )
         try:
             #prepare a list of files for processing
+            #ensure the list order (oldest files should be first after sort)
+            self._file_list.sort()
             #get a list of raw files, and create a new list that does not include already processed files, then take no_of_files_to_proc_in_cycle elements and pass to the workflow
             self._file_list_to_process = [x for x in self._file_list if x not in self._processed_files_list][:self._config.getint("params", "no_of_files_to_proc_in_cycle")]
         except Exception as e:

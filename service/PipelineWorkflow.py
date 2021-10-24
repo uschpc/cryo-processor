@@ -646,8 +646,8 @@ class PipelineWorkflow:
             motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
             motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
             motionCor_job.set_stderr(mc2_stderr, stage_out=True, register_replica=False)
-            #motionCor_job.add_profiles(Namespace.PEGASUS, "label", "mc-{}".format(fraction_file_name))
-            motionCor_job.add_profiles(Namespace.PEGASUS, "label", "mc2")
+            motionCor_job.add_profiles(Namespace.PEGASUS, "label", "img-{}".format(fraction_file_name))
+            #motionCor_job.add_profiles(Namespace.PEGASUS, "label", "mc2")
             self.wf.add_jobs(motionCor_job)
 
             # gctf
@@ -674,8 +674,8 @@ class PipelineWorkflow:
             gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
             gctf_job.set_stdout(gctf_stdout, stage_out=True, register_replica=False)
             gctf_job.set_stderr(gctf_stderr, stage_out=True, register_replica=False)
-            #gctf_job.add_profiles(Namespace.PEGASUS, "label", "gctf-{}".format(fraction_file_name))
-            gctf_job.add_profiles(Namespace.PEGASUS, "label", "gctf")
+            gctf_job.add_profiles(Namespace.PEGASUS, "label", "img-{}".format(fraction_file_name))
+            #gctf_job.add_profiles(Namespace.PEGASUS, "label", "gctf")
             self.wf.add_jobs(gctf_job)
 
             # e2proc2d - motion-corrected to jpg, then resize to 20% size
