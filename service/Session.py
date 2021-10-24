@@ -145,8 +145,8 @@ class Session:
                     # flist = self._find_files(self.raw_location[0], self.raw_location[1])
                     
                     
-                log.info("RAW files are in %s"%os.path.join(os.path.join(self._session_dir, "raw")))
-                log.info("No. of raw files %i"%len(self._file_list))
+                #log.info("RAW files are in %s"%os.path.join(os.path.join(self._session_dir, "raw")))
+                #log.info("No. of raw files %i"%len(self._file_list))
                 return len(self._file_list)
             except Exception as e:
                 log.info(e)
@@ -308,7 +308,7 @@ class Session:
             self._no_of_succeeded = status['succeeded']
             self._no_of_failed = status['failed']
             #self._percent_current_cycle = status['dags']['root']['percent_done']
-            self._percent_current_cycle = status['totals']['percent_done']
+            self._percent_current_cycle = status['percent_done']
 
         # is the workflow already running?
         if status is not None:
