@@ -373,10 +373,10 @@ class Session:
             #prepare gain reference jobs (to ensure we are doing it only once)
             #check if there is one already, if not process
             #check if gainrref was processed already
-            gr_sr_flipy = self.find_files2(self._processed_dir, '*_sr.flipy.mrc')
-            gr_sr = self.find_files2(self._processed_dir, '*_sr.mrc')
-            gr_std_flipy = self.find_files2(self._processed_dir, '*_std.flipy.mrc')
-            gr_std = self.find_files2(self._processed_dir, '*_std.mrc')
+            gr_sr_flipy = self._find_files(self._processed_dir, '*_sr.flipy.mrc')
+            gr_sr = self._find_files(self._processed_dir, '*_sr.mrc')
+            gr_std_flipy = self._find_files(self._processed_dir, '*_std.flipy.mrc')
+            gr_std = self._find_files(self._processed_dir, '*_std.mrc')
             if len(gr_sr_flipy) != 0 and len(gr_sr) != 0 and len(gr_std_flipy) != 0 and len(gr_std) != 0:
                 self.gr_sr_flipy = gr_sr_flipy[0]
                 self.gr_sr = gr_sr[0]
@@ -397,7 +397,7 @@ class Session:
                 for i in self.rawdatadirs:
                     for possible_gf in possible_gf_files_regexes:
                         logger.info("searching gain ref here: {} with {} regex".format(i, possible_gf))
-                        raw_gain_ref_path = self.find_files2(os.path.join(i,"**"), possible_gf)
+                        raw_gain_ref_path = self._find_files(os.path.join(i,"**"), possible_gf)
                         if len(raw_gain_ref_path)>=1:
                             self._gain_ref_fn=raw_gain_ref_path
                             break
@@ -406,7 +406,7 @@ class Session:
                     break
             #prepare defect map jobs (to ensure we are doing it only once)
             #check if there is one already, if not process     
-            dmf = self.find_files2(self._processed_dir, '*Map.m1.mrc')
+            dmf = self._find_files(self._processed_dir, '*Map.m1.mrc')
             if len(dmf) != 0:
                 self.dmf = dmf[0]
                 self._defect_map_done = True
@@ -419,14 +419,14 @@ class Session:
                     possible_dm_files_regexes.append(self.rawdefectsmap)
                 #check if dm was processed already
                 for possible_dm in possible_dm_files_regexes:
-                    raw_defect_map_path = self.find_files2(os.path.join(self._processed_dir,"**"), possible_dm)
+                    raw_defect_map_path = self._find_files(os.path.join(self._processed_dir,"**"), possible_dm)
                     if len(raw_defect_map_path)>=1:
                         self._defect_map_fn=raw_defect_map_path
                         break
                 raw_defect_map_path=None
                 for i in self.rawdatadirs:
                     for possible_dm in possible_dm_files_regexes:
-                        raw_defect_map_path = self.find_files2(os.path.join(i,"**"), possible_dm)
+                        raw_defect_map_path = self._find_files(os.path.join(i,"**"), possible_dm)
                         if len(raw_defect_map_path)>=1:
                             logger.info("searching defect map here: {} with {} regex".format(i, possible_dm))
                             self._defect_map_fn=raw_defect_map_path

@@ -402,7 +402,7 @@ class PipelineWorkflow:
             
             
         if len(self._gain_ref_fn) != 0 and self._gainref_done == False:
-            logger.info("processing Raw_Gain_Ref_SR_path: {}".format(Raw_Gain_Ref_SR_path))
+            logger.info("processing self._gain_ref_fn[0]: {}".format(self._gain_ref_fn[0]))
             Raw_Gain_Ref_SR_path = self._gain_ref_fn[0]
             # get the extension
             gainref_extension=Raw_Gain_Ref_SR_path.split('.')[-1]
