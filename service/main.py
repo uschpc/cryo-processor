@@ -105,7 +105,7 @@ def main_loop():
 
 
 def load_state():
-    sfilename = os.path.join(os.environ['HOME'], '.cryoem-dev.state')
+    sfilename = os.path.join(os.environ['HOME'], '.cryoem.state')
     if os.path.exists(sfilename):
         with open(sfilename) as f:
             j = json.load(open(sfilename))
@@ -117,7 +117,7 @@ def save_state():
     j = {}
     for sid, session in app.state.sessions.items():
         j[sid] = session.get_state()
-    with open(os.path.join(os.environ['HOME'], '.cryoem-dev.state'), 'w') as f:
+    with open(os.path.join(os.environ['HOME'], '.cryoem.state'), 'w') as f:
         json.dump(j, f)
 
 
@@ -156,7 +156,7 @@ async def shutdown():
             "content": {
                 "application/json": {
                     "example": {
-                        "sessions": [{"session_id": "20211010_USC_osinski_K3_samplename"}]
+                        "sessions": [{"session_id": "20211010_usc_osinski_k3_samplename"}]
                     }
                 }
             }
