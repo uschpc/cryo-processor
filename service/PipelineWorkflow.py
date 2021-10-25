@@ -355,29 +355,6 @@ class PipelineWorkflow:
     # --- Create Workflow -----------------------------------------------------
     def create_workflow(self):
         self.wf = Workflow(self.wf_name, infer_dependencies=True)
-        
-        # #Try to find Gain reference file - it might not be a part of the dataset, 
-        # #so we must take it into account.
-        # #define Gain reference Super resolution input and output filename
-        # logger.info("self.inputs_dir {}".format(self.inputs_dir))
-        # raw_gain_ref_path=None
-        # Raw_Gain_Ref_SR_path=[]
-        # logger.info("looking for gain reference")
-        # possible_gf_files_regexes=['*_gain.tiff','*.gain']
-        # #add user provided optional regex:
-        # if self.rawgainref!=None:
-            # possible_gf_files_regexes.append(self.rawgainref)
-        # for i in self.inputs_dir:
-            # for possible_gf in possible_gf_files_regexes:
-                # logger.info("searching gain ref here: {} with {} regex".format(i, possible_gf))
-                # raw_gain_ref_path = self.find_files2(os.path.join(i,"**"), possible_gf)
-                # if len(raw_gain_ref_path)>=1:
-                    # Raw_Gain_Ref_SR_path=raw_gain_ref_path
-                    # break
-            # else:
-                # continue
-            # break
-
 
         if len(self._gain_ref_fn) != 0 and self._gainref_done == False:
             logger.info("processing self._gain_ref_fn[0]: {}".format(self._gain_ref_fn[0]))
@@ -479,24 +456,6 @@ class PipelineWorkflow:
             logger.info("FAILED: gain ref not found")
             sys.exit()
             pass
-        
-        # #Try to find Defect Map file - it might not be a part of the dataset; file is not needed for now
-        # logger.info("looking for Defect Map")
-        # possible_dm_files_regexes=['*Map.m1.dm4']
-        # raw_defect_map_path=None
-        # Raw_Defect_Map_path=[]
-        # if self.rawdefectsmap!=None:
-            # possible_dm_files_regexes.append(self.rawdefectsmap)
-        # for i in self.inputs_dir:
-            # for possible_dm in possible_dm_files_regexes:
-                # raw_defect_map_path = self.find_files2(os.path.join(i,"**"), possible_dm)
-                # if len(raw_defect_map_path)>=1:
-                    # logger.info("searching defect map here: {} with {} regex".format(i, possible_dm))
-                    # Raw_Defect_Map_path=raw_defect_map_path
-                    # break
-            # else:
-                # continue
-            # break
 
             
         if len(self._defect_map_fn) != 0 and self._defect_map_done == False:
@@ -524,59 +483,7 @@ class PipelineWorkflow:
         else:
             logger.info("Raw_Defect_Map_path not found")
             pass
-        
-        # # try to find where exactly raw files are. Done this way to speed-up the process
-        # possible_raw_files_regexes=['FoilHole*fractions.tiff','FoilHole*fractions.mrc','FoilHole*EER.eer']
-        # if self.basename_prefix!=None and self.basename_suffix!=None and self.basename_extension!=None:
-            # possible_raw_files_regexes.append("%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
-        
-        # for i in self.inputs_dir:
-            # for possible_raw_files in possible_raw_files_regexes:
-                # raw_location=(os.path.join(i, "**"), possible_raw_files)
-                # self.correct_input_dir=i
-                # flist = self.find_files2(raw_location[0], raw_location[1])
-                # if len(flist)>=1:
-                    # file_list=flist
-                    # self.raw_location = raw_location
-                    # break
-            # else:
-                # continue
-            # break
-                
-        # #sort? sort - to make it somewhat FIFO
-        # file_list.sort()
-        # #define filename extension
-        # self.basename_extension=file_list[0].split('.')[-1]
-        # self.basename_suffix=file_list[0].split('.')[-2].split('_')[-1]
-        
-        # #set the number of raw files
-        # self.no_of_raw=len(file_list)
-        
-        # if self.no_of_files_to_proc_in_cycle != -1 and not self.debug:
-            # #do all
-            # pass
-        
-        # if self.no_of_files_to_proc_in_cycle != -1 and self.debug:
-            # # when debugging, only do a fraction of the files
-            # file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
-        # else:
-            # # even for production, only process a part of the dataset (maybe change this later?)
-            # #
-            # #file_list = random.sample(file_list, self.no_of_files_to_proc_in_cycle)
-            # pass
-        
-        #set file list to be equal to no_of_files_to_proc_in_cycle based on self.processed_files_list
-        # if self.no_of_files_to_proc_in_cycle != -1:
-            # file_list = [x for x in file_list if x not in self.processed_files_list][:self.no_of_files_to_proc_in_cycle]
-            # #pass
-            # # for x in self.processed_files_list: 
-                # # file_list.append(x)
-        # elif self.no_of_files_to_proc_in_cycle ==-1:
-            # #ignore no_of_files_to_proc_in_cycle and do all at once
-            # pass
-        # else:
-            # loger.info("Cannot get file list")
-            # pass
+
         
         logger.info("Currently processing {} files. Processed list length is {}".format(len(self._file_list_to_process), len(self._processed_files_list)))
         #logger.info("Currently processing {} files. Processed list length is {}".format("\n".join(file_list), len(self.processed_files_list)))

@@ -129,22 +129,6 @@ class Session:
                     else:
                         continue
                     break
-                
-                
-            
-                # for i in glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*")):
-                    # raw_location=(os.path.join(i, "**"),
-                            # "%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
-                    # correct_input_dir=i
-                    # flist = self._find_files(raw_location[0], raw_location[1])
-                    # if len(flist)>=1:
-                        # file_list=flist
-                        # self.raw_location = raw_location
-                        # break
-                # else:
-                    # flist = self._find_files(self.raw_location[0], self.raw_location[1])
-                    
-                    
                 #log.info("RAW files are in %s"%os.path.join(os.path.join(self._session_dir, "raw")))
                 #log.info("No. of raw files %i"%len(self._file_list))
                 return len(self._file_list)
@@ -439,31 +423,10 @@ class Session:
                     else:
                         continue
                     break
-            # #prepare a list of files for processing
-            # #list of files should be here from first status check and counting raw files
-            # #ensure the list order (oldest files should be first after sort)
-            # self._file_list.sort()
-            # #get a list of raw files, and create a new list that does not include already processed files, then take no_of_files_to_proc_in_cycle elements and pass to the workflow
-            # #prepare a list of files that have not been processed yet
-            # processed_list_corenames=[os.path.basename(x).replace('_DW.mrc','') for x in self._processed_files_list]
-            # log.info("processed_list_corenames: {}".format(processed_list_corenames))
-            # #list to process
-            # fext=self._file_list[0].split('.')[-1]
-            # bsuf=self._file_list[0].split('.')[-2].split('_')[-1]
-            # file_dict_corenames=dict([(os.path.basename(x).replace('_%s.%s'%(bsuf,fext),''),x) for x in self._file_list])
-            # #create a list of files to process 
-            # for x in file_dict_corenames.keys():
-                # if x not in processed_list_corenames:
-                    # self._file_list_to_process.append(file_dict_corenames[x])
-            
-            
-            
-            # #self._file_list_to_process = [os.path.basename(x) for x in self._file_list if os.path.basename(x) not in self._processed_files_list]
-            # #take first no_of_files_to_proc_in_cycle elements
-            # self._file_list_to_process=self._file_list_to_process[:self._config.getint("params", "no_of_files_to_proc_in_cycle")]
-            # #log.info("self._file_list_to_process: {}".format(self._file_list_to_process))
-            
-            #again
+
+            #prepare a list of files for processing
+            #list of files should be here from first status check and counting raw files
+            #ensure the list order (oldest files should be first after sort)
             self._file_list.sort()
             self._file_list_to_process=[]
             for x in self._file_list:
