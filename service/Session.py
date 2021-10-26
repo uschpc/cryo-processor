@@ -31,6 +31,7 @@ class Session:
     _STATE_PROCESSING = "processing"
     _STATE_PROCESSING_COMPLETE = "processing_complete"
     _STATE_PROCESSING_FAILURE = "processing_failure"
+    _STATE_INCOMPLETE_OR_EMPTY = "incomplete_or_empty"
 
     # state
     _state = None
@@ -393,6 +394,11 @@ class Session:
                     else:
                         continue
                     break
+            # mark as incomplete in case of the gainref missing
+            if len(self._gain_ref_fn)==0:
+                pass
+            
+            
             #prepare defect map jobs (to ensure we are doing it only once)
             #check if there is one already, if not process     
             dmf = self._find_files(self._processed_dir, '*Map.m1.mrc')
@@ -435,6 +441,11 @@ class Session:
             self._file_list_to_process=self._file_list_to_process[:self._config.getint("params", "no_of_files_to_proc_in_cycle")]
             log.info("self._file_list_to_process: len {}".format(len(self._file_list_to_process)))
             log.info("self._sent_for_processing BEFOR: len {}".format(len(self._sent_for_processing)))
+            #mark as incomplete if no files are found
+            if len(self._file_list_to_process)==0:
+                pass
+            
+            
             for x in self._file_list_to_process:
                 if x not in self._sent_for_processing:
                     self._sent_for_processing.append(x)

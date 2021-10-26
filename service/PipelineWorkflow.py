@@ -599,7 +599,7 @@ class PipelineWorkflow:
             
             gctf_job = (
                 Job("gctf").add_args("--apix", self.apix, "--kV", self.kev, "--Cs", "2.7", "--ac", "0.1",
-                                     "--ctfstar", ctf_star_file, "--gid", "0", "--boxsize", "1024", mrc_file)
+                                     "--ctfstar", ctf_star_file, "--gid", "1", "--boxsize", "1024", mrc_file)
             )
 
             gctf_job.add_inputs(mrc_file)
