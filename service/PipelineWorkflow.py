@@ -29,7 +29,7 @@ class PipelineWorkflow:
     
 
     # --- Init ----------------------------------------------------------------
-    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=True, partition="debug", account="osinski_703", glite_arguments="--gres=gpu:k40:2", gctf_glite_arguments="--gres=gpu:k40:2", maxjobs=100, debug_maxjobs=10, pgss_stgt_clusters=10, cluster_size=10, no_of_files_to_proc_in_cycle=-1):
+    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=True, partition="debug", account="osinski_703", glite_arguments="--gres=gpu:k40:2", gctf_glite_arguments="--gres=gpu:k40:2", glite_for_cryoem_partition="", maxjobs=100, debug_maxjobs=10, pgss_stgt_clusters=10, cluster_size=10, no_of_files_to_proc_in_cycle=-1):
         self.wf_name = "motioncor2"
         self.debug = debug
         logger.info("PipelineWorkflow init")
@@ -42,7 +42,7 @@ class PipelineWorkflow:
         self.account = account
         self.glite_arguments = glite_arguments
         self.gctf_glite_arguments = gctf_glite_arguments
-        self.glite_for_cryoem_partition = "--nodelist=e17-[20-24],d23-[11-12]"
+        self.glite_for_cryoem_partition = glite_for_cryoem_partition
         self.pgss_stgt_clusters = pgss_stgt_clusters
         self.maxjobs = maxjobs
         self.debug_maxjobs = debug_maxjobs
