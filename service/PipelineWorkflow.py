@@ -57,6 +57,7 @@ class PipelineWorkflow:
             logger.info("account {}".format(self.account))
             logger.info("glite_arguments {}".format(self.glite_arguments))
             logger.info("gctf_glite_arguments {}".format(self.gctf_glite_arguments))
+            logger.info("glite_for_cryoem_partition {}".format(self.glite_for_cryoem_partition))
             logger.info("pgss_stgt_clusters {}".format(self.pgss_stgt_clusters))
             logger.info("maxjobs {}".format(self.maxjobs))
             logger.info("debug_maxjobs {}".format(self.debug_maxjobs))
@@ -163,7 +164,8 @@ class PipelineWorkflow:
         )
         dm2mrc_gainref.add_pegasus_profile( cores="4",
                                         runtime="300",
-                                        memory="4096"
+                                        memory="4096",
+                                        glite_arguments=self.glite_for_cryoem_partition
         )
         tif2mrc_gainref = Transformation(
             "tif2mrc_gainref",
@@ -173,7 +175,8 @@ class PipelineWorkflow:
         )
         tif2mrc_gainref.add_pegasus_profile( cores="4",
                                         runtime="300",
-                                        memory="4096"
+                                        memory="4096",
+                                        glite_arguments=self.glite_for_cryoem_partition
         )
         newstack_gainref = Transformation(
             "newstack_gainref",
@@ -183,7 +186,8 @@ class PipelineWorkflow:
         )
         newstack_gainref.add_pegasus_profile( cores="4",
                                         runtime="300",
-                                        memory="4096"
+                                        memory="4096",
+                                        glite_arguments=self.glite_for_cryoem_partition
         )
         clip_gainref = Transformation(
             "clip_gainref",
@@ -193,7 +197,8 @@ class PipelineWorkflow:
         )
         clip_gainref.add_pegasus_profile( cores="4",
                                         runtime="300",
-                                        memory="4096"
+                                        memory="4096",
+                                        glite_arguments=self.glite_for_cryoem_partition
         )
         clip_gainref_superres = Transformation(
             "clip_gainref_superres",
@@ -203,7 +208,8 @@ class PipelineWorkflow:
         )
         clip_gainref_superres.add_pegasus_profile( cores="4",
                                         runtime="300",
-                                        memory="4096"
+                                        memory="4096",
+                                        glite_arguments=self.glite_for_cryoem_partition
         )
         # second - let's try to get the Defect map file:
         dm2mrc_defect_map = Transformation(
@@ -214,7 +220,8 @@ class PipelineWorkflow:
         )
         dm2mrc_defect_map.add_pegasus_profile( cores="4",
                                         runtime="300",
-                                        memory="4096"
+                                        memory="4096",
+                                        glite_arguments=self.glite_for_cryoem_partition
         )
         if self.debug:
             pass
@@ -266,7 +273,7 @@ class PipelineWorkflow:
         e2proc2d.add_pegasus_profile(cores="2",
                                      runtime="300",
                                      memory="4096",
-                                     #glite_arguments=self.gctf_glite_arguments
+                                     glite_arguments=self.glite_for_cryoem_partition
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         magick = Transformation(
@@ -278,7 +285,7 @@ class PipelineWorkflow:
         magick.add_pegasus_profile( cores="2",
                                         runtime="300",
                                         memory="4096",
-                                        #glite_arguments=self.gctf_glite_arguments
+                                        glite_arguments=self.glite_for_cryoem_partition
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         magick2 = Transformation(
@@ -290,7 +297,7 @@ class PipelineWorkflow:
         magick.add_pegasus_profile( cores="2",
                                         runtime="300",
                                         memory="4096",
-                                        #glite_arguments=self.gctf_glite_arguments
+                                        glite_arguments=self.glite_for_cryoem_partition
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         gaussian = Transformation(
@@ -302,7 +309,7 @@ class PipelineWorkflow:
         gaussian.add_pegasus_profile( cores="2",
                                         runtime="300",
                                         memory="4096",
-                                        #glite_arguments=self.gctf_glite_arguments
+                                        glite_arguments=self.glite_for_cryoem_partition
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
 
@@ -315,7 +322,7 @@ class PipelineWorkflow:
         grep_wrapper.add_pegasus_profile( cores="2",
                                         runtime="300",
                                         memory="2048",
-                                        #glite_arguments=self.gctf_glite_arguments
+                                        glite_arguments=self.glite_for_cryoem_partition
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         
         slack_notify = Transformation(
@@ -327,7 +334,7 @@ class PipelineWorkflow:
         slack_notify.add_pegasus_profile( cores="1",
                                         runtime="120",
                                         memory="2048",
-                                        #glite_arguments=self.gctf_glite_arguments
+                                        glite_arguments=self.glite_for_cryoem_partition
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         
         #dealing with gain reference and similar
