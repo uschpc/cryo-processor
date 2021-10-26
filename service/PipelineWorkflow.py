@@ -324,8 +324,8 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/slack_notify.sh"),
             is_stageable=False
         )
-        slack_notify.add_pegasus_profile( cores="2",
-                                        runtime="300",
+        slack_notify.add_pegasus_profile( cores="1",
+                                        runtime="120",
                                         memory="2048",
                                         #glite_arguments=self.gctf_glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)

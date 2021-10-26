@@ -435,6 +435,7 @@ class Session:
             #list of files should be here from first status check and counting raw files
             #ensure the list order (oldest files should be first after sort)
             self._file_list.sort()
+            log.info("self._file_list BEFORE TRIM: len {}".format(len(self._file_list)))
             self._file_list_to_process=[]
             for x in self._file_list:
                 if x not in self._sent_for_processing:
