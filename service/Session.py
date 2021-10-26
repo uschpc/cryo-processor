@@ -225,6 +225,7 @@ class Session:
     def stop_processing(self):
         self._state = self._STATE_NEEDS_PROCESSING
         self._next_processing_time = 0
+        self._sent_for_processing = []
         # also cancel any potential workflows
         wf = Workflow("motioncor2")
         wf._submit_dir = self._run_dir
@@ -395,8 +396,8 @@ class Session:
                         continue
                     break
             # mark as incomplete in case of the gainref missing
-            if len(self._gain_ref_fn)==0:
-                pass
+            # if len(self._gain_ref_fn)==0:
+                # pass
             
             
             #prepare defect map jobs (to ensure we are doing it only once)
@@ -442,8 +443,8 @@ class Session:
             log.info("self._file_list_to_process: len {}".format(len(self._file_list_to_process)))
             log.info("self._sent_for_processing BEFOR: len {}".format(len(self._sent_for_processing)))
             #mark as incomplete if no files are found
-            if len(self._file_list_to_process)==0:
-                pass
+            # if len(self._file_list_to_process)==0:
+                # pass
             
             
             for x in self._file_list_to_process:

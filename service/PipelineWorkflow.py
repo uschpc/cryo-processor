@@ -29,7 +29,7 @@ class PipelineWorkflow:
     
 
     # --- Init ----------------------------------------------------------------
-    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=False, partition="debug", account="osinski_703", glite_arguments="--gres=gpu:k40:2", gctf_glite_arguments="--gres=gpu:k40:2", maxjobs=100, debug_maxjobs=10, pgss_stgt_clusters=10, cluster_size=10, no_of_files_to_proc_in_cycle=-1):
+    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=True, partition="debug", account="osinski_703", glite_arguments="--gres=gpu:k40:2", gctf_glite_arguments="--gres=gpu:k40:2", maxjobs=100, debug_maxjobs=10, pgss_stgt_clusters=10, cluster_size=10, no_of_files_to_proc_in_cycle=-1):
         self.wf_name = "motioncor2"
         self.debug = debug
         logger.info("PipelineWorkflow init")
