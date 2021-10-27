@@ -97,11 +97,11 @@ def main_loop():
         for sid in to_del: del app.state.sessions[sid]
 
         # save periodically?   
-        #save_state()
+        save_state()
 
         time.sleep(60)
 
-    #save_state()
+    save_state()
 
 
 def load_state():
@@ -111,7 +111,11 @@ def load_state():
             j = json.load(open(sfilename))
             for sid, session in j.items():
                 app.state.sessions[sid] = Session(config, session["project_id"], session["user"], session["session_id"])
-                app.state.sessions[sid].sideload(session)
+                try:
+                    app.state.sessions[sid].sideload(session)
+                    log.info("session data loaded correctly")
+                except:
+                    log.info("session data NOT loaded")
 
 
 def save_state():
