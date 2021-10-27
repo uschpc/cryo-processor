@@ -328,6 +328,16 @@ class Session:
         else:
             return False
         
+        # time to submit a new one after an unscheduled shutdown mid-processing
+        if self._next_processing_time == 0 and self._no_of_processed > 0 and\
+           self._no_of_processed < self._no_of_raw:
+            # space the workflows a little bit in case of failure
+            self._next_processing_time = time.time() + 120
+        else:
+            return False
+        
+        
+        
         # if we get here, it is time to submit a new workflow 
         log.info("A new workflow is required. Submitting now ...")
         self._state = self._STATE_PROCESSING

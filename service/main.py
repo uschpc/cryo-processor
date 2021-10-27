@@ -88,6 +88,7 @@ def main_loop():
         for sid, session in app.state.sessions.items():
             log.info("Checking on session {}".format(sid))
             session.update()
+            log.info("FRESH: {}".format(app.state.sessions[sid]))
             log.info(pprint.pformat(session.get_status()))
 
             if not session.is_valid():
