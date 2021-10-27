@@ -97,11 +97,11 @@ def main_loop():
         for sid in to_del: del app.state.sessions[sid]
 
         # save periodically?   
-        save_state()
+        #save_state()
 
         time.sleep(60)
 
-        save_state()
+    #save_state()
 
 
 def load_state():
