@@ -101,7 +101,7 @@ def main_loop():
 
         time.sleep(60)
 
-    save_state()
+        save_state()
 
 
 def load_state():
