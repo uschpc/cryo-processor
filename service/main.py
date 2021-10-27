@@ -88,7 +88,6 @@ def main_loop():
         for sid, session in app.state.sessions.items():
             log.info("Checking on session {}".format(sid))
             session.update()
-            log.info("FRESH: {}".format(app.state.sessions[sid]))
             log.info(pprint.pformat(session.get_status()))
 
             if not session.is_valid():
@@ -112,6 +111,7 @@ def load_state():
             j = json.load(open(sfilename))
             for sid, session in j.items():
                 app.state.sessions[sid] = Session(config, session["project_id"], session["user"], session["session_id"])
+                app.state.sessions[sid].sideload(session)
 
 
 def save_state():

@@ -61,9 +61,24 @@ class Session:
         self._state = self._STATE_UNKNOWN
 
         # defaults to get us started
+        self.apix = None
+        self.fmdose = None
+        self.kev = None
+        self.superresolution = False
+        self.rawgainref = None
+        self.rawdefectsmap = None
+        
+        
+        
+        
+        
+        
+        
         self.basename_prefix = 'FoilHole'
         self.basename_suffix = 'fractions'
         self.basename_extension = 'tiff'
+        self.throw=0
+        self.trunc=0
         self.raw_location = ""
         self.possible_raw_files = ""
         
@@ -80,6 +95,7 @@ class Session:
         self._file_list_to_process = []
         #filenames sent for processing
         self._sent_for_processing = []
+        self._is_loaded = False
         
         
 
@@ -97,8 +113,38 @@ class Session:
             "user": self._user,
             "session_id": self._session_id,
             "state": self._state,
-            "next_processing_time": self._next_processing_time
+            "next_processing_time": self._next_processing_time,
+            "apix": self.apix,
+            "fmdose": self.fmdose,
+            "kev": self.kev,
+            "superresolution": self.superresolution,
+            "rawgainref": self.rawgainref,
+            "rawdefectsmap": self.rawdefectsmap,
+            "basename_prefix": self.basename_prefix,
+            "basename_suffix": self.basename_suffix,
+            "basename_extension": self.basename_extension,
+            "throw": self.throw,
+            "trunc": self.trunc,
+            "particle_size": self.particle_size
         }
+    
+    def sideload(self, session_data):
+        self._state = session_data["state"]
+        self._next_processing_time = session_data["next_processing_time"]
+        self._is_loaded = True
+        self.apix = session_data["apix"]
+        self.fmdose = session_data["fmdose"]
+        self.kev = session_data["kev"]
+        self.superresolution = session_data["superresolution"]
+        self.rawgainref = session_data["rawgainref"]
+        self.rawdefectsmap = session_data["rawdefectsmap"]
+        self.basename_prefix = session_data["basename_prefix"]
+        self.basename_suffix = session_data["basename_suffix"]
+        self.basename_extension = session_data["basename_extension"]
+        self.throw = session_data["throw"]
+        self.trunc = session_data["trunc"]
+        self.particle_size = session_data["particle_size"]
+
 
 
     def count_raw_files(self):
@@ -329,9 +375,10 @@ class Session:
             return False
         
         # time to submit a new one after an unscheduled shutdown mid-processing
-        if self._next_processing_time == 0 and self._no_of_processed > 0 and\
-           self._no_of_processed < self._no_of_raw:
+        if self._next_processing_time != 0 and self._no_of_processed > 0 and\
+           self._no_of_processed < self._no_of_raw and self._is_loaded == True:
             # space the workflows a little bit in case of failure
+            log.info("IMPORTANT: SESSION LOADED - TRYING TO RESUME")
             self._next_processing_time = time.time() + 120
         else:
             return False
