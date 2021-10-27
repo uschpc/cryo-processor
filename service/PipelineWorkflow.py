@@ -163,7 +163,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         dm2mrc_gainref.add_pegasus_profile( cores="4",
-                                        runtime="300",
+                                        runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
         )
@@ -174,7 +174,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         tif2mrc_gainref.add_pegasus_profile( cores="4",
-                                        runtime="300",
+                                        runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
         )
@@ -185,7 +185,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         newstack_gainref.add_pegasus_profile( cores="4",
-                                        runtime="300",
+                                        runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
         )
@@ -196,7 +196,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         clip_gainref.add_pegasus_profile( cores="4",
-                                        runtime="300",
+                                        runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
         )
@@ -207,7 +207,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         clip_gainref_superres.add_pegasus_profile( cores="4",
-                                        runtime="300",
+                                        runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
         )
@@ -219,7 +219,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         dm2mrc_defect_map.add_pegasus_profile( cores="4",
-                                        runtime="300",
+                                        runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
         )
@@ -247,7 +247,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         motionCor2.add_pegasus_profile( cores="2",
-                                        runtime="300",
+                                        runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
@@ -259,7 +259,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         gctf.add_pegasus_profile( cores="2",
-                                        runtime="300",
+                                        runtime="600",
                                         memory="4096",
                                         glite_arguments=self.gctf_glite_arguments
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
@@ -271,7 +271,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         e2proc2d.add_pegasus_profile(cores="2",
-                                     runtime="300",
+                                     runtime="600",
                                      memory="4096",
                                      glite_arguments=self.glite_for_cryoem_partition
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
@@ -283,7 +283,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         magick.add_pegasus_profile( cores="2",
-                                        runtime="300",
+                                        runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
@@ -295,7 +295,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         magick.add_pegasus_profile( cores="2",
-                                        runtime="300",
+                                        runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
@@ -307,7 +307,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         gaussian.add_pegasus_profile( cores="2",
-                                        runtime="300",
+                                        runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
@@ -320,7 +320,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         grep_wrapper.add_pegasus_profile( cores="2",
-                                        runtime="300",
+                                        runtime="600",
                                         memory="2048",
                                         glite_arguments=self.glite_for_cryoem_partition
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
@@ -332,7 +332,7 @@ class PipelineWorkflow:
             is_stageable=False
         )
         slack_notify.add_pegasus_profile( cores="1",
-                                        runtime="120",
+                                        runtime="300",
                                         memory="2048",
                                         glite_arguments=self.glite_for_cryoem_partition
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
@@ -461,8 +461,9 @@ class PipelineWorkflow:
             FlipY = File(FlipY_name)
             self.rc.add_replica("slurm", FlipY_name, self.gr_std_flipy)
         else:
-            logger.info("FAILED: gain ref not found")
-            sys.exit()
+            logger.info("Gain ref NOT found - continuing without")
+            Gain_Ref_SR_name = []
+            #sys.exit()
             pass
 
             

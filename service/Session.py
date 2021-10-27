@@ -306,7 +306,7 @@ class Session:
 
             if "state" in status and status["state"] == "Running":
                 return False
-
+            
             # skip this if we are asked to start a new wf
             if self._state != self._STATE_PROCESSING_START:
                 if "state" in status and status["state"] == "Failure":
@@ -397,6 +397,7 @@ class Session:
                         continue
                     break
             # mark as incomplete in case of the gainref missing
+            # 2021-10-25 TO: nope, we can continue without gain ref
             # if len(self._gain_ref_fn)==0:
                 # pass
             
@@ -445,17 +446,15 @@ class Session:
             log.info("self._file_list_to_process: len {}".format(len(self._file_list_to_process)))
             log.info("self._sent_for_processing BEFOR: len {}".format(len(self._sent_for_processing)))
             #mark as incomplete if no files are found
-            # if len(self._file_list_to_process)==0:
+            if len(self._file_list_to_process)==0:
                 # pass
+                self._state = self._STATE_INCOMPLETE_OR_EMPTY
             
             
             for x in self._file_list_to_process:
                 if x not in self._sent_for_processing:
                     self._sent_for_processing.append(x)
             log.info("self._sent_for_processing AFTER: len {}".format(len(self._sent_for_processing)))
-            
-            
-            
         except Exception as e:
             log.exception(e)
         try:
