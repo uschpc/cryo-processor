@@ -380,6 +380,8 @@ class Session:
             log.info("IMPORTANT: SESSION LOADED - TRYING TO RESUME")
             self._next_processing_time = time.time() + 120
             self._is_loaded = False
+            #try not to reprocess files
+            self._sent_for_processing = self._processed_files_list
         else:
             return False
         
