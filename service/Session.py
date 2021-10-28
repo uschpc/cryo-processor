@@ -371,19 +371,20 @@ class Session:
         if self._next_processing_time > 0 and self._next_processing_time < time.time():
             # space the workflows a little bit in case of failure
             log.info("IMPORTANT: SESSION SENT FOR PROCESSING")
+            log.info("self._next_processing_time {}".format(self._next_processing_time))
             self._next_processing_time = time.time() + 120
         else:
             return False
         
         # time to submit a new one after an unscheduled shutdown mid-processing
-        if self._next_processing_time > 0 and self._no_of_processed > 0 and\
-           self._no_of_processed < self._no_of_raw and self._is_loaded == True and self._next_processing_time < time.time():
-            # space the workflows a little bit in case of failure
-            log.info("IMPORTANT: SESSION LOADED - TRYING TO RESUME")
-            self._next_processing_time = time.time() + 120
-            self._is_loaded = False
-        else:
-            return False
+        # if self._next_processing_time > 0 and self._no_of_processed > 0 and\
+           # self._no_of_processed < self._no_of_raw and self._is_loaded == True and self._next_processing_time < time.time():
+            # # space the workflows a little bit in case of failure
+            # log.info("IMPORTANT: SESSION LOADED - TRYING TO RESUME")
+            # self._next_processing_time = time.time() + 120
+            # self._is_loaded = False
+        # else:
+            # return False
         
         
         
