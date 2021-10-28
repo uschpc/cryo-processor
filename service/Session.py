@@ -367,16 +367,16 @@ class Session:
             return
  
         # time to submit a new one? 
-        if self._next_processing_time > 0 and \
-           self._next_processing_time < time.time():
+        if self._next_processing_time > 0 and self._next_processing_time < time.time():
             # space the workflows a little bit in case of failure
+            log.info("IMPORTANT: SESSION SENT FOR PROCESSING")
             self._next_processing_time = time.time() + 120
         else:
             return False
         
         # time to submit a new one after an unscheduled shutdown mid-processing
         if self._next_processing_time > 0 and self._no_of_processed > 0 and\
-           self._no_of_processed < self._no_of_raw and self._is_loaded == True:
+           self._no_of_processed < self._no_of_raw and self._is_loaded == True and self._next_processing_time < time.time():
             # space the workflows a little bit in case of failure
             log.info("IMPORTANT: SESSION LOADED - TRYING TO RESUME")
             self._next_processing_time = time.time() + 120
@@ -504,9 +504,9 @@ class Session:
             log.info("self._file_list_to_process: len {}".format(len(self._file_list_to_process)))
             log.info("self._sent_for_processing BEFOR: len {}".format(len(self._sent_for_processing)))
             #mark as incomplete if no files are found
-            if len(self._file_list_to_process)==0:
-                # pass
-                self._state = self._STATE_INCOMPLETE_OR_EMPTY
+            #if len(self._file_list_to_process)==0:
+            #    # pass
+            #    self._state = self._STATE_INCOMPLETE_OR_EMPTY
             
             
             for x in self._file_list_to_process:
