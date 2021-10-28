@@ -144,6 +144,7 @@ class Session:
         self.throw = session_data["throw"]
         self.trunc = session_data["trunc"]
         self.particle_size = session_data["particle_size"]
+        log.info("session loaded")
 
 
 
@@ -419,20 +420,24 @@ class Session:
                                     cluster_size=self._config.get("params", "cluster_size"),
                                     no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
                                     )
+        log.info("Bef try")
         try:
             #prepare gain reference jobs (to ensure we are doing it only once)
             #check if there is one already, if not process
             #check if gainrref was processed already
+            log.info("Sta try")
             gr_sr_flipy = self._find_files(self._processed_dir, '*_sr.flipy.mrc')
             gr_sr = self._find_files(self._processed_dir, '*_sr.mrc')
             gr_std_flipy = self._find_files(self._processed_dir, '*_std.flipy.mrc')
             gr_std = self._find_files(self._processed_dir, '*_std.mrc')
+            log.info("Bef if")
             if len(gr_sr_flipy) != 0 and len(gr_sr) != 0 and len(gr_std_flipy) != 0 and len(gr_std) != 0:
                 self.gr_sr_flipy = gr_sr_flipy[0]
                 self.gr_sr = gr_sr[0]
                 self.gr_std_flipy = gr_std_flipy[0]
                 self.gr_std = gr_std[0]
                 self._gainref_done = True
+            log.info("Bef if2")
             if self._gainref_done == False:
                 #Try to find Gain reference file - it might not be a part of the dataset, 
                 #so we must take it into account.
@@ -454,6 +459,7 @@ class Session:
                     else:
                         continue
                     break
+            
             # mark as incomplete in case of the gainref missing
             # 2021-10-25 TO: nope, we can continue without gain ref
             # if len(self._gain_ref_fn)==0:
