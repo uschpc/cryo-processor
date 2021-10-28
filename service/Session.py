@@ -81,6 +81,7 @@ class Session:
         self.trunc=0
         self.raw_location = ""
         self.possible_raw_files = ""
+        self.particle_size = 0
         
         #handling files for processing moved here
         self._gainref_done = False
