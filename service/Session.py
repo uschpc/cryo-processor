@@ -128,7 +128,8 @@ class Session:
             "basename_extension": self.basename_extension,
             "throw": self.throw,
             "trunc": self.trunc,
-            "particle_size": self.particle_size
+            "particle_size": self.particle_size,
+            "retries": self.retries
         }
     
     def sideload(self, session_data):
@@ -147,6 +148,7 @@ class Session:
         self.throw = session_data["throw"]
         self.trunc = session_data["trunc"]
         self.particle_size = session_data["particle_size"]
+        self.retries = session_data["retries"]
         log.info("session loaded")
 
 
@@ -359,11 +361,13 @@ class Session:
             
             # skip this if we are asked to start a new wf
             if self._state != self._STATE_PROCESSING_START:
+                log.info("Checking to submit a new wf".format(self.retries))
                 if "state" in status and status["state"] == "Failure":
                     self._next_processing_time = 0
                     self._state = self._STATE_PROCESSING_FAILURE
                     return False
                 elif "state" in status and status["state"] == "incomplete_or_empty" and self.retries == 5:
+                    log.info("IMPORTANT: marking as failed. retries {}".format(self.retries))
                     self._next_processing_time = 0
                     self._state = self._STATE_PROCESSING_FAILURE
                     return False
@@ -381,7 +385,9 @@ class Session:
             log.info("IMPORTANT: SESSION SENT FOR PROCESSING")
             log.info("self._next_processing_time {}".format(self._next_processing_time))
             self._next_processing_time = time.time() + 120
+            log.info("IMPORTANT-1: RETRIES {}".format(self.retries))
             self.retries = 0
+            log.info("IMPORTANT-1: RETRIES RESET {}".format(self.retries))
             
             
         elif self._next_processing_time > 0 and self._no_of_processed > 0 and self._no_of_processed < self._no_of_raw and self._is_loaded == True and self._next_processing_time < time.time():
@@ -392,7 +398,9 @@ class Session:
             self._is_loaded = False
             #try not to reprocess files
             self._sent_for_processing = self._processed_files_list
+            log.info("IMPORTANT-2: RETRIES {}".format(self.retries))
             self.retries = 0
+            log.info("IMPORTANT-2: RETRIES RESET {}".format(self.retries))
             
         else:
             return False
