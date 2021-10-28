@@ -357,17 +357,20 @@ class Session:
                 log.info("Workflow status is: {}".format(status["state"]))
 
             if "state" in status and status["state"] == "Running":
+                log.info("Workflow status is: Running {}".format(status["state"]))
                 return False
             
             # skip this if we are asked to start a new wf
             if self._state != self._STATE_PROCESSING_START:
                 log.info("Checking to submit a new wf".format(self.retries))
                 if "state" in status and status["state"] == "Failure":
+                    log.info("Workflow status is: Failure {}".format(status["state"]))
                     self._next_processing_time = 0
                     self._state = self._STATE_PROCESSING_FAILURE
                     return False
                 elif "state" in status and status["state"] == "incomplete_or_empty" and self.retries == 5:
                     log.info("IMPORTANT: marking as failed. retries {}".format(self.retries))
+                    log.info("Workflow status is:  incomplete{}".format(status["state"]))
                     self._next_processing_time = 0
                     self._state = self._STATE_PROCESSING_FAILURE
                     return False
@@ -402,6 +405,12 @@ class Session:
             #self.retries = 0
             #log.info("IMPORTANT-2: RETRIES RESET {}".format(self.retries))
             
+        elif "state" in status and status["state"] == "incomplete_or_empty" and self.retries == 5:
+            log.info("Workflow-X status is:  incomplete{}".format(status["state"]))
+            log.info("Marking as failed")
+            log.info("Workflow status is:  incomplete{}".format(status["state"]))
+            self._next_processing_time = 0
+            self._state = self._STATE_PROCESSING_FAILURE
         else:
             return False
         
