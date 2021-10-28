@@ -380,17 +380,17 @@ class Session:
             return
  
         # time to submit a new one? 
-        if self._next_processing_time > 0 and self._next_processing_time < time.time():
+        if self._next_processing_time > 0 and self._next_processing_time < time.time() and self.retries < 5:
             # space the workflows a little bit in case of failure
             log.info("IMPORTANT: SESSION SENT FOR PROCESSING")
             log.info("self._next_processing_time {}".format(self._next_processing_time))
             self._next_processing_time = time.time() + 120
             log.info("IMPORTANT-1: RETRIES {}".format(self.retries))
-            self.retries = 0
-            log.info("IMPORTANT-1: RETRIES RESET {}".format(self.retries))
+            #self.retries = 0
+            #log.info("IMPORTANT-1: RETRIES RESET {}".format(self.retries))
             
             
-        elif self._next_processing_time > 0 and self._no_of_processed > 0 and self._no_of_processed < self._no_of_raw and self._is_loaded == True and self._next_processing_time < time.time():
+        elif self._next_processing_time > 0 and self._no_of_processed > 0 and self._no_of_processed < self._no_of_raw and self._is_loaded == True and self._next_processing_time < time.time() and self.retries < 5:
             # time to submit a new one after an unscheduled shutdown mid-processing
             # space the workflows a little bit in case of failure
             log.info("IMPORTANT: SESSION LOADED - TRYING TO RESUME")
@@ -399,8 +399,8 @@ class Session:
             #try not to reprocess files
             self._sent_for_processing = self._processed_files_list
             log.info("IMPORTANT-2: RETRIES {}".format(self.retries))
-            self.retries = 0
-            log.info("IMPORTANT-2: RETRIES RESET {}".format(self.retries))
+            #self.retries = 0
+            #log.info("IMPORTANT-2: RETRIES RESET {}".format(self.retries))
             
         else:
             return False
@@ -533,7 +533,7 @@ class Session:
                 # pass
                 #self._state = self._STATE_INCOMPLETE_OR_EMPTY
                 self.retries+=1
-                log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIMES BEFORE MARKING AS FAILURE.".format(5-self.retries))
+                log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIMES BEFORE MARKING AS FAILURE. Next try in 120s".format(5-self.retries))
                 return False
             
             
