@@ -240,10 +240,10 @@ class Session:
         except: self.basename_extension = None
         #self.throw = data.get(throw, default=None)
         try: self.throw=data[throw] # how many frames discard from the top
-        except: self.throw = None
+        except: self.throw = 0
         #self.trunc = data.get(trunc, default=None)
         try: self.trunc = data[trunc] # how many frames keep
-        except: self.trunc=None
+        except: self.trunc=0
         #self.particle_size = data.get(particle_size, default=None)
         try: self.particle_size = data[particle_size] # <-- future; stage 2
         except: self.particle_size = None
@@ -258,9 +258,9 @@ class Session:
             log.info("basename_suffix: %s"%self.basename_suffix)
         if self.basename_extension!=None:
             log.info("basename_extension: %s"%self.basename_extension)
-        if self.throw!=None:
+        if self.throw!=0:
             log.info("throw: %s"%self.throw)
-        if self.trunc!=None:
+        if self.trunc!=0:
             log.info("trunc: %s"%self.trunc)
         if self.particle_size!=None:
             log.info("particle_size: %s"%self.particle_size)
@@ -375,13 +375,14 @@ class Session:
             return False
         
         # time to submit a new one after an unscheduled shutdown mid-processing
-        #if self._next_processing_time > 0 and self._no_of_processed > 0 and\
-        #   self._no_of_processed < self._no_of_raw and self._is_loaded == True:
-        #    # space the workflows a little bit in case of failure
-        #    log.info("IMPORTANT: SESSION LOADED - TRYING TO RESUME")
-        #    self._next_processing_time = time.time() + 120
-        #else:
-        #    return False
+        if self._next_processing_time > 0 and self._no_of_processed > 0 and\
+           self._no_of_processed < self._no_of_raw and self._is_loaded == True:
+            # space the workflows a little bit in case of failure
+            log.info("IMPORTANT: SESSION LOADED - TRYING TO RESUME")
+            self._next_processing_time = time.time() + 120
+            self._is_loaded = False
+        else:
+            return False
         
         
         
