@@ -98,6 +98,8 @@ class Session:
         self._sent_for_processing = []
         self._is_loaded = False
         
+        self.retries = 0
+        
         
 
     def is_valid(self):
@@ -361,6 +363,11 @@ class Session:
                     self._next_processing_time = 0
                     self._state = self._STATE_PROCESSING_FAILURE
                     return False
+                elif "state" in status and status["state"] == "incomplete_or_empty" and self.retries == 5:
+                    self._next_processing_time = 0
+                    self._state = self._STATE_PROCESSING_FAILURE
+                    return False
+
 
         # end condition
         if (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0):
@@ -374,6 +381,9 @@ class Session:
             log.info("IMPORTANT: SESSION SENT FOR PROCESSING")
             log.info("self._next_processing_time {}".format(self._next_processing_time))
             self._next_processing_time = time.time() + 120
+            self.retries = 0
+            
+            
         elif self._next_processing_time > 0 and self._no_of_processed > 0 and self._no_of_processed < self._no_of_raw and self._is_loaded == True and self._next_processing_time < time.time():
             # time to submit a new one after an unscheduled shutdown mid-processing
             # space the workflows a little bit in case of failure
@@ -382,6 +392,8 @@ class Session:
             self._is_loaded = False
             #try not to reprocess files
             self._sent_for_processing = self._processed_files_list
+            self.retries = 0
+            
         else:
             return False
         
@@ -509,9 +521,12 @@ class Session:
             log.info("self._file_list_to_process: len {}".format(len(self._file_list_to_process)))
             log.info("self._sent_for_processing BEFOR: len {}".format(len(self._sent_for_processing)))
             #mark as incomplete if no files are found
-            #if len(self._file_list_to_process)==0:
-            #    # pass
-            #    self._state = self._STATE_INCOMPLETE_OR_EMPTY
+            if len(self._file_list_to_process)==0:
+                # pass
+                self._state = self._STATE_INCOMPLETE_OR_EMPTY
+                self.retries+=1
+                log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIMES BEFORE MARKING AS FAILURE.".format(5-self.retries))
+                return False
             
             
             for x in self._file_list_to_process:
