@@ -414,7 +414,6 @@ class Session:
         else:
             return False
         
-        
         # if we get here, it is time to submit a new workflow 
         log.info("A new workflow is required. Submitting now ...")
         self._state = self._STATE_PROCESSING
@@ -448,24 +447,20 @@ class Session:
                                     cluster_size=self._config.get("params", "cluster_size"),
                                     no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
                                     )
-        log.info("Bef try")
         try:
             #prepare gain reference jobs (to ensure we are doing it only once)
             #check if there is one already, if not process
             #check if gainrref was processed already
-            log.info("Sta try")
             gr_sr_flipy = self._find_files(self._processed_dir, '*_sr.flipy.mrc')
             gr_sr = self._find_files(self._processed_dir, '*_sr.mrc')
             gr_std_flipy = self._find_files(self._processed_dir, '*_std.flipy.mrc')
             gr_std = self._find_files(self._processed_dir, '*_std.mrc')
-            log.info("Bef if")
             if len(gr_sr_flipy) != 0 and len(gr_sr) != 0 and len(gr_std_flipy) != 0 and len(gr_std) != 0:
                 self.gr_sr_flipy = gr_sr_flipy[0]
                 self.gr_sr = gr_sr[0]
                 self.gr_std_flipy = gr_std_flipy[0]
                 self.gr_std = gr_std[0]
                 self._gainref_done = True
-            log.info("Bef if2")
             if self._gainref_done == False:
                 #Try to find Gain reference file - it might not be a part of the dataset, 
                 #so we must take it into account.
@@ -487,15 +482,9 @@ class Session:
                     else:
                         continue
                     break
-            
-            # mark as incomplete in case of the gainref missing
-            # 2021-10-25 TO: nope, we can continue without gain ref
-            # if len(self._gain_ref_fn)==0:
-                # pass
-            
-            
+            # mark as incomplete in case of the gainref missing. 2021-10-25 TO: nope, we can continue without gain ref
             #prepare defect map jobs (to ensure we are doing it only once)
-            #check if there is one already, if not process     
+            #check if there is one already, if not, process     
             dmf = self._find_files(self._processed_dir, '*Map.m1.mrc')
             if len(dmf) != 0:
                 self.dmf = dmf[0]
@@ -524,7 +513,6 @@ class Session:
                     else:
                         continue
                     break
-
             #prepare a list of files for processing
             #list of files should be here from first status check and counting raw files
             #ensure the list order (oldest files should be first after sort)
@@ -539,13 +527,10 @@ class Session:
             log.info("self._sent_for_processing BEFOR: len {}".format(len(self._sent_for_processing)))
             #mark as incomplete if no files are found
             if len(self._file_list_to_process)==0:
-                # pass
                 self._state = self._STATE_INCOMPLETE_OR_EMPTY
                 self.retries+=1
                 log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS FAILURE. Next try in 120s".format(6-self.retries))
                 return False
-            
-            
             for x in self._file_list_to_process:
                 if x not in self._sent_for_processing:
                     self._sent_for_processing.append(x)
@@ -560,7 +545,6 @@ class Session:
             self.wf.submit_workflow()
         except Exception as e:
             log.exception(e)
-
         return True
 
 
