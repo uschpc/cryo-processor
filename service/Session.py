@@ -407,7 +407,7 @@ class Session:
             #self.retries = 0
             #log.info("IMPORTANT-2: RETRIES RESET {}".format(self.retries))
             
-        elif "state" in status and status["state"] == "incomplete_or_empty" and self.retries == 5:
+        elif self._state == self._STATE_INCOMPLETE_OR_EMPTY and self.retries == 5:
             log.info("Workflow-X status is:  incomplete{}".format(status["state"]))
             log.info("Marking as failed")
             log.info("Workflow status is:  incomplete{}".format(status["state"]))
