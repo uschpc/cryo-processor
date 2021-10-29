@@ -411,7 +411,6 @@ class Session:
             log.info("Marking as failed")
             self._next_processing_time = 0
             self._state = self._STATE_PROCESSING_FAILURE
-        else:
             return False
         
         # if we get here, it is time to submit a new workflow 
