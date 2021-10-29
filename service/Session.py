@@ -301,6 +301,8 @@ class Session:
             self._update_processing()
         elif self._state == self._STATE_PROCESSING:
             self._update_processing()
+        elif self._state == self._STATE_INCOMPLETE_OR_EMPTY:
+            self._update_processing()
         else:
             # all other states
             pass
