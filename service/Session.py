@@ -408,9 +408,7 @@ class Session:
             #log.info("IMPORTANT-2: RETRIES RESET {}".format(self.retries))
             
         elif self._state == self._STATE_INCOMPLETE_OR_EMPTY and self.retries == 5:
-            log.info("Workflow-X status is:  incomplete{}".format(status["state"]))
             log.info("Marking as failed")
-            log.info("Workflow status is:  incomplete{}".format(status["state"]))
             self._next_processing_time = 0
             self._state = self._STATE_PROCESSING_FAILURE
         else:
@@ -544,7 +542,7 @@ class Session:
                 # pass
                 self._state = self._STATE_INCOMPLETE_OR_EMPTY
                 self.retries+=1
-                log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIMES BEFORE MARKING AS FAILURE. Next try in 120s".format(5-self.retries))
+                log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS FAILURE. Next try in 120s".format(6-self.retries))
                 return False
             
             
