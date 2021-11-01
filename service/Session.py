@@ -535,7 +535,7 @@ class Session:
             log.info("self._file_list_to_process: len {}".format(len(self._file_list_to_process)))
             log.info("self._sent_for_processing BEFOR: len {}".format(len(self._sent_for_processing)))
             #mark as incomplete if no files are found
-            if len(self._file_list_to_process)==0 and self.retries <5:
+            if len(self._file_list_to_process)==0 and self.retries <=5:
                 self._state = self._STATE_INCOMPLETE_OR_EMPTY
                 self.retries+=1
                 log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS FAILURE. Next try in 120s".format(6-self.retries))
