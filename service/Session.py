@@ -370,12 +370,21 @@ class Session:
                     self._next_processing_time = 0
                     self._state = self._STATE_PROCESSING_FAILURE
                     return False
-                elif "state" in status and status["state"] == "incomplete_or_empty" and self.retries == 5:
-                    log.info("IMPORTANT: marking as failed. retries {}".format(self.retries))
-                    log.info("Workflow status is:  incomplete{}".format(status["state"]))
-                    self._next_processing_time = 0
-                    self._state = self._STATE_PROCESSING_FAILURE
-                    return False
+                # elif "state" in status and status["state"] == "incomplete_or_empty" and self.retries == 5:
+                    # log.info("IMPORTANT: marking as failed. retries {}".format(self.retries))
+                    # log.info("Workflow status is:  incomplete{}".format(status["state"]))
+                    # self._next_processing_time = 0
+                    # self._state = self._STATE_PROCESSING_FAILURE
+                    # return False
+
+        #clean after loading
+        if self._is_loaded == True:
+            try:
+                log.info("Cleanup! removing _wf_dir: {}".format(self._wf_dir))
+                shutil.rmtree(self._wf_dir)
+            except:
+                log.info("FAILED Cleanup!: removing _wf_dir: {}".format(self._wf_dir))
+                pass
 
 
         # end condition
@@ -525,11 +534,18 @@ class Session:
             log.info("self._file_list_to_process: len {}".format(len(self._file_list_to_process)))
             log.info("self._sent_for_processing BEFOR: len {}".format(len(self._sent_for_processing)))
             #mark as incomplete if no files are found
-            if len(self._file_list_to_process)==0:
+            if len(self._file_list_to_process)==0 and self.retries <5:
                 self._state = self._STATE_INCOMPLETE_OR_EMPTY
                 self.retries+=1
                 log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS FAILURE. Next try in 120s".format(6-self.retries))
                 return False
+            # elif len(self._file_list_to_process)==0 and self.retries == 5:
+                # log.info("Marking as failed")
+                # self._next_processing_time = 0
+                # self._state = self._STATE_PROCESSING_FAILURE
+                # return False
+            # else:
+                # pass
             for x in self._file_list_to_process:
                 if x not in self._sent_for_processing:
                     self._sent_for_processing.append(x)
