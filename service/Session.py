@@ -149,6 +149,10 @@ class Session:
         self.trunc = session_data["trunc"]
         self.particle_size = session_data["particle_size"]
         self.retries = session_data["retries"]
+        #try to guess how many files were proceesed
+        self._no_of_processed = self.count_processed_files()
+        self._sent_for_processing = _processed_files_list
+        
         #clean after loading
         if self._is_loaded == True:
             try:
