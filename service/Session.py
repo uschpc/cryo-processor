@@ -540,11 +540,11 @@ class Session:
                 self.retries+=1
                 log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS FAILURE. Next try in 120s".format(6-self.retries))
                 return False
-            # elif len(self._file_list_to_process)==0 and self.retries == 5:
-                # log.info("Marking as failed")
-                # self._next_processing_time = 0
-                # self._state = self._STATE_PROCESSING_FAILURE
-                # return False
+            elif len(self._file_list_to_process)==0 and self.retries > 5:
+                log.info("Marking as failed")
+                self._next_processing_time = 0
+                self._state = self._STATE_PROCESSING_FAILURE
+                return False
             # else:
                 # pass
             for x in self._file_list_to_process:
@@ -559,6 +559,7 @@ class Session:
             log.exception(e)
         try:
             self.wf.submit_workflow()
+            self.retries = 0
         except Exception as e:
             log.exception(e)
         return True
