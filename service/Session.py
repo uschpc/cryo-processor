@@ -151,16 +151,15 @@ class Session:
         self.retries = session_data["retries"]
         #try to guess how many files were proceesed
         self._no_of_processed = self.count_processed_files()
-        self._sent_for_processing = _processed_files_list
+        self._sent_for_processing = self._processed_files_list
         
         #clean after loading
-        if self._is_loaded == True:
-            try:
-                log.info("Cleanup! removing _wf_dir: {}".format(self._wf_dir))
-                shutil.rmtree(self._wf_dir)
-            except:
-                log.info("FAILED Cleanup!: removing _wf_dir: {}".format(self._wf_dir))
-                pass
+        try:
+            log.info("Cleanup! removing _wf_dir: {}".format(self._wf_dir))
+            shutil.rmtree(self._wf_dir)
+        except:
+            log.info("FAILED Cleanup!: removing _wf_dir: {}".format(self._wf_dir))
+            pass
         log.info("session loaded")
 
 
