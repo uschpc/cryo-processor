@@ -497,8 +497,13 @@ class PipelineWorkflow:
         logger.info("Currently processing {} files. Processed list length is {}".format(len(self._file_list_to_process), len(self._processed_files_list)))
         #logger.info("Currently processing {} files. Processed list length is {}".format("\n".join(file_list), len(self.processed_files_list)))
         #define filename extension
-        self.basename_extension=self._file_list_to_process[0].split('.')[-1]
-        self.basename_suffix=self._file_list_to_process[0].split('.')[-2].split('_')[-1]
+        try:
+            self.basename_extension=self._file_list_to_process[0].split('.')[-1]
+            self.basename_suffix=self._file_list_to_process[0].split('.')[-2].split('_')[-1]
+        except:
+            logger.info("Currently processing {} files. Processed list length is {}. Failed to get basename extension and suffix - using tiff and fractions".format(len(self._file_list_to_process), len(self._processed_files_list)))
+            self.basename_extension="tiff"
+            self.basename_suffix="fractions"
         #for fraction_file_path in file_list:
         for fraction_file_path in self._file_list_to_process:
             #logger.info("fraction_file_path {}".format(fraction_file_path))
