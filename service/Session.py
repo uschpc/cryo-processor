@@ -558,7 +558,7 @@ class Session:
                 # pass
             for x in self._file_list_to_process:
                 bname=os.path.basename(x).replace('fractions.tiff','')
-                if bnamenot in self._sent_for_processing:
+                if bname not in self._sent_for_processing:
                     self._sent_for_processing.append(bname)
             log.info("self._sent_for_processing AFTER: len {}".format(len(self._sent_for_processing)))
         except Exception as e:
