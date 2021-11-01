@@ -151,7 +151,7 @@ class Session:
         self.retries = session_data["retries"]
         #try to guess how many files were proceesed
         self._no_of_processed = self.count_processed_files()
-        self._sent_for_processing = self._processed_files_list
+        self._sent_for_processing = [x.replace('_DW.mrc','_fractions.tiff') for x in self._processed_files_list]
         
         #clean after loading
         try:
@@ -415,7 +415,7 @@ class Session:
             self._next_processing_time = time.time() + 120
             self._is_loaded = False
             #try not to reprocess files
-            self._sent_for_processing = self._processed_files_list
+            self._sent_for_processing = [x.replace('_DW.mrc','_fractions.tiff') for x in self._processed_files_list]
             log.info("IMPORTANT-2: RETRIES {}".format(self.retries))
             #self.retries = 0
             #log.info("IMPORTANT-2: RETRIES RESET {}".format(self.retries))
