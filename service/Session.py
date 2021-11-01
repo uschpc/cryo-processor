@@ -537,7 +537,7 @@ class Session:
             log.info("self._file_list BEFORE TRIM: len {}".format(len(self._file_list)))
             self._file_list_to_process=[]
             for x in self._file_list:
-                bname=os.path.basename(x).replace('fractions.tiff','')
+                bname=os.path.basename(x).replace('_fractions.tiff','')
                 if bname not in self._sent_for_processing:
                     self._file_list_to_process.append(x)
             self._file_list_to_process=self._file_list_to_process[:self._config.getint("params", "no_of_files_to_proc_in_cycle")]
@@ -557,7 +557,7 @@ class Session:
             # else:
                 # pass
             for x in self._file_list_to_process:
-                bname=os.path.basename(x).replace('fractions.tiff','')
+                bname=os.path.basename(x).replace('_fractions.tiff','')
                 if bname not in self._sent_for_processing:
                     self._sent_for_processing.append(bname)
             log.info("self._sent_for_processing AFTER: len {}".format(len(self._sent_for_processing)))
