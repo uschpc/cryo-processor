@@ -149,6 +149,14 @@ class Session:
         self.trunc = session_data["trunc"]
         self.particle_size = session_data["particle_size"]
         self.retries = session_data["retries"]
+        #clean after loading
+        if self._is_loaded == True:
+            try:
+                log.info("Cleanup! removing _wf_dir: {}".format(self._wf_dir))
+                shutil.rmtree(self._wf_dir)
+            except:
+                log.info("FAILED Cleanup!: removing _wf_dir: {}".format(self._wf_dir))
+                pass
         log.info("session loaded")
 
 
@@ -377,14 +385,7 @@ class Session:
                     # self._state = self._STATE_PROCESSING_FAILURE
                     # return False
 
-        #clean after loading
-        if self._is_loaded == True:
-            try:
-                log.info("Cleanup! removing _wf_dir: {}".format(self._wf_dir))
-                shutil.rmtree(self._wf_dir)
-            except:
-                log.info("FAILED Cleanup!: removing _wf_dir: {}".format(self._wf_dir))
-                pass
+
 
 
         # end condition
