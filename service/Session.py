@@ -151,7 +151,7 @@ class Session:
         self.retries = session_data["retries"]
         #try to guess how many files were proceesed
         self._no_of_processed = self.count_processed_files()
-        self._sent_for_processing = [x.replace('_DW.mrc','_fractions.tiff') for x in self._processed_files_list]
+        self._sent_for_processing = [os.path.basename(x).replace('_DW.mrc','') for x in self._processed_files_list]
         
         #clean after loading
         try:
@@ -185,6 +185,11 @@ class Session:
                         flist = self._find_files(raw_location[0], raw_location[1])
                         if len(flist)>=1:
                             self._file_list=flist
+                            
+                            self.basename_prefix=
+                            self.basename_suffix=
+                            self.basename_extension=
+                            
                             self.raw_location = raw_location
                             self.possible_raw_files = possible_raw_files
                             log.info("RAW files are in %s"%os.path.join(raw_location[0],raw_location[1]))
@@ -415,7 +420,7 @@ class Session:
             self._next_processing_time = time.time() + 120
             self._is_loaded = False
             #try not to reprocess files
-            self._sent_for_processing = [x.replace('_DW.mrc','_fractions.tiff') for x in self._processed_files_list]
+            self._sent_for_processing = [os.path.basename(x).replace('_DW.mrc','') for x in self._processed_files_list]
             log.info("IMPORTANT-2: RETRIES {}".format(self.retries))
             #self.retries = 0
             #log.info("IMPORTANT-2: RETRIES RESET {}".format(self.retries))
@@ -532,7 +537,8 @@ class Session:
             log.info("self._file_list BEFORE TRIM: len {}".format(len(self._file_list)))
             self._file_list_to_process=[]
             for x in self._file_list:
-                if x not in self._sent_for_processing:
+                bname=os.path.basename(x).replace('fractions.tiff','')
+                if bname not in self._sent_for_processing:
                     self._file_list_to_process.append(x)
             self._file_list_to_process=self._file_list_to_process[:self._config.getint("params", "no_of_files_to_proc_in_cycle")]
             log.info("self._file_list_to_process: len {}".format(len(self._file_list_to_process)))
@@ -551,8 +557,9 @@ class Session:
             # else:
                 # pass
             for x in self._file_list_to_process:
-                if x not in self._sent_for_processing:
-                    self._sent_for_processing.append(x)
+                bname=os.path.basename(x).replace('fractions.tiff','')
+                if bnamenot in self._sent_for_processing:
+                    self._sent_for_processing.append(bname)
             log.info("self._sent_for_processing AFTER: len {}".format(len(self._sent_for_processing)))
         except Exception as e:
             log.exception(e)
