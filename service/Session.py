@@ -186,9 +186,9 @@ class Session:
                         if len(flist)>=1:
                             self._file_list=flist
                             
-                            self.basename_prefix=
-                            self.basename_suffix=
-                            self.basename_extension=
+                            self.basename_prefix=os.path.basename(flist[0]).split('_')[0]
+                            self.basename_suffix=os.path.basename(flist[0]).split('_')[-1].split('.')[0]
+                            self.basename_extension=os.path.basename(flist[0]).split('_')[-1].split('.')[-1]
                             
                             self.raw_location = raw_location
                             self.possible_raw_files = possible_raw_files
