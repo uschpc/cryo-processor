@@ -26,10 +26,14 @@ class PipelineWorkflow:
     wf_name = None
     wf_dir = None
     inputs_dir = None
-    
+
 
     # --- Init ----------------------------------------------------------------
-    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=True, partition="debug", account="osinski_703", glite_arguments="--gres=gpu:k40:2", gctf_glite_arguments="--gres=gpu:k40:2", glite_for_cryoem_partition="", maxjobs=100, debug_maxjobs=10, pgss_stgt_clusters=10, cluster_size=10, no_of_files_to_proc_in_cycle=-1):
+    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=True, partition="debug", \
+                    account="osinski_703", glite_arguments="--gres=gpu:k40:2", \
+                    gctf_glite_arguments="--gres=gpu:k40:2", glite_for_cryoem_partition="", \
+                    maxjobs=100, debug_maxjobs=10, pgss_stgt_clusters=10, cluster_size=10, \
+                    no_of_files_to_proc_in_cycle=-1):
         self.wf_name = "motioncor2"
         self.debug = debug
         logger.info("PipelineWorkflow init")
@@ -63,13 +67,11 @@ class PipelineWorkflow:
             logger.info("debug_maxjobs {}".format(self.debug_maxjobs))
             logger.info("cluster_size {}".format(self.cluster_size))
             logger.info("no_of_files_to_proc_in_cycle {}".format(self.no_of_files_to_proc_in_cycle))
-        
         self.no_of_processed = 0
         self.no_of_raw = 0
         self.gainref_done = False
         self.defmap_done = False
-        #self.processed = []
-        
+
 
     # --- Write files in directory --------------------------------------------
     def write(self):
@@ -114,7 +116,6 @@ class PipelineWorkflow:
                 FileServer("file://" + local_storage_dir, Operation.ALL)
             ),
         )
-
         shared_scratch_dir = os.path.join(self.wf_dir, "scratch")
         self.shared_scratch_dir = shared_scratch_dir
         # exec_site = (
@@ -380,20 +381,17 @@ class PipelineWorkflow:
             self.rc.add_replica("slurm", Raw_Gain_Ref_SR_name, "file://{}".format(Raw_Gain_Ref_SR_path))
     
             #define Gain reference output filename
-            #TODO: improve lines below
             Gain_Ref_path = Gain_Ref_SR_path.replace('_sr.mrc','_std.mrc')
             Gain_Ref_name = os.path.basename(Gain_Ref_path)
             Gain_Ref = File(Gain_Ref_name)
     
             #define flip Y Super resolution output filename
-            #TODO: improve lines below
             FlipY_SR_path = Gain_Ref_SR_path.replace('_sr.mrc','_sr.flipy.mrc')
             #logger.info(" ... found {} ".format(FlipY_SR_path))
             FlipY_SR_name = os.path.basename(FlipY_SR_path)
             FlipY_SR = File(FlipY_SR_name)
     
             #define flip Y std resolution output filename
-            #TODO: improve lines below
             FlipY_path = Gain_Ref_path.replace('_std.mrc','_std.flipy.mrc')
             FlipY_name = os.path.basename(FlipY_path)
             FlipY = File(FlipY_name)
