@@ -18,6 +18,9 @@ from Pegasus.api import *
 
 
 class PipelineWorkflow:
+    """
+    Workflow handling: creation, submission etc.
+    """
     wf = None
     sc = None
     tc = None
