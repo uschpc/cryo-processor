@@ -89,12 +89,13 @@ class PipelineWorkflow:
         self.props["pegasus.data.configuration"] = "sharedfs"
         self.props["pegasus.transfer.links"] = "True"
         self.props["pegasus.stageout.clusters"] = self.pgss_stgt_clusters
-        #self.props["pegasus.transfer.refiner"] = "Bundle" 
+        #self.props["pegasus.transfer.refiner"] = "Bundle"
         self.props["pegasus.transfer.refiner"] = "BalancedCluster"
         # debug queue means we can not put too many jobs in the queue
         # Help Pegasus developers by sharing performance data (optional)
         self.props["pegasus.monitord.encoding"] = "json"
-        self.props["pegasus.catalog.workflow.amqp.url"] = "amqp://friend:donatedata@msgs.pegasus.isi.edu:5672/prod/workflows"
+        purl = "amqp://friend:donatedata@msgs.pegasus.isi.edu:5672/prod/workflows"
+        self.props["pegasus.catalog.workflow.amqp.url"] = purl
         if self.debug:
             self.props["dagman.maxjobs"] = self.debug_maxjobs
         else:
@@ -124,7 +125,8 @@ class PipelineWorkflow:
             # .add_profiles(Namespace.PEGASUS, key="style", value="glite")
             # .add_profiles(Namespace.PEGASUS, key="project", value=self.account)
             # .add_profiles(Namespace.PEGASUS, key="auxillary.local", value=True)
-            # .add_profiles(Namespace.PEGASUS, key="glite.arguments", value=self.glite_for_cryoem_partition)
+            # .add_profiles(Namespace.PEGASUS, key="glite.arguments", \
+            #                                   value=self.glite_for_cryoem_partition)
             # .add_profiles(Namespace.ENV, key="PEGASUS_HOME", value=os.environ["PEGASUS_HOME"])
             # .add_directories(
                 # Directory(Directory.SHARED_SCRATCH, shared_scratch_dir).add_file_servers(
@@ -267,7 +269,7 @@ class PipelineWorkflow:
 
         e2proc2d = Transformation(
             "e2proc2d",
-            site=exec_site_name, 
+            site=exec_site_name,
             pfn=os.path.join(self.base_dir, "workflow/scripts/e2proc2d_wrapper.sh"),
             is_stageable=False
         )
@@ -301,31 +303,6 @@ class PipelineWorkflow:
                                         glite_arguments=self.glite_for_cryoem_partition
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
-        gaussian = Transformation(
-            "gaussian",
-            site=exec_site_name,
-            pfn=os.path.join(self.base_dir, "workflow/scripts/gaussian.sh"),
-            is_stageable=False
-        )
-        gaussian.add_pegasus_profile( cores="2",
-                                        runtime="600",
-                                        memory="4096",
-                                        glite_arguments=self.glite_for_cryoem_partition
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
-
-
-        grep_wrapper = Transformation(
-            "grep_wrapper",
-            site=exec_site_name,
-            pfn=os.path.join(self.base_dir, "workflow/scripts/grep_wrapper.sh"),
-            is_stageable=False
-        )
-        grep_wrapper.add_pegasus_profile( cores="2",
-                                        runtime="600",
-                                        memory="2048",
-                                        glite_arguments=self.glite_for_cryoem_partition
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
-        
         slack_notify = Transformation(
             "slack_notify",
             site=exec_site_name,
@@ -337,7 +314,7 @@ class PipelineWorkflow:
                                         memory="2048",
                                         glite_arguments=self.glite_for_cryoem_partition
         ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
-        
+
         #dealing with gain reference and similar
         self.tc.add_transformations(dm2mrc_gainref)
         self.tc.add_transformations(tif2mrc_gainref)
@@ -352,8 +329,6 @@ class PipelineWorkflow:
         self.tc.add_transformations(e2proc2d)
         self.tc.add_transformations(magick)
         self.tc.add_transformations(magick2)
-        self.tc.add_transformations(gaussian)
-        self.tc.add_transformations(grep_wrapper)
         self.tc.add_transformations(slack_notify)
 
     # --- Replica Catalog ------------------------------------------------------
@@ -370,8 +345,6 @@ class PipelineWorkflow:
             Raw_Gain_Ref_SR_path = self._gain_ref_fn[0]
             # get the extension
             gainref_extension=Raw_Gain_Ref_SR_path.split('.')[-1]
-            
-            
             Raw_Gain_Ref_SR_name = os.path.basename(Raw_Gain_Ref_SR_path)
             logger.info("Found gain reference file {} ...".format(Raw_Gain_Ref_SR_name))
             Raw_Gain_Ref_SR = File(Raw_Gain_Ref_SR_name)
@@ -379,18 +352,15 @@ class PipelineWorkflow:
             Gain_Ref_SR_name = os.path.basename(Gain_Ref_SR_path)
             Gain_Ref_SR = File(Gain_Ref_SR_name)
             self.rc.add_replica("slurm", Raw_Gain_Ref_SR_name, "file://{}".format(Raw_Gain_Ref_SR_path))
-    
             #define Gain reference output filename
             Gain_Ref_path = Gain_Ref_SR_path.replace('_sr.mrc','_std.mrc')
             Gain_Ref_name = os.path.basename(Gain_Ref_path)
             Gain_Ref = File(Gain_Ref_name)
-    
             #define flip Y Super resolution output filename
             FlipY_SR_path = Gain_Ref_SR_path.replace('_sr.mrc','_sr.flipy.mrc')
             #logger.info(" ... found {} ".format(FlipY_SR_path))
             FlipY_SR_name = os.path.basename(FlipY_SR_path)
             FlipY_SR = File(FlipY_SR_name)
-    
             #define flip Y std resolution output filename
             FlipY_path = Gain_Ref_path.replace('_std.mrc','_std.flipy.mrc')
             FlipY_name = os.path.basename(FlipY_path)
@@ -414,7 +384,8 @@ class PipelineWorkflow:
                 logger.info("Unknown gain reference file extension {} ...".format(gainref_extension))
                 raise
             #create standard resolution gain ref file from superres gain ref file
-            #newstack usage here (decrease the size of Super resolution image by factor of 2): newstack -bin 2 infile outfile
+            #newstack usage here (decrease the size of Super resolution image by factor of 2)
+            #newstack -bin 2 infile outfile
             newstack_gainref_job = Job("newstack_gainref")
             newstack_gainref_job.add_args("-bin", "2", Gain_Ref_SR, Gain_Ref)
             newstack_gainref_job.add_inputs(Gain_Ref_SR)
@@ -446,25 +417,18 @@ class PipelineWorkflow:
             Gain_Ref_SR_name=os.path.basename(self.gr_sr)
             Gain_Ref_SR = File(Gain_Ref_SR_name)
             self.rc.add_replica("slurm", Gain_Ref_SR_name, self.gr_sr)
-            
             FlipY_SR_name = os.path.basename(self.gr_sr_flipy)
             FlipY_SR = File(FlipY_SR_name)
             self.rc.add_replica("slurm", FlipY_SR_name, self.gr_sr_flipy)
-            
             Gain_Ref_name=os.path.basename(self.gr_std)
             Gain_Ref = File(Gain_Ref_name)
             self.rc.add_replica("slurm", Gain_Ref_name, self.gr_std)
-            
             FlipY_name=os.path.basename(self.gr_std_flipy)
             FlipY = File(FlipY_name)
             self.rc.add_replica("slurm", FlipY_name, self.gr_std_flipy)
         else:
             logger.info("Gain ref NOT found - continuing without")
             Gain_Ref_SR_name = []
-            #sys.exit()
-            pass
-
-            
         if len(self._defect_map_fn) != 0 and self._defect_map_done == False:
             Raw_Defect_Map_path = self._defect_map_fn[0]
             Raw_Defect_Map_name = os.path.basename(Raw_Defect_Map_path)
@@ -489,11 +453,7 @@ class PipelineWorkflow:
             self.rc.add_replica("slurm", Defect_Map, self.dmf)
         else:
             logger.info("Raw_Defect_Map_path not found")
-            pass
-
-        
         logger.info("Currently processing {} files. Processed list length is {}".format(len(self._file_list_to_process), len(self._processed_files_list)))
-        #logger.info("Currently processing {} files. Processed list length is {}".format("\n".join(file_list), len(self.processed_files_list)))
         #define filename extension
         try:
             self.basename_extension=self._file_list_to_process[0].split('.')[-1]
@@ -502,7 +462,6 @@ class PipelineWorkflow:
             logger.info("Currently processing {} files. Processed list length is {}. Failed to get basename extension and suffix - using tiff and fractions".format(len(self._file_list_to_process), len(self._processed_files_list)))
             self.basename_extension="tiff"
             self.basename_suffix="fractions"
-        #for fraction_file_path in file_list:
         for fraction_file_path in self._file_list_to_process:
             #logger.info("fraction_file_path {}".format(fraction_file_path))
             fraction_file_name = os.path.basename(fraction_file_path)
@@ -602,18 +561,14 @@ class PipelineWorkflow:
             #ctf_pf_file = File(mrc_file_name.replace(".mrc","_pf.mrc"))
             ctf_file = File(mrc_file_name.replace(".mrc",".ctf"))
             gctf_log_file = File(mrc_file_name.replace(".mrc","_gctf.log"))
-                        
             gctf_stdout_file_name=mrc_file_name.replace(".mrc","_gctf_stdout.txt")
             gctf_stderr_file_name=mrc_file_name.replace(".mrc","_gctf_stderr.txt")
             gctf_stdout = File(gctf_stdout_file_name)
             gctf_stderr = File(gctf_stderr_file_name)
-            
-            
             gctf_job = (
                 Job("gctf").add_args("--apix", self.apix, "--kV", self.kev, "--Cs", "2.7", "--ac", "0.1",
                                      "--ctfstar", ctf_star_file, "--gid", "1", "--boxsize", "1024", mrc_file)
             )
-
             gctf_job.add_inputs(mrc_file)
             gctf_job.add_outputs(ctf_star_file, stage_out=True, register_replica=False)
             #gctf_job.add_outputs(ctf_pf_file, stage_out=True, register_replica=True)
@@ -631,7 +586,6 @@ class PipelineWorkflow:
             e2proc2d_job1 = Job("e2proc2d")            
             e2proc2d_job1.add_inputs(dw_file)
             e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
-            #e2proc2d_job1.add_args("--average", dw_file, dw_jpg_file)
             e2proc2d_job1.add_args("--process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane", dw_file, dw_jpg_file)
             e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "2img-{}".format(fraction_file_name))
             self.wf.add_jobs(e2proc2d_job1)
@@ -644,8 +598,7 @@ class PipelineWorkflow:
             magick_resize.add_args("convert", "-resize", '20%', dw_jpg_file, magick_jpg_file)
             magick_resize.add_profiles(Namespace.PEGASUS, "label", "2img-{}".format(fraction_file_name))
             self.wf.add_jobs(magick_resize)
-            
-            
+
             # e2proc2d - ctf to jpg
             jpg_ctf_file = File(mrc_file_name.replace(".mrc","_ctf.jpg"))
             e2proc2d_job2 = Job("e2proc2d")            
@@ -655,68 +608,29 @@ class PipelineWorkflow:
             e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "2img-{}".format(fraction_file_name))
             self.wf.add_jobs(e2proc2d_job2)
 
-            # # make an image file that makes particles more visible using filters
-            # gaussian_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg",".filtered.jpg"))
-            # gaussian_filter = Job("gaussian")
-            # gaussian_filter.add_inputs(magick_jpg_file)
-            # gaussian_filter.add_outputs(gaussian_jpg_file, stage_out=True, register_replica=False)
-            # gaussian_filter.add_args(magick_jpg_file, gaussian_jpg_file)
-            # gaussian_filter.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            # self.wf.add_jobs(gaussian_filter)
-            
-
-
             #imagemagick - stitch together resized jpg and add text
             magick_combined_jpg_fn = dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg")
             magick_combined_jpg_file = File(magick_combined_jpg_fn)
-            #magick_combined_jpg_out_fn = dw_jpg_name.replace("_DW_fs.jpg","_combined.txt")
-            #magick_combined_jpg_out=File(magick_combined_jpg_out_fn)
             magick_convert = Job("magick2")
             magick_convert.add_inputs(magick_jpg_file)
             magick_convert.add_inputs(jpg_ctf_file)
             magick_convert.add_inputs(gctf_log_file)
             magick_convert.add_inputs(mc2_stdout)
             magick_convert.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
-            #magick_convert.add_outputs(magick_combined_jpg_out, stage_out=True, register_replica=False)
-            #magick_convert.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x1024", magick_combined_jpg_file)
-            #magick_convert.add_args(dw_jpg_file, jpg_ctf_file, magick_combined_jpg_file, os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), gctf_log_file.lfn), os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), mc2_stdout.lfn), magick_combined_jpg_out)
             magick_convert.add_args(magick_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn)
             magick_convert.add_profiles(Namespace.PEGASUS, "label", "2img-{}".format(fraction_file_name))
             self.wf.add_jobs(magick_convert)
-            
-            # # #prepare text output - shifts from motioncor2
-            # # magick_combined_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg"))
-            # # grep_wrapper_shifts = Job("grep_wrapper")
-            # # grep_wrapper_shifts.add_inputs(mc2_stdout)
-            # # grep_wrapper_shifts.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
-            # # grep_wrapper_shifts.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
-            # # grep_wrapper_shifts.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            # # self.wf.add_jobs(grep_wrapper_shifts)
-            
-            # # #prepare text output - estimated resolution from ctf
-            # # magick_combined_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg"))
-            # # grep_wrapper_ctf_reso = Job("grep_wrapper")
-            # # grep_wrapper_ctf_reso.add_inputs(mc2_stdout)
-            # # grep_wrapper_ctf_reso.add_inputs(jpg_ctf_file)
-            # # grep_wrapper_ctf_reso.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
-            # # grep_wrapper_ctf_reso.add_args("convert", "+append", dw_jpg_file, jpg_ctf_file, "-resize", "x512", magick_combined_jpg_file)
-            # # grep_wrapper_ctf_reso.add_profiles(Namespace.PEGASUS, "label", "{}".format(fraction_file_name))
-            # # self.wf.add_jobs(grep_wrapper_ctf_reso)
-            
+
             #send notification to the slack channel
             slack_notify_out=File(mrc_file_name.replace(".mrc","_slack_msg.txt"))
             slack_notify_job = Job("slack_notify")
-            #slack_notify_job.add_inputs(mc2_stdout)
-            #slack_notify_job.add_inputs(gctf_log_file)
             slack_notify_job.add_inputs(magick_combined_jpg_file)
             slack_notify_job.add_outputs(slack_notify_out, stage_out=True, register_replica=False)
-            #slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), gctf_log_file.lfn, mc2_stdout.lfn, slack_notify_out)
             slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), slack_notify_out)
             slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "2img-{}".format(fraction_file_name))
             self.wf.add_jobs(slack_notify_job)
             
             self.no_of_processed+=1
-            
 
 
     def set_params(self, datum):
@@ -756,49 +670,34 @@ class PipelineWorkflow:
         self.superresolution = datum.superresolution
 
     # --- Submit Workflow -----------------------------------------------------
-    # def submit_workflow(self, apix, fmdose, kev, rawgainref, rawdefectsmap, 
-                        # basename_prefix, basename_suffix, basename_extension, 
-                        # throw, trunc, superresolution):
     def submit_workflow(self):
-        # self.apix = apix
-        # self.fmdose = fmdose
-        # self.kev = kev
-        # self.particle_size = particle_size
-        # self.rawgainref = rawgainref
-        # self.rawdefectsmap = rawdefectsmap
-        # self.basename_prefix = basename_prefix
-        # self.throw=throw
-        # self.trunc=trunc
-        # self.superresolution = superresolution
-        
         logger.info("Starting a new workflow in {} ...".format(self.wf_dir))
-       
         try: 
             os.mkdir(self.wf_dir)
         except:
             pass
         os.chdir(self.wf_dir)
-    
+
         logger.info("Creating workflow properties...")
         self.create_pegasus_properties()
-    
+
         logger.info("Creating execution sites...")
         self.create_sites_catalog()
-        
+
         logger.info("Creating transformation catalog...")
         self.create_transformation_catalog()
-    
+
         logger.info("Creating replica catalog...")
         self.create_replica_catalog()
-    
+
         logger.info("Creating pipeline workflow dag...")
         self.create_workflow()
-   
+
         self.write()
-        
+
         logger.info("os.getcwd() {}".format(os.getcwd()))
         logger.info("self.wf_name {}".format(self.wf_name))
-        
+
 
         self.wf.plan(submit=True,
                      sites=["slurm"],
@@ -807,45 +706,3 @@ class PipelineWorkflow:
                      relative_dir=self.wf_name,
                      cluster=["label"]
                     )
-
-
-    def find_files(self, root_dir, regex):
-        '''
-        Traverse the directory and find according to the regex
-        '''
-        count = 0
-        found_files = []
-        pattern = re.compile(regex)
-        for root, dirs, files in os.walk(root_dir):
-            for name in files:
-                if pattern.search(name):
-                    found_files.append(os.path.join(root, name))
-                    count += 1
-        logger.info(" ... found {} files matching {}".format(count, regex))
-        return found_files
-        
-    def find_files2(self, root_dir, regex):
-        '''
-        Returns sorted list of files matching regex = root_dir+/+regex (similar to ls)
-        Much faster than find_files
-        eg. f=find_files2("/project/cryoem/K3_sample_dataset/20210205_mutant/Images-Disc1", "*/Data/*_fractions.tiff") to get all files
-        '''
-        search_path=os.path.join(root_dir,regex)
-        found_files=glob.glob(search_path, recursive=True)
-        logger.info(" ... searching for {}".format(search_path))
-        logger.info(" ... found {} files matching {}".format(len(found_files), regex))
-        return found_files
-
-
-    def find_files3(self, regex):
-        '''
-        Returns sorted list of files matching regex = root_dir+/+regex (similar to ls)
-        Much faster than find_files
-        eg. f=find_files2("/project/cryoem/K3_sample_dataset/20210205_mutant/Images-Disc1", "*/Data/*_fractions.tiff") to get all files
-        '''
-
-        found_files=glob.glob(regex, recursive=True)
-        logger.info(" ... searching for {}".format(search_path))
-        logger.info(" ... found {} files matching {}".format(len(found_files), regex))
-        return found_files
-        
