@@ -607,7 +607,7 @@ class PipelineWorkflow:
             e2proc2d_job2 = Job("e2proc2d")            
             e2proc2d_job2.add_inputs(ctf_file)
             e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True, register_replica=False)
-            e2proc2d_job2.add_args(ctf_file, jpg_ctf_file)
+            e2proc2d_job2.add_args("--fixintscaling=sane", ctf_file, jpg_ctf_file)
             e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "2img-{}".format(fraction_file_name))
             self.wf.add_jobs(e2proc2d_job2)
 
