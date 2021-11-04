@@ -85,13 +85,17 @@ def main_loop():
         
         #log.info("Checking on SESSIONS {}".format(app.state.sessions))
         to_del = []
-        for sid, session in app.state.sessions.items():
-            log.info("Checking on session {}".format(sid))
-            session.update()
-            log.info(pprint.pformat(session.get_status()))
+        try:
+            for sid, session in app.state.sessions.items():
+                log.info("Checking on session {}".format(sid))
+                session.update()
+                log.info(pprint.pformat(session.get_status()))
 
-            if not session.is_valid():
-                to_del.append(sid)
+                if not session.is_valid():
+                    to_del.append(sid)
+        except RuntimeError:
+            log.info("There is an issue with session ")
+            pass
         
         # clean up expired sessions
         for sid in to_del: del app.state.sessions[sid]
