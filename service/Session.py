@@ -244,6 +244,14 @@ class Session:
         log.info("fmdose: %s"%self.fmdose)
         log.info("kev: %s"%self.kev)
         log.info("superresolution: %s"%self.superresolution)
+        if self.apix == None: self.apix = 0.813
+        if self.fmdose == None: self.fmdose = 1.224
+        if self.kev == None: self.kev = 300
+        if self.superresolution == None: self.superresolution = False
+        
+        
+        
+        
         
         #self.rawgainref = data.get(rawgainref, default=None)
         try: self.rawgainref = data[rawgainref] # ls like regex to pickup raw gain ref file
@@ -563,6 +571,11 @@ class Session:
             log.info("self._sent_for_processing AFTER: len {}".format(len(self._sent_for_processing)))
         except Exception as e:
             log.exception(e)
+        try:
+            #do final check on required params
+            pass
+        except:
+            return False
         try:
             self.wf.set_params(self)
         except Exception as e:
