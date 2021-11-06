@@ -377,12 +377,14 @@ class PipelineWorkflow:
                 tif2mrc_gainref_sr_job.add_args(Raw_Gain_Ref_SR, Gain_Ref_SR)
                 tif2mrc_gainref_sr_job.add_inputs(Raw_Gain_Ref_SR)
                 tif2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR, stage_out=True)
+                tif2mrc_gainref_sr_job.add_profiles(Namespace.PEGASUS, "label", "grf")
             elif gainref_extension=="dm":
                 logger.info("gain reference file extension {} ...".format(gainref_extension))
                 dm2mrc_gainref_sr_job = Job("dm2mrc_gainref")
                 dm2mrc_gainref_sr_job.add_args(Raw_Gain_Ref_SR, Gain_Ref_SR)
                 dm2mrc_gainref_sr_job.add_inputs(Raw_Gain_Ref_SR)
                 dm2mrc_gainref_sr_job.add_outputs(Gain_Ref_SR, stage_out=True)
+                dm2mrc_gainref_sr_job.add_profiles(Namespace.PEGASUS, "label", "grf")
             else:
                 logger.info("Unknown gain reference file extension {} ...".format(gainref_extension))
                 raise
@@ -393,6 +395,7 @@ class PipelineWorkflow:
             newstack_gainref_job.add_args("-bin", "2", Gain_Ref_SR, Gain_Ref)
             newstack_gainref_job.add_inputs(Gain_Ref_SR)
             newstack_gainref_job.add_outputs(Gain_Ref, stage_out=True)
+            newstack_gainref_job.add_profiles(Namespace.PEGASUS, "label", "grf")
             #flip both gain reference files on y axis
             #clip usage here (flip img on Y axis): clip flipy infile outfile
             #std resolution
@@ -400,11 +403,13 @@ class PipelineWorkflow:
             clip_gainref_job.add_args("flipy", Gain_Ref, FlipY)
             clip_gainref_job.add_inputs(Gain_Ref)
             clip_gainref_job.add_outputs(FlipY, stage_out=True)
+            clip_gainref_job.add_profiles(Namespace.PEGASUS, "label", "grf")
             #super resolution
             clip_gainref_superres_job = Job("clip_gainref_superres")
             clip_gainref_superres_job.add_args("flipy", Gain_Ref_SR, FlipY_SR)
             clip_gainref_superres_job.add_inputs(Gain_Ref_SR)
             clip_gainref_superres_job.add_outputs(FlipY_SR, stage_out=True)
+            clip_gainref_superres_job.add_profiles(Namespace.PEGASUS, "label", "grf")
             if gainref_extension == "tiff":
                 self.wf.add_jobs(tif2mrc_gainref_sr_job)
             elif gainref_extension == "dm":
@@ -447,6 +452,7 @@ class PipelineWorkflow:
             dm2mrc_defect_map_job.add_args(Raw_Defect_Map, Defect_Map)
             dm2mrc_defect_map_job.add_inputs(Raw_Defect_Map)
             dm2mrc_defect_map_job.add_outputs(Defect_Map, stage_out=True)
+            dm2mrc_defect_map_job.add_profiles(Namespace.PEGASUS, "label", "dmf")
             self.wf.add_jobs(dm2mrc_defect_map_job)
             #self.defmap_done = True
         elif self._defect_map_done == True:
@@ -465,7 +471,11 @@ class PipelineWorkflow:
             logger.info("Currently processing {} files. Processed list length is {}. Failed to get basename extension and suffix - using tiff and fractions".format(len(self._file_list_to_process), len(self._processed_files_list)))
             self.basename_extension="tiff"
             self.basename_suffix="fractions"
+        fastcounter=0
+        slowcounter=0
         for fraction_file_path in self._file_list_to_process:
+            if fastcounter % 5 == 0:
+                slowcounter+=1
             #logger.info("fraction_file_path {}".format(fraction_file_path))
             fraction_file_name = os.path.basename(fraction_file_path)
             fraction_file = File(fraction_file_name)
@@ -555,7 +565,7 @@ class PipelineWorkflow:
             motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
             motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
             motionCor_job.set_stderr(mc2_stderr, stage_out=True, register_replica=False)
-            motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1img-{}".format(fraction_file_name))
+            motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
             #motionCor_job.add_profiles(Namespace.PEGASUS, "label", "mc2")
             self.wf.add_jobs(motionCor_job)
 
@@ -579,7 +589,7 @@ class PipelineWorkflow:
             gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
             gctf_job.set_stdout(gctf_stdout, stage_out=True, register_replica=False)
             gctf_job.set_stderr(gctf_stderr, stage_out=True, register_replica=False)
-            gctf_job.add_profiles(Namespace.PEGASUS, "label", "1img-{}".format(fraction_file_name))
+            gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
             #gctf_job.add_profiles(Namespace.PEGASUS, "label", "gctf")
             self.wf.add_jobs(gctf_job)
 
@@ -590,7 +600,7 @@ class PipelineWorkflow:
             e2proc2d_job1.add_inputs(dw_file)
             e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
             e2proc2d_job1.add_args("--process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane", dw_file, dw_jpg_file)
-            e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "2img-{}".format(fraction_file_name))
+            e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
             self.wf.add_jobs(e2proc2d_job1)
             
             #imagemagick - resize the input jpg from about 5k to 1k px
@@ -599,7 +609,7 @@ class PipelineWorkflow:
             magick_resize.add_inputs(dw_jpg_file)
             magick_resize.add_outputs(magick_jpg_file, stage_out=True, register_replica=False)
             magick_resize.add_args("convert", "-resize", '20%', dw_jpg_file, magick_jpg_file)
-            magick_resize.add_profiles(Namespace.PEGASUS, "label", "2img-{}".format(fraction_file_name))
+            magick_resize.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
             self.wf.add_jobs(magick_resize)
 
             # e2proc2d - ctf to jpg
@@ -608,7 +618,7 @@ class PipelineWorkflow:
             e2proc2d_job2.add_inputs(ctf_file)
             e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True, register_replica=False)
             e2proc2d_job2.add_args("--fixintscaling=sane", ctf_file, jpg_ctf_file)
-            e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "2img-{}".format(fraction_file_name))
+            e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
             self.wf.add_jobs(e2proc2d_job2)
 
             #imagemagick - stitch together resized jpg and add text
@@ -621,7 +631,7 @@ class PipelineWorkflow:
             magick_convert.add_inputs(mc2_stdout)
             magick_convert.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
             magick_convert.add_args(magick_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn)
-            magick_convert.add_profiles(Namespace.PEGASUS, "label", "2img-{}".format(fraction_file_name))
+            magick_convert.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
             self.wf.add_jobs(magick_convert)
 
             #send notification to the slack channel
@@ -630,10 +640,11 @@ class PipelineWorkflow:
             slack_notify_job.add_inputs(magick_combined_jpg_file)
             slack_notify_job.add_outputs(slack_notify_out, stage_out=True, register_replica=False)
             slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), slack_notify_out)
-            slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "2img-{}".format(fraction_file_name))
+            slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
             self.wf.add_jobs(slack_notify_job)
             
             self.no_of_processed+=1
+            fastcounter+=1
 
 
     def set_params(self, datum):
