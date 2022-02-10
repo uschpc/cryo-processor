@@ -507,7 +507,7 @@ class PipelineWorkflow:
             mc_cmd3=mc_cmd0+" -Throw {} -Trunc {}"
             if len(Gain_Ref_SR_name) != 0:
                 #case where we have gain reference file
-                if FlipY or Gain_Ref
+                if FlipY or Gain_Ref:
                 if str(self.kev) == "300":
                     gff=FlipY
                 elif str(self.kev) == "200":
