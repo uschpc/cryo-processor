@@ -508,12 +508,12 @@ class PipelineWorkflow:
             if len(Gain_Ref_SR_name) != 0:
                 #case where we have gain reference file
                 if FlipY or Gain_Ref:
-                if str(self.kev) == "300":
-                    gff=FlipY
-                elif str(self.kev) == "200":
-                    gff=Gain_Ref
-                else:
-                    gff=None
+                    if str(self.kev) == "300":
+                        gff=FlipY
+                    elif str(self.kev) == "200":
+                        gff=Gain_Ref
+                    else:
+                        gff=None
                 if gff!=None:
                     if self.throw!=0 and self.trunc!=0:
                         motionCor_job = Job("MotionCor2").add_args(mc_cmd1.format(mc2_in, "./{}".format(fraction_file_name), \
