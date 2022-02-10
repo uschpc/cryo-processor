@@ -430,22 +430,7 @@ class Session:
             log.info("FAILED: removing _scratch_dir: {}".format(self._scratch_dir))
             pass
         
-        self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
-                                    self._wf_dir,
-                                    self.rawdatadirs,
-                                    self._processed_dir,
-                                    debug=self._config.getboolean("general", "debug"),
-                                    glite_arguments=self._config.get("params", "glite_arguments"),
-                                    gctf_glite_arguments=self._config.get("params", "gctf_glite_arguments"),
-                                    glite_for_cryoem_partition=self._config.get("params", "glite_for_cryoem_partition"),
-                                    maxjobs=self._config.get("params", "maxjobs"),
-                                    debug_maxjobs=self._config.get("params", "debug_maxjobs"),
-                                    partition=self._config.get("params", "partition"),
-                                    account=self._config.get("params", "account"),
-                                    pgss_stgt_clusters=self._config.get("params", "pegasus_stageout_clusters"),
-                                    cluster_size=self._config.get("params", "cluster_size"),
-                                    no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
-                                    )
+
         try:
             #prepare gain reference jobs (to ensure we are doing it only once)
             #check if there is one already, if not process
@@ -545,6 +530,25 @@ class Session:
             log.info("self._sent_for_processing AFTER: len {}".format(len(self._sent_for_processing)))
         except Exception as e:
             log.exception(e)
+
+        pegasus_stageout_clusters=self._config.get("params", "pegasus_stageout_clusters", int(len(self._sent_for_processing)/4)
+
+        self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
+                                    self._wf_dir,
+                                    self.rawdatadirs,
+                                    self._processed_dir,
+                                    debug=self._config.getboolean("general", "debug"),
+                                    glite_arguments=self._config.get("params", "glite_arguments"),
+                                    gctf_glite_arguments=self._config.get("params", "gctf_glite_arguments"),
+                                    glite_for_cryoem_partition=self._config.get("params", "glite_for_cryoem_partition"),
+                                    maxjobs=self._config.get("params", "maxjobs"),
+                                    debug_maxjobs=self._config.get("params", "debug_maxjobs"),
+                                    partition=self._config.get("params", "partition"),
+                                    account=self._config.get("params", "account"),
+                                    pgss_stgt_clusters=pegasus_stageout_clusters,
+                                    cluster_size=self._config.get("params", "cluster_size"),
+                                    no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
+                                    )
         try:
             #do final check on required params
             pass
