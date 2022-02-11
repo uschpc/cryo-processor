@@ -46,7 +46,7 @@ Create a config file under `~/.cryoem.conf` with the contents like:
     
     [api]
     
-    port = 8112
+    port = 8115
 	#production is running on 8113
     token = somesecret
     
@@ -61,11 +61,15 @@ Create a config file under `~/.cryoem.conf` with the contents like:
 	glite_for_cryoem_partition = --exclude=d23-[11-12],a13-06
     cluster_size = 10
     no_of_files_to_proc_in_cycle = 100
-	pegasus_stageout_clusters = 25
+	#Optional for debug. 
+	#When not defined here it is being adjusted automatically 
+	#to the number of files processed in a cycle
+	#pegasus_stageout_clusters = 25
 
 
 
-Then simply start the service on discovery1 by running
+The service is added as a systemd service, and starts with the system. 
+For the debug you can simply start the service on the login node by running:
 
     cd service/
     ./runme.sh
@@ -79,14 +83,19 @@ The endpoints available are:
  * `/{project_id}/{user}/session/{session_id}` (gives status of a session)
  * `/{project_id}/{user}/session/{session_id}/start-processing`
  * `/{project_id}/{user}/session/{session_id}/stop-processing`
+ * `/{project_id}/{user}/session/{session_id}/resume-processing`
 
 For example, to start a new workflow:
 
-    $ curl 'localhost:8112/ttrojan_123/rynge/session/20210427113_usc_ttrojan_k3_mysample1/start-processing?access_token=somesecret'
+    $ curl 'localhost:8112/ttrojan_123/ttrojan/session/20210427113_usc_ttrojan_k3_mysample1/start-processing?apix=0.813&fmdose=1.224&kev=300&superresolution=False&access_token=somesecret'
+
+To resume the workflow (after it stopped, because the microscope paused during the acquisition session)
+
+    $ curl 'localhost:8112/ttrojan_123/ttrojan/session/20210427113_usc_ttrojan_k3_mysample1/start-processing?apix=0.813&fmdose=1.224&kev=300&superresolution=False&access_token=somesecret'
 
 To get status:
 
-    $ curl 'localhost:8113/osinski_703/jkhong/session/20211010_usc_jkhong_k3_6a1_grid2_3mg_au_test?access_token=somesecret' | python -m json.tool
+    $ curl 'localhost:8112/ttrojan_123/ttrojan/session/20210427113_usc_ttrojan_k3_mysample1?access_token=somesecret' | python -m json.tool
     {
     "failed_jobs": 0,
     "percent_current_cycle": 100.0,
