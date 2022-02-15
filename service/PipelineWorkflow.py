@@ -122,21 +122,9 @@ class PipelineWorkflow:
         )
         shared_scratch_dir = os.path.join(self.wf_dir, "scratch")
         self.shared_scratch_dir = shared_scratch_dir
-        # exec_site = (
-            # Site(exec_site_name)
-            # .add_profiles(Namespace.CONDOR, key="grid_resource", value="batch slurm")
-            # .add_profiles(Namespace.PEGASUS, key="style", value="glite")
-            # .add_profiles(Namespace.PEGASUS, key="project", value=self.account)
-            # .add_profiles(Namespace.PEGASUS, key="auxillary.local", value=True)
-            # .add_profiles(Namespace.PEGASUS, key="glite.arguments", \
-            #                                   value=self.glite_for_cryoem_partition)
-            # .add_profiles(Namespace.ENV, key="PEGASUS_HOME", value=os.environ["PEGASUS_HOME"])
-            # .add_directories(
-                # Directory(Directory.SHARED_SCRATCH, shared_scratch_dir).add_file_servers(
-                    # FileServer("file://" + shared_scratch_dir, Operation.ALL)
-                # )
-            # )
-        # )
+        #TODO: for future tune up
+        # .add_profiles(Namespace.PEGASUS, key="glite.arguments", \
+        #                                   value=self.glite_for_cryoem_partition)
         exec_site = (
             Site(exec_site_name)
             .add_profiles(Namespace.CONDOR, key="grid_resource", value="batch slurm")
@@ -229,11 +217,8 @@ class PipelineWorkflow:
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
         )
-        if self.debug:
-            pass
-            #self.cluster_size = 1
-        #else:
-        #    pass
+        
+        #temporarily commented out
         # third - let's copy the original jpg file to processed dir:
         #copy_jpeg = Transformation(
         #    "copy_jpeg",
@@ -244,8 +229,8 @@ class PipelineWorkflow:
         #copy_jpeg.add_pegasus_profile( cores="1",
         #                                runtime="60"
         #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        
         # fourth - let's do the Motioncor2
-        # these are fast jobs - cluster to improve performance
         motionCor2 = Transformation(
             "MotionCor2",
             site=exec_site_name,
@@ -480,8 +465,8 @@ class PipelineWorkflow:
             fraction_file_name = os.path.basename(fraction_file_path)
             fraction_file = File(fraction_file_name)
             self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))
-            ##find and copy the jpeg file 
             ## 2021-07-23; TO; skipping temprarily due to the uncertain location of the file
+            ##find and copy the jpeg file 
             #jpeg_file_path_dirname=os.path.dirname(fraction_file_path)
             #jpeg_file_name=("%s.jpg"%"_".join(fraction_file_name.split("_")[:-1]))
             #jpeg_file_path=os.sep.join([jpeg_file_path_dirname,jpeg_file_name])
@@ -514,64 +499,42 @@ class PipelineWorkflow:
             elif self.basename_extension=="eer":
                 mc2_in="-InEer"
             else:
-                logger.info("Unknown image extension - %s"%self.basename_extension)
+                logger.info("Unknown image extension - {}".format(self.basename_extension))
                 sys.exit(1)
-            
+            mc_cmd0="{} {} -OutMrc {} -Iter 7 -Tol 0.5 -Kv {} -PixSize {} -FmDose {} -Gpu 0 -Serial 0 -OutStack 0 -SumRange 0 0"
+            mc_cmd1=mc_cmd0+" -Gain {} -Throw {} -Trunc {}"
+            mc_cmd2=mc_cmd0+" -Gain {}"
+            mc_cmd3=mc_cmd0+" -Throw {} -Trunc {}"
             if len(Gain_Ref_SR_name) != 0:
                 #case where we have gain reference file
-                if self.throw!=0 and self.trunc!=0:
-                    # case for k3
+                if FlipY or Gain_Ref:
                     if str(self.kev) == "300":
-                        motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                            mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5", "-Kv 300",
-                            "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
-                            "-OutStack 0", "-SumRange 0 0")
-                        motionCor_job.add_inputs(fraction_file, FlipY)
-                    # case for f4
+                        gff=FlipY
                     elif str(self.kev) == "200":
-                        motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                            mrc_file, "-Gain", Gain_Ref,"-Iter 7 -Tol 0.5", "-Kv 200",
-                            "-PixSize", self.apix, "-FmDose", self.fmdose, "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
-                            "-OutStack 0", "-SumRange 0 0")
-                        motionCor_job.add_inputs(fraction_file, Gain_Ref)
+                        gff=Gain_Ref
                     else:
-                        motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                            mrc_file, "-Iter 7 -Tol 0.5",  "-Kv 300", "-PixSize", self.apix, "-FmDose", self.fmdose, "-Kv 300", "-Gpu 0 -Serial 0",
-                            "-OutStack 0", "-SumRange 0 0")
-                        motionCor_job.add_inputs(fraction_file)
+                        gff=None
+                if gff!=None:
+                    if self.throw!=0 and self.trunc!=0:
+                        motionCor_job = Job("MotionCor2").add_args(mc_cmd1.format(mc2_in, "./{}".format(fraction_file_name), \
+                                        mrc_file, str(self.kev), self.apix, self.fmdose, gff, self.throw, self.trunc))
+                    else:
+                        motionCor_job = Job("MotionCor2").add_args(mc_cmd2.format(mc2_in, "./{}".format(fraction_file_name), \
+                                        mrc_file, str(self.kev), self.apix, self.fmdose, gff))
+                    motionCor_job.add_inputs(gff)
                 else:
-                    # case for k3
-                    if str(self.kev) == "300":
-                        motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                            mrc_file, "-Gain", FlipY,"-Iter 7 -Tol 0.5", "-PixSize", self.apix, "-FmDose", 
-                            self.fmdose, "-Kv 300", "-Gpu 0 -Serial 0", "-OutStack 0", "-SumRange 0 0")
-                        motionCor_job.add_inputs(fraction_file, FlipY)
-                    # case for f4
-                    elif str(self.kev) == "200":
-                        motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                            mrc_file, "-Gain", Gain_Ref,"-Iter 7 -Tol 0.5", "-PixSize", self.apix, "-FmDose", 
-                            self.fmdose, "-Kv 200", "-Gpu 0 -Serial 0", "-OutStack 0", "-SumRange 0 0")
-                        motionCor_job.add_inputs(fraction_file, Gain_Ref)
-                    # something else?
-                    else:
-                        motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                            mrc_file, "-Iter 7 -Tol 0.5", "-PixSize", self.apix, "-FmDose", self.fmdose, "-Kv 300", "-Gpu 0 -Serial 0",
-                            "-OutStack 0", "-SumRange 0 0")
-                        motionCor_job.add_inputs(fraction_file)
-
+                    #do bare mc
+                    motionCor_job = Job("MotionCor2").add_args(mc_cmd0.format(mc2_in, "./{}".format(fraction_file_name), \
+                                        mrc_file, str(self.kev), self.apix, self.fmdose))
             else:
                 #case where we do not have gain referencee file
                 if self.throw!=0 and self.trunc!=0:
-                    motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                        mrc_file, "-Iter 7 -Tol 0.5",
-                        "-PixSize", self.apix, "-FmDose", self.fmdose, "-Kv 300", "-Throw", self.throw, "-Trunc", self.trunc, "-Gpu 0 -Serial 0",
-                        "-OutStack 0", "-SumRange 0 0")
+                    motionCor_job = Job("MotionCor2").add_args(mc_cmd3.format(mc2_in, "./{}".format(fraction_file_name), \
+                                    mrc_file, str(self.kev), self.apix, self.fmdose, self.throw, self.trunc))
                 else:
-                    motionCor_job = Job("MotionCor2").add_args(mc2_in, "./{}".format(fraction_file_name), "-OutMrc",
-                        mrc_file, "-Iter 7 -Tol 0.5", "-PixSize", self.apix, "-FmDose", self.fmdose, "-Kv 300", "-Gpu 0 -Serial 0",
-                        "-OutStack 0", "-SumRange 0 0")
-                motionCor_job.add_inputs(fraction_file)
-
+                    motionCor_job = Job("MotionCor2").add_args(mc_cmd0.format(mc2_in, "./{}".format(fraction_file_name), \
+                                    mrc_file, str(self.kev), self.apix, self.fmdose))
+            motionCor_job.add_inputs(fraction_file)
             motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
             motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
             motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
@@ -590,8 +553,8 @@ class PipelineWorkflow:
             gctf_stdout = File(gctf_stdout_file_name)
             gctf_stderr = File(gctf_stderr_file_name)
             gctf_job = (
-                Job("gctf").add_args("--apix", self.apix, "--kV", self.kev, "--Cs", "2.7", "--ac", "0.1",
-                                     "--ctfstar", ctf_star_file, "--gid", "1", "--boxsize", "1024", mrc_file)
+                Job("gctf").add_args("--apix {} --kV {} --Cs 2.7 --ac 0.1 --ctfstar {} --gid 1 --boxsize 1024 {}".format(\
+                self.apix,self.kev,ctf_star_file,mrc_file))
             )
             gctf_job.add_inputs(mrc_file)
             gctf_job.add_outputs(ctf_star_file, stage_out=True, register_replica=False)
@@ -657,25 +620,27 @@ class PipelineWorkflow:
             self.no_of_processed+=1
             fastcounter+=1
 
-
     def set_params(self, datum):
         self.apix = datum.apix
         self.fmdose = datum.fmdose
         self.kev = datum.kev
         self._gainref_done = datum._gainref_done
+        #make it go even if gain ref not found
         try: self._gain_ref_fn = datum._gain_ref_fn
         except: pass
         self._defect_map_done = datum._defect_map_done
         self._defect_map_fn = datum._defect_map_fn
         self._processed_files_list = datum._processed_files_list
         self._file_list_to_process = datum._file_list_to_process
+        #TODO: future feature
         #self.particle_size = particle_size
         try:
             self.gr_sr_flipy = datum.gr_sr_flipy
             self.gr_sr = datum.gr_sr
             self.gr_std_flipy = datum.gr_std_flipy
             self.gr_std = datum.gr_std
-        except: pass        
+        except: pass
+        #try to set all params. do not worry if some fail
         try: self.dmf = datum.dmf
         except: pass
         try: self.rawgainref = datum.rawgainref
@@ -722,7 +687,6 @@ class PipelineWorkflow:
 
         logger.info("os.getcwd() {}".format(os.getcwd()))
         logger.info("self.wf_name {}".format(self.wf_name))
-
 
         self.wf.plan(submit=True,
                      sites=["slurm"],

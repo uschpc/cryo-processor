@@ -56,10 +56,7 @@ class Session:
         self._scratch_dir = os.path.join(self._wf_dir, 'scratch')
         self.rawdatadirs=glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*"))
         log.info("using rawdatadirs dirs %s"%(' '.join(self.rawdatadirs)))
-
-        
         self._state = self._STATE_UNKNOWN
-
         # defaults to get us started
         self.apix = None
         self.fmdose = None
@@ -67,13 +64,6 @@ class Session:
         self.superresolution = False
         self.rawgainref = None
         self.rawdefectsmap = None
-        
-        
-        
-        
-        
-        
-        
         self.basename_prefix = 'FoilHole'
         self.basename_suffix = 'fractions'
         self.basename_extension = 'tiff'
@@ -82,7 +72,6 @@ class Session:
         self.raw_location = ""
         self.possible_raw_files = ""
         self.particle_size = 0
-        
         #handling files for processing moved here
         self._gainref_done = False
         self._gain_ref_fn = []
@@ -97,9 +86,7 @@ class Session:
         #filenames sent for processing
         self._sent_for_processing = []
         self._is_loaded = False
-        
         self.retries = 0
-        
         
 
     def is_valid(self):
@@ -163,7 +150,6 @@ class Session:
         log.info("session loaded")
 
 
-
     def count_raw_files(self):
         if self.raw_location != "" and self.possible_raw_files != "":
             log.info("using raw_location dir %s and %s as regex"%(self.raw_location,self.possible_raw_files))
@@ -175,7 +161,6 @@ class Session:
                 possible_raw_files_regexes=['FoilHole*fractions.tiff','FoilHole*fractions.mrc','FoilHole*EER.eer']
                 if self.basename_prefix!=None and self.basename_suffix!=None and self.basename_extension!=None:
                     possible_raw_files_regexes.append("%s*%s.%s"%(self.basename_prefix,self.basename_suffix,self.basename_extension))
-            
                 for i in self.rawdatadirs:
                     log.info("input dir %s"%i)
                     for possible_raw_files in possible_raw_files_regexes:
@@ -185,11 +170,9 @@ class Session:
                         flist = self._find_files(raw_location[0], raw_location[1])
                         if len(flist)>=1:
                             self._file_list=flist
-                            
                             self.basename_prefix=os.path.basename(flist[0]).split('_')[0]
                             self.basename_suffix=os.path.basename(flist[0]).split('_')[-1].split('.')[0]
                             self.basename_extension=os.path.basename(flist[0]).split('_')[-1].split('.')[-1]
-                            
                             self.raw_location = raw_location
                             self.possible_raw_files = possible_raw_files
                             log.info("RAW files are in %s"%os.path.join(raw_location[0],raw_location[1]))
@@ -230,12 +213,10 @@ class Session:
             "processed_files": self._no_of_processed,
             "raw_files": self._no_of_raw
         }
-    
         return response
 
     
     def start_processing(self, apix, fmdose, kev, superresolution, **data):
-        
         self.apix = apix # pixel size
         self.fmdose = fmdose # dose in e-/A^2 per frame
         self.kev = kev # voltage
@@ -244,15 +225,11 @@ class Session:
         log.info("fmdose: %s"%self.fmdose)
         log.info("kev: %s"%self.kev)
         log.info("superresolution: %s"%self.superresolution)
+        #default - will not produce optimal results, but will prevent from failing
         if self.apix == None: self.apix = 0.813
         if self.fmdose == None: self.fmdose = 1.224
         if self.kev == None: self.kev = 300
         if self.superresolution == None: self.superresolution = False
-        
-        
-        
-        
-        
         #self.rawgainref = data.get(rawgainref, default=None)
         try: self.rawgainref = data[rawgainref] # ls like regex to pickup raw gain ref file
         except: self.rawgainref = None
@@ -401,9 +378,6 @@ class Session:
                     # self._state = self._STATE_PROCESSING_FAILURE
                     # return False
 
-
-
-
         # end condition
         if (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0):
             self._next_processing_time = 0
@@ -456,22 +430,7 @@ class Session:
             log.info("FAILED: removing _scratch_dir: {}".format(self._scratch_dir))
             pass
         
-        self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
-                                    self._wf_dir,
-                                    self.rawdatadirs,
-                                    self._processed_dir,
-                                    debug=self._config.getboolean("general", "debug"),
-                                    glite_arguments=self._config.get("params", "glite_arguments"),
-                                    gctf_glite_arguments=self._config.get("params", "gctf_glite_arguments"),
-                                    glite_for_cryoem_partition=self._config.get("params", "glite_for_cryoem_partition"),
-                                    maxjobs=self._config.get("params", "maxjobs"),
-                                    debug_maxjobs=self._config.get("params", "debug_maxjobs"),
-                                    partition=self._config.get("params", "partition"),
-                                    account=self._config.get("params", "account"),
-                                    pgss_stgt_clusters=self._config.get("params", "pegasus_stageout_clusters"),
-                                    cluster_size=self._config.get("params", "cluster_size"),
-                                    no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
-                                    )
+
         try:
             #prepare gain reference jobs (to ensure we are doing it only once)
             #check if there is one already, if not process
@@ -571,6 +530,25 @@ class Session:
             log.info("self._sent_for_processing AFTER: len {}".format(len(self._sent_for_processing)))
         except Exception as e:
             log.exception(e)
+        #try fallback
+        pegasus_stageout_clusters=self._config.get("params", "pegasus_stageout_clusters", fallback="{}".format(int(len(self._sent_for_processing)/10)))
+
+        self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
+                                    self._wf_dir,
+                                    self.rawdatadirs,
+                                    self._processed_dir,
+                                    debug=self._config.getboolean("general", "debug"),
+                                    glite_arguments=self._config.get("params", "glite_arguments"),
+                                    gctf_glite_arguments=self._config.get("params", "gctf_glite_arguments"),
+                                    glite_for_cryoem_partition=self._config.get("params", "glite_for_cryoem_partition"),
+                                    maxjobs=self._config.get("params", "maxjobs"),
+                                    debug_maxjobs=self._config.get("params", "debug_maxjobs"),
+                                    partition=self._config.get("params", "partition"),
+                                    account=self._config.get("params", "account"),
+                                    pgss_stgt_clusters=pegasus_stageout_clusters,
+                                    cluster_size=self._config.get("params", "cluster_size"),
+                                    no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
+                                    )
         try:
             #do final check on required params
             pass
@@ -591,8 +569,7 @@ class Session:
     def _find_files(self, root_dir, regex):
         '''
         Returns sorted list of files matching regex = root_dir+/+regex (similar to ls)
-        Much faster than find_files
-        eg. f=find_files2("/project/cryoem/K3_sample_dataset/20210205_mutant/Images-Disc1", "*/Data/*_fractions.tiff") to get all files
+        eg. f=find_files("/project/cryoem/K3_sample_dataset/20210205_mutant/Images-Disc1", "*/Data/*_fractions.tiff") to get all files
         '''
         search_path=os.path.join(root_dir,regex)
         found_files=glob.glob(search_path, recursive=True)
@@ -600,13 +577,12 @@ class Session:
         log.info(" ... found {} files matching {}".format(len(found_files), regex))
         return found_files
 
-    def _find_files3(self, regex):
+
+    def _find_files2(self, regex):
         '''
         Returns sorted list of files matching regex = root_dir+/+regex (similar to ls)
-        Much faster than find_files
         eg. f=find_files2("/project/cryoem/K3_sample_dataset/20210205_mutant/Images-Disc1", "*/Data/*_fractions.tiff") to get all files
         '''
-
         found_files=glob.glob(regex, recursive=True)
         log.info(" ... searching for {}".format(search_path))
         log.info(" ... found {} files matching {}".format(len(found_files), regex))

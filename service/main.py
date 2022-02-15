@@ -36,7 +36,6 @@ log_config = {
             "()": "uvicorn.logging.DefaultFormatter",
             "fmt": "%(levelprefix)s %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S",
-
         },
     },
     "handlers": {
@@ -94,6 +93,7 @@ def main_loop():
                 if not session.is_valid():
                     to_del.append(sid)
         except RuntimeError:
+            #ignore; will try to start session again
             log.info("There is an issue with session ")
             pass
         
@@ -127,7 +127,7 @@ def save_state():
     for sid, session in app.state.sessions.items():
         j[sid] = session.get_state()
     with open(os.path.join(os.environ['HOME'], '.cryoem.state'), 'w') as f:
-        json.dump(j, f)
+        json.dump(j, f, sort_keys=True, indent=4)
 
 
 async def get_api_key(
@@ -203,6 +203,53 @@ async def session_status(project_id: str, user: str, session_id: str, api_key: A
 
 @app.post("/{project_id}/{user}/session/{session_id}/start-processing")
 async def start_processing(project_id: str,
+                           user: str,
+                           session_id: str, 
+                           apix: float,
+                           fmdose: float,
+                           kev: int,
+                           # rawgainref: str,
+                           # rawdefectsmap: str,
+                           # basename_prefix: str,
+                           # basename_suffix: str,
+                           # basename_extension: str,
+                           # throw: int,
+                           # trunc: int,
+                           # particle_size: int,
+                           superresolution: bool,
+                           api_key: APIKey = Depends(get_api_key)
+                           ):
+
+    key = "{}/{}/{}".format(project_id, user, session_id)
+    if key in app.state.sessions:
+        s = app.state.sessions[key]
+    else:
+        s = Session(config, project_id, user, session_id)
+        if not s.is_valid():
+            # should this be a 404?
+            return {"results": "no_such_session"}
+        app.state.sessions[key] = s
+
+    if not s.is_processing():
+        s.start_processing(apix = apix,
+            fmdose = fmdose,
+            kev = kev,
+            # rawgainref = rawgainref,
+            # rawdefectsmap = rawdefectsmap,
+            # basename_prefix = basename_prefix,
+            # basename_suffix = basename_suffix,
+            # basename_extension = basename_extension,
+            # throw = throw,
+            # trunc = trunc,
+            # particle_size = particle_size,
+            superresolution = superresolution,
+            )
+
+    return {"result": "ok"}
+
+
+@app.post("/{project_id}/{user}/session/{session_id}/resume-processing")
+async def resume_processing(project_id: str,
                            user: str,
                            session_id: str, 
                            apix: float,
