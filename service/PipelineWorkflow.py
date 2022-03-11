@@ -395,7 +395,7 @@ class PipelineWorkflow:
             clip_gainref_superres_job.add_inputs(Gain_Ref_SR)
             clip_gainref_superres_job.add_outputs(FlipY_SR, stage_out=True)
             clip_gainref_superres_job.add_profiles(Namespace.PEGASUS, "label", "grf")
-            if gainref_extension == "tiff":
+            if gainref_extension == "tiff" or gainref_extension=="gain":
                 self.wf.add_jobs(tif2mrc_gainref_sr_job)
             elif gainref_extension == "dm":
                 self.wf.add_jobs(dm2mrc_gainref_sr_job)
