@@ -356,7 +356,7 @@ class PipelineWorkflow:
             #convert Superres dm4 or tiff file to mrc
             #dm2mrc usage: dm2mrc infile outfile
             #tif2mrc usage: tif2mrc infile outfile
-            if gainref_extension=="tiff":
+            if gainref_extension=="tiff" or gainref_extension=="gain":
                 logger.info("gain reference file extension {} ...".format(gainref_extension))
                 tif2mrc_gainref_sr_job = Job("tif2mrc_gainref")
                 tif2mrc_gainref_sr_job.add_args(Raw_Gain_Ref_SR, Gain_Ref_SR)
@@ -506,14 +506,23 @@ class PipelineWorkflow:
             mc_cmd2=mc_cmd0+" -Gain {}"
             mc_cmd3=mc_cmd0+" -Throw {} -Trunc {}"
             if len(Gain_Ref_SR_name) != 0:
-                #case where we have gain reference file
-                if FlipY or Gain_Ref:
-                    if str(self.kev) == "300":
-                        gff=FlipY
-                    elif str(self.kev) == "200":
-                        gff=Gain_Ref
-                    else:
-                        gff=None
+                #case where we have gain reference file and superresolution
+                if self.superresolution == True:
+                    if FlipY or Gain_Ref:
+                        if str(self.kev) == "300":
+                            gff=FlipY_SR
+                        elif str(self.kev) == "200":
+                            gff=Gain_Ref_SR
+                        else:
+                            gff=None
+                else:
+                    if FlipY or Gain_Ref:
+                        if str(self.kev) == "300":
+                            gff=FlipY
+                        elif str(self.kev) == "200":
+                            gff=Gain_Ref
+                        else:
+                            gff=None
                 if gff!=None:
                     if self.throw!=0 and self.trunc!=0:
                         motionCor_job = Job("MotionCor2").add_args(mc_cmd1.format(mc2_in, "./{}".format(fraction_file_name), \
