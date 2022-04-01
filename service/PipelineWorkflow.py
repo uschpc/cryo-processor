@@ -459,7 +459,7 @@ class PipelineWorkflow:
         fastcounter=0
         slowcounter=0
         for fraction_file_path in self._file_list_to_process:
-            if fastcounter % 5 == 0:
+            if fastcounter % 4 == 0:
                 slowcounter+=1
             #logger.info("fraction_file_path {}".format(fraction_file_path))
             fraction_file_name = os.path.basename(fraction_file_path)
@@ -501,7 +501,7 @@ class PipelineWorkflow:
             else:
                 logger.info("Unknown image extension - {}".format(self.basename_extension))
                 sys.exit(1)
-            mc_cmd0="{} {} -OutMrc {} -Iter 7 -Tol 0.5 -Kv {} -PixSize {} -FmDose {} -Serial 0 -OutStack 0 -SumRange 0 0"
+            mc_cmd0="{} {} -OutMrc {} -Iter 7 -Tol 0.5 -Kv {} -PixSize {} -FmDose {} -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0 -Gpu {}".format(fastcounter)
             mc_cmd1=mc_cmd0+" -Gain {} -Throw {} -Trunc {}"
             mc_cmd2=mc_cmd0+" -Gain {}"
             mc_cmd3=mc_cmd0+" -Throw {} -Trunc {}"
@@ -562,8 +562,8 @@ class PipelineWorkflow:
             gctf_stdout = File(gctf_stdout_file_name)
             gctf_stderr = File(gctf_stderr_file_name)
             gctf_job = (
-                Job("gctf").add_args("--apix {} --kV {} --Cs 2.7 --ac 0.1 --ctfstar {} --boxsize 1024 {}".format(\
-                self.apix,self.kev,ctf_star_file,mrc_file))
+                Job("gctf").add_args("--apix {} --kV {} --Cs 2.7 --ac 0.1 --ctfstar {} --boxsize 1024 {} --gid {}".format(\
+                self.apix,self.kev,ctf_star_file,mrc_file,fastcounter))
             )
             gctf_job.add_inputs(mrc_file)
             gctf_job.add_outputs(ctf_star_file, stage_out=True, register_replica=False)
