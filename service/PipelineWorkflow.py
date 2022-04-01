@@ -562,7 +562,7 @@ class PipelineWorkflow:
             gctf_stdout = File(gctf_stdout_file_name)
             gctf_stderr = File(gctf_stderr_file_name)
             gctf_job = (
-                Job("gctf").add_args("--apix {} --kV {} --Cs 2.7 --ac 0.1 --ctfstar {} --gid 1 --boxsize 1024 {}".format(\
+                Job("gctf").add_args("--apix {} --kV {} --Cs 2.7 --ac 0.1 --ctfstar {} --boxsize 1024 {}".format(\
                 self.apix,self.kev,ctf_star_file,mrc_file))
             )
             gctf_job.add_inputs(mrc_file)
