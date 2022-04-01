@@ -156,7 +156,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/imod_dm2mrc_wrapper.sh"),
             is_stageable=False
         )
-        dm2mrc_gainref.add_pegasus_profile( cores="4",
+        dm2mrc_gainref.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
@@ -167,7 +167,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/imod_tif2mrc_wrapper.sh"),
             is_stageable=False
         )
-        tif2mrc_gainref.add_pegasus_profile( cores="4",
+        tif2mrc_gainref.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
@@ -178,7 +178,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/imod_newstack_wrapper.sh"),
             is_stageable=False
         )
-        newstack_gainref.add_pegasus_profile( cores="4",
+        newstack_gainref.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
@@ -189,7 +189,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/imod_clip_wrapper.sh"),
             is_stageable=False
         )
-        clip_gainref.add_pegasus_profile( cores="4",
+        clip_gainref.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
@@ -200,7 +200,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/imod_clip_wrapper.sh"),
             is_stageable=False
         )
-        clip_gainref_superres.add_pegasus_profile( cores="4",
+        clip_gainref_superres.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
@@ -212,7 +212,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/imod_dm2mrc_wrapper.sh"),
             is_stageable=False
         )
-        dm2mrc_defect_map.add_pegasus_profile( cores="4",
+        dm2mrc_defect_map.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
@@ -237,7 +237,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/motioncor2_wrapper.sh"),
             is_stageable=False
         )
-        motionCor2.add_pegasus_profile( cores="2",
+        motionCor2.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
@@ -249,7 +249,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/gctf_wrapper.sh"),
             is_stageable=False
         )
-        gctf.add_pegasus_profile( cores="2",
+        gctf.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.gctf_glite_arguments
@@ -261,7 +261,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/e2proc2d_wrapper.sh"),
             is_stageable=False
         )
-        e2proc2d.add_pegasus_profile(cores="2",
+        e2proc2d.add_pegasus_profile(cores="1",
                                      runtime="600",
                                      memory="4096",
                                      glite_arguments=self.glite_for_cryoem_partition
@@ -273,7 +273,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/imagemagick_wrapper.sh"),
             is_stageable=False
         )
-        magick.add_pegasus_profile( cores="2",
+        magick.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
@@ -285,7 +285,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/imagemagick_wrapper2.sh"),
             is_stageable=False
         )
-        magick.add_pegasus_profile( cores="2",
+        magick.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_for_cryoem_partition
