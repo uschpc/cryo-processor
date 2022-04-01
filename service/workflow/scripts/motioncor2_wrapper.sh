@@ -43,7 +43,7 @@ echo `hostname`
 #echo `nvidia-smi`
 echo $CUDA_VISIBLE_DEVICES
 echo
-echo "MotionCor2 -GpuMemUsage 0 -Gpu $CUDA_VISIBLE_DEVICES $@" 
+echo "MotionCor2 $@" 
 echo
 MotionCor2 "$@" 
 

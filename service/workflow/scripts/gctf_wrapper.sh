@@ -25,7 +25,7 @@ export LD_LIBRARY_PATH=/home1/cryoemadmin/software/gctf_libs_from_c10.1.243_to_w
 echo `hostname`
 echo $CUDA_VISIBLE_DEVICES
 echo
-echo "gctf --gid $CUDA_VISIBLE_DEVICES $@"
+echo "gctf $@"
 echo
 gctf --gid $CUDA_VISIBLE_DEVICES "$@"
 
