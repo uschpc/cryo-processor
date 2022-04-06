@@ -141,13 +141,14 @@ class Session:
         self._no_of_processed = self.count_processed_files()
         self._sent_for_processing = [os.path.basename(x).replace('_DW.mrc','') for x in self._processed_files_list]
         
+        #_wf_dir is not timestamped. no need to clean
         #clean after loading
-        try:
-            log.info("Cleanup! removing _wf_dir: {}".format(self._wf_dir))
-            shutil.rmtree(self._wf_dir)
-        except:
-            log.info("FAILED Cleanup!: removing _wf_dir: {}".format(self._wf_dir))
-            pass
+        #try:
+        #    log.info("Cleanup! removing _wf_dir: {}".format(self._wf_dir))
+        #    shutil.rmtree(self._wf_dir)
+        #except:
+        #    log.info("FAILED Cleanup!: removing _wf_dir: {}".format(self._wf_dir))
+        #    pass
         log.info("session loaded")
 
 
@@ -418,18 +419,19 @@ class Session:
         log.info("A new workflow is required. Submitting now ...")
         self._state = self._STATE_PROCESSING
 
-        try:
-            log.info("removing run_dir: {}".format(self._run_dir))
-            shutil.rmtree(self._run_dir)
-        except:
-            log.info("FAILED: removing run_dir: {}".format(self._run_dir))
-            pass
-        try:
-            log.info("removing _scratch_dir: {}".format(self._scratch_dir))
-            shutil.rmtree(self._scratch_dir)
-        except:
-            log.info("FAILED: removing _scratch_dir: {}".format(self._scratch_dir))
-            pass
+        #no need after every wflow is in timestamped dir
+        #try:
+        #    log.info("removing run_dir: {}".format(self._run_dir))
+        #    shutil.rmtree(self._run_dir)
+        #except:
+        #    log.info("FAILED: removing run_dir: {}".format(self._run_dir))
+        #    pass
+        #try:
+        #    log.info("removing _scratch_dir: {}".format(self._scratch_dir))
+        #    shutil.rmtree(self._scratch_dir)
+        #except:
+        #    log.info("FAILED: removing _scratch_dir: {}".format(self._scratch_dir))
+        #    pass
         
 
         try:
