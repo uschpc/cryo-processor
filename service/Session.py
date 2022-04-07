@@ -540,7 +540,7 @@ class Session:
         pegasus_stageout_clusters=self._config.get("params", "pegasus_stageout_clusters", fallback="{}".format(int(len(self._sent_for_processing)/10)))
 
         self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
-                                    self._wf_dir,
+                                    self._session_dir,
                                     self.rawdatadirs,
                                     self._processed_dir,
                                     debug=self._config.getboolean("general", "debug"),
