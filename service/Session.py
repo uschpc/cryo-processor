@@ -335,7 +335,7 @@ class Session:
         #_find_current_wflow_dir(self._session_dir)
 
 
-        wf._submit_dir = _find_current_wflow_dir(self._session_dir)
+        wf._submit_dir = self._find_current_wflow_dir(self._session_dir)
         log.info("Workflow wf._submit_dir is: {}".format(wf._submit_dir))
         try:
             status = wf.get_status()
@@ -601,12 +601,14 @@ class Session:
         '''
         if (os.path.isdir(pathtodir) and (not os.path.exists(pathtodir))):
             print("the directory does not exist")
+            return "1"
         else:
             os.chdir(pathtodir)
             # files varialbe contains all files and folders under the path directory
             files = sorted(os.listdir(os.getcwd()), key=os.path.getmtime)
             if len(files) == 0:
                 print("there are no regular files or folders in the given directory!")
+                return "2"
             else:
                 #folder list
                 directory_list = []
@@ -619,6 +621,7 @@ class Session:
                     #    file_list.append(f)
             if len(directory_list) == 0:
                 print("there are no workflow folders in the session directory!")
+                return "3"
             else:
                 #oldest_folder = directory_list[0]
                 #newest_folder = directory_list[-1]
