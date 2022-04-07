@@ -282,7 +282,7 @@ class Session:
         self._sent_for_processing = []
         # also cancel any potential workflows
         wf = Workflow("motioncor2")
-        wf._submit_dir = self._run_dir
+        wf._submit_dir = self._find_current_wflow_dir(self._session_dir)
         try:
             state = wf.remove()
         except:
@@ -599,33 +599,19 @@ class Session:
         Returns sorted list of files matching regex = root_dir+/+regex (similar to ls)
         eg. f=find_files2("/project/cryoem/K3_sample_dataset/20210205_mutant/Images-Disc1", "*/Data/*_fractions.tiff") to get all files
         '''
-        if (os.path.isdir(pathtodir) and (not os.path.exists(pathtodir))):
-            print("the directory does not exist")
-            return "1"
+        os.chdir(pathtodir)
+        files = sorted(os.listdir(os.getcwd()), key=os.path.getmtime)
+        directory_list = []
+        for f in files:
+            if (os.path.isdir(f)) and f.startswith('workflow'):
+                directory_list.append(f)
+        if len(directory_list) == 0:
+            print("there are no workflow folders in the session directory!")
+            return "3"
         else:
-            os.chdir(pathtodir)
-            # files varialbe contains all files and folders under the path directory
-            files = sorted(os.listdir(os.getcwd()), key=os.path.getmtime)
-            if len(files) == 0:
-                print("there are no regular files or folders in the given directory!")
-                return "2"
-            else:
-                #folder list
-                directory_list = []
-                #regular file list
-                #file_list = []
-                for f in files:
-                    if (os.path.isdir(f)) and f.startswith('workflow'):
-                        directory_list.append(f)
-                    #elif (os.path.isfile(f)):
-                    #    file_list.append(f)
-            if len(directory_list) == 0:
-                print("there are no workflow folders in the session directory!")
-                return "3"
-            else:
-                #oldest_folder = directory_list[0]
-                #newest_folder = directory_list[-1]
-                #print("Oldest folder:", oldest_folder)
-                #print("Newest folder:", newest_folder)
-                #print("All folders sorted by modified time -- oldest to newest:", directory_list)
-                return directory_list[-1]
+            #oldest_folder = directory_list[0]
+            #newest_folder = directory_list[-1]
+            #print("Oldest folder:", oldest_folder)
+            #print("Newest folder:", newest_folder)
+            #print("All folders sorted by modified time -- oldest to newest:", directory_list)
+            return directory_list[-1]
