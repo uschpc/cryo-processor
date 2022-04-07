@@ -6,7 +6,6 @@ import pprint
 import shutil
 import time
 import glob
-import datetime
 
 from Pegasus.api import *
 
@@ -51,10 +50,10 @@ class Session:
         self._session_id = session_id
         self._session_dir = os.path.join(config.get('general', 'session_dir'), self._project_id, "sessions", self._user, self._session_id)
         log.info("using _session_dir dir %s"%(self._session_dir))
-        self._wf_dir = os.path.join(self._session_dir, 'workflow-{}'.format(datetime.datetime.now().replace(microsecond=0).strftime("%Y-%m-%d-%H-%M-%S")))
+        #self._wf_dir = os.path.join(self._session_dir, 'workflow')
         self._processed_dir = os.path.join(self._session_dir, 'processed')
-        self._run_dir = os.path.join(self._wf_dir, 'motioncor2')
-        self._scratch_dir = os.path.join(self._wf_dir, 'scratch')
+        #self._run_dir = os.path.join(self._wf_dir, 'motioncor2')
+        #self._scratch_dir = os.path.join(self._wf_dir, 'scratch')
         self.rawdatadirs=glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*"))
         log.info("using rawdatadirs dirs %s"%(' '.join(self.rawdatadirs)))
         self._state = self._STATE_UNKNOWN
@@ -141,7 +140,7 @@ class Session:
         self._no_of_processed = self.count_processed_files()
         self._sent_for_processing = [os.path.basename(x).replace('_DW.mrc','') for x in self._processed_files_list]
         
-        #_wf_dir is not timestamped. no need to clean
+        #_wf_dir is now timestamped. no need to clean
         #clean after loading
         #try:
         #    log.info("Cleanup! removing _wf_dir: {}".format(self._wf_dir))
@@ -332,7 +331,11 @@ class Session:
         # 'succeeded': 22,
         # 'unready': 0}
         wf = Workflow("motioncor2")
-        wf._submit_dir = self._run_dir
+        #find the newest run dir
+        #_find_current_wflow_dir(self._session_dir)
+
+
+        wf._submit_dir = _find_current_wflow_dir(self._session_dir)
         log.info("Workflow wf._submit_dir is: {}".format(wf._submit_dir))
         try:
             status = wf.get_status()
@@ -590,3 +593,36 @@ class Session:
         log.info(" ... searching for {}".format(search_path))
         log.info(" ... found {} files matching {}".format(len(found_files), regex))
         return found_files
+        
+    def _find_current_wflow_dir(self, pathtodir):
+        '''
+        Returns sorted list of files matching regex = root_dir+/+regex (similar to ls)
+        eg. f=find_files2("/project/cryoem/K3_sample_dataset/20210205_mutant/Images-Disc1", "*/Data/*_fractions.tiff") to get all files
+        '''
+        if (os.path.isdir(pathtodir) and (not os.path.exists(pathtodir))):
+            print("the directory does not exist")
+        else:
+            os.chdir(pathtodir)
+            # files varialbe contains all files and folders under the path directory
+            files = sorted(os.listdir(os.getcwd()), key=os.path.getmtime)
+            if len(files) == 0:
+                print("there are no regular files or folders in the given directory!")
+            else:
+                #folder list
+                directory_list = []
+                #regular file list
+                #file_list = []
+                for f in files:
+                    if (os.path.isdir(f)) and f.startswith('workflow'):
+                        directory_list.append(f)
+                    #elif (os.path.isfile(f)):
+                    #    file_list.append(f)
+            if len(directory_list) == 0:
+                print("there are no workflow folders in the session directory!")
+            else:
+                #oldest_folder = directory_list[0]
+                #newest_folder = directory_list[-1]
+                #print("Oldest folder:", oldest_folder)
+                #print("Newest folder:", newest_folder)
+                #print("All folders sorted by modified time -- oldest to newest:", directory_list)
+                return newest_folder[-1]

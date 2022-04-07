@@ -8,6 +8,7 @@ import random
 import re
 import sys
 import glob
+import datetime
 from pathlib import Path
 from argparse import ArgumentParser
 
@@ -28,11 +29,12 @@ class PipelineWorkflow:
 
     wf_name = None
     wf_dir = None
+    session_dir = None
     inputs_dir = None
 
 
     # --- Init ----------------------------------------------------------------
-    def __init__(self, base_dir, wf_dir, inputs_dir, outputs_dir, debug=True, partition="debug", \
+    def __init__(self, base_dir, session_dir, inputs_dir, outputs_dir, debug=True, partition="debug", \
                     account="osinski_703", glite_arguments="--gres=gpu:k40:2", \
                     gctf_glite_arguments="--gres=gpu:k40:2", glite_for_cryoem_partition="", \
                     maxjobs=100, debug_maxjobs=10, pgss_stgt_clusters=10, cluster_size=10, \
@@ -42,7 +44,15 @@ class PipelineWorkflow:
         logger.info("PipelineWorkflow init")
         logger.info("debug {}".format(self.debug))
         self.base_dir = base_dir
-        self.wf_dir = wf_dir
+        self.session_dir = session_dir
+        
+        self.wf_dir = os.path.join(self.session_dir, 'workflow-{}'.format(datetime.datetime.now().replace(microsecond=0).strftime("%Y-%m-%d-%H-%M-%S")))
+        
+
+        self._run_dir = os.path.join(self.wf_dir, 'motioncor2')
+        self._scratch_dir = os.path.join(self.wf_dir, 'scratch')
+        
+        
         self.inputs_dir = inputs_dir
         self.outputs_dir = outputs_dir
         self.partition = partition
@@ -57,7 +67,7 @@ class PipelineWorkflow:
         self.no_of_files_to_proc_in_cycle = no_of_files_to_proc_in_cycle
         if self.debug:
             logger.info("sbase_dir {}".format(self.base_dir))
-            logger.info("wf_dir {}".format(self.wf_dir))
+            logger.info("session_dir {}".format(self.session_dir))
             logger.info("inputs_dir {}".format(self.inputs_dir))
             logger.info("outputs_dir {}".format(self.outputs_dir))
             logger.info("partition {}".format(self.partition))
