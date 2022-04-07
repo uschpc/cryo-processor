@@ -628,4 +628,4 @@ class Session:
                 #print("Oldest folder:", oldest_folder)
                 #print("Newest folder:", newest_folder)
                 #print("All folders sorted by modified time -- oldest to newest:", directory_list)
-                return newest_folder[-1]
+                return directory_list[-1]
