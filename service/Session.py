@@ -282,7 +282,7 @@ class Session:
         self._sent_for_processing = []
         # also cancel any potential workflows
         wf = Workflow("motioncor2")
-        wf._submit_dir = self._find_current_wflow_dir(self._session_dir)
+        wf._submit_dir = os.path.join(self._find_current_wflow_dir(self._session_dir), 'motioncor2')
         try:
             state = wf.remove()
         except:
@@ -335,7 +335,7 @@ class Session:
         #_find_current_wflow_dir(self._session_dir)
 
 
-        wf._submit_dir = self._find_current_wflow_dir(self._session_dir)
+        wf._submit_dir = os.path.join(self._find_current_wflow_dir(self._session_dir), 'motioncor2')
         log.info("Workflow wf._submit_dir is: {}".format(wf._submit_dir))
         try:
             status = wf.get_status()
