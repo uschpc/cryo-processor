@@ -241,6 +241,20 @@ class PipelineWorkflow:
         #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         
         # fourth - let's do the Motioncor2
+        
+        eer2tiff = Transformation(
+            "eer2tiff",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/eer2tiff_wrapper.sh"),
+            is_stageable=False
+        )
+        eer2tiff.add_pegasus_profile( cores="1",
+                                        runtime="600",
+                                        memory="4096",
+                                        glite_arguments=self.glite_arguments
+        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size).add_profiles(Namespace.PEGASUS, key="job.aggregator.arguments", value="-n auto")
+        
+        
         motionCor2 = Transformation(
             "MotionCor2",
             site=exec_site_name,
@@ -468,8 +482,10 @@ class PipelineWorkflow:
             self.basename_suffix="fractions"
         fastcounter=0
         slowcounter=0
+        
+        
         for fraction_file_path in self._file_list_to_process:
-            if fastcounter % 30 == 0:
+            if fastcounter % 20 == 0:
                 slowcounter+=1
             #logger.info("fraction_file_path {}".format(fraction_file_path))
             fraction_file_name = os.path.basename(fraction_file_path)
