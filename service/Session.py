@@ -50,10 +50,10 @@ class Session:
         self._session_id = session_id
         self._session_dir = os.path.join(config.get('general', 'session_dir'), self._project_id, "sessions", self._user, self._session_id)
         log.info("using _session_dir dir %s"%(self._session_dir))
-        self._wf_dir = os.path.join(self._session_dir, 'workflow')
+        #self._wf_dir = os.path.join(self._session_dir, 'workflow')
         self._processed_dir = os.path.join(self._session_dir, 'processed')
-        self._run_dir = os.path.join(self._wf_dir, 'motioncor2')
-        self._scratch_dir = os.path.join(self._wf_dir, 'scratch')
+        #self._run_dir = os.path.join(self._wf_dir, 'motioncor2')
+        #self._scratch_dir = os.path.join(self._wf_dir, 'scratch')
         self.rawdatadirs=glob.glob(os.path.join(os.path.join(self._session_dir, "raw"), "*"))
         log.info("using rawdatadirs dirs %s"%(' '.join(self.rawdatadirs)))
         self._state = self._STATE_UNKNOWN
@@ -140,13 +140,14 @@ class Session:
         self._no_of_processed = self.count_processed_files()
         self._sent_for_processing = [os.path.basename(x).replace('_DW.mrc','') for x in self._processed_files_list]
         
+        #_wf_dir is now timestamped. no need to clean
         #clean after loading
-        try:
-            log.info("Cleanup! removing _wf_dir: {}".format(self._wf_dir))
-            shutil.rmtree(self._wf_dir)
-        except:
-            log.info("FAILED Cleanup!: removing _wf_dir: {}".format(self._wf_dir))
-            pass
+        #try:
+        #    log.info("Cleanup! removing _wf_dir: {}".format(self._wf_dir))
+        #    shutil.rmtree(self._wf_dir)
+        #except:
+        #    log.info("FAILED Cleanup!: removing _wf_dir: {}".format(self._wf_dir))
+        #    pass
         log.info("session loaded")
 
 
@@ -281,7 +282,7 @@ class Session:
         self._sent_for_processing = []
         # also cancel any potential workflows
         wf = Workflow("motioncor2")
-        wf._submit_dir = self._run_dir
+        wf._submit_dir = os.path.join(self._find_current_wflow_dir(self._session_dir), 'motioncor2')
         try:
             state = wf.remove()
         except:
@@ -330,7 +331,11 @@ class Session:
         # 'succeeded': 22,
         # 'unready': 0}
         wf = Workflow("motioncor2")
-        wf._submit_dir = self._run_dir
+        #find the newest run dir
+        #_find_current_wflow_dir(self._session_dir)
+
+
+        wf._submit_dir = os.path.join(self._find_current_wflow_dir(self._session_dir), 'motioncor2')
         log.info("Workflow wf._submit_dir is: {}".format(wf._submit_dir))
         try:
             status = wf.get_status()
@@ -417,18 +422,19 @@ class Session:
         log.info("A new workflow is required. Submitting now ...")
         self._state = self._STATE_PROCESSING
 
-        try:
-            log.info("removing run_dir: {}".format(self._run_dir))
-            shutil.rmtree(self._run_dir)
-        except:
-            log.info("FAILED: removing run_dir: {}".format(self._run_dir))
-            pass
-        try:
-            log.info("removing _scratch_dir: {}".format(self._scratch_dir))
-            shutil.rmtree(self._scratch_dir)
-        except:
-            log.info("FAILED: removing _scratch_dir: {}".format(self._scratch_dir))
-            pass
+        #no need after every wflow is in timestamped dir
+        #try:
+        #    log.info("removing run_dir: {}".format(self._run_dir))
+        #    shutil.rmtree(self._run_dir)
+        #except:
+        #    log.info("FAILED: removing run_dir: {}".format(self._run_dir))
+        #    pass
+        #try:
+        #    log.info("removing _scratch_dir: {}".format(self._scratch_dir))
+        #    shutil.rmtree(self._scratch_dir)
+        #except:
+        #    log.info("FAILED: removing _scratch_dir: {}".format(self._scratch_dir))
+        #    pass
         
 
         try:
@@ -534,7 +540,7 @@ class Session:
         pegasus_stageout_clusters=self._config.get("params", "pegasus_stageout_clusters", fallback="{}".format(int(len(self._sent_for_processing)/10)))
 
         self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
-                                    self._wf_dir,
+                                    self._session_dir,
                                     self.rawdatadirs,
                                     self._processed_dir,
                                     debug=self._config.getboolean("general", "debug"),
@@ -587,3 +593,25 @@ class Session:
         log.info(" ... searching for {}".format(search_path))
         log.info(" ... found {} files matching {}".format(len(found_files), regex))
         return found_files
+        
+    def _find_current_wflow_dir(self, pathtodir):
+        '''
+        Returns sorted list of files matching regex = root_dir+/+regex (similar to ls)
+        eg. f=find_files2("/project/cryoem/K3_sample_dataset/20210205_mutant/Images-Disc1", "*/Data/*_fractions.tiff") to get all files
+        '''
+        os.chdir(pathtodir)
+        files = sorted(os.listdir(os.getcwd()), key=os.path.getmtime)
+        directory_list = []
+        for f in files:
+            if (os.path.isdir(f)) and f.startswith('workflow'):
+                directory_list.append(f)
+        if len(directory_list) == 0:
+            print("there are no workflow folders in the session directory!")
+            return "3"
+        else:
+            #oldest_folder = directory_list[0]
+            #newest_folder = directory_list[-1]
+            #print("Oldest folder:", oldest_folder)
+            #print("Newest folder:", newest_folder)
+            #print("All folders sorted by modified time -- oldest to newest:", directory_list)
+            return directory_list[-1]

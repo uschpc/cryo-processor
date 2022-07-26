@@ -41,7 +41,11 @@ echo "Running $SLURM_NTASKS tasks."
 echo "Current working directory is `pwd`"
 echo `hostname`
 #echo `nvidia-smi`
-MotionCor2 "$@"
+echo $CUDA_VISIBLE_DEVICES
+echo
+echo "MotionCor2 $@" 
+echo
+MotionCor2 "$@" 
 
 exit $?
 
