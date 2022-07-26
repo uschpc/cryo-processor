@@ -485,7 +485,7 @@ class PipelineWorkflow:
         
         
         for fraction_file_path in self._file_list_to_process:
-            if fastcounter % 10 == 0:
+            if fastcounter % 20 == 0:
                 slowcounter+=1
             #logger.info("fraction_file_path {}".format(fraction_file_path))
             fraction_file_name = os.path.basename(fraction_file_path)
