@@ -24,7 +24,7 @@ def split_into_n(l, n):
     result=[]
     for i in range(0, len(l), n):
         slice_item = slice(i, i + n, 1)
-        result.append(a[slice_item])
+        result.append(l[slice_item])
     return result
 
 class PipelineWorkflow:
