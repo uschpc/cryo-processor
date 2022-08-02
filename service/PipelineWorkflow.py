@@ -494,7 +494,7 @@ class PipelineWorkflow:
         #fastcounter=0
         #slowcounter=0
         #prep list of 4 elems
-        list_of_lists_of_files_to_process=split_into_n(self._file_list_to_process, 4)
+        list_of_lists_of_files_to_process=split_into_n(self._file_list_to_process, 2)
         for element in list_of_lists_of_files_to_process:
             joblabel_index= list_of_lists_of_files_to_process.index(element)
             #if fastcounter % 30 == 0:
