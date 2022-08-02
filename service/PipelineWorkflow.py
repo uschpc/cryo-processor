@@ -500,7 +500,8 @@ class PipelineWorkflow:
             #if fastcounter % 30 == 0:
             #    slowcounter+=1
             for fraction_file_path in element:
-                ffp_index = element.index(fraction_file_path)
+                #ffp_index = element.index(fraction_file_path)
+                ffp_index = 0
                 
                 fraction_file_name = os.path.basename(fraction_file_path)
                 fraction_file = File(fraction_file_name)
@@ -528,7 +529,7 @@ class PipelineWorkflow:
                 else:
                     logger.info("Unknown image extension - {}".format(self.basename_extension))
                     sys.exit(1)
-                mc_cmd0="{} {} -OutMrc {} -Iter 7 -Tol 0.5 -Kv {} -PixSize {} -FmDose {} -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.75 --Gpu {}"
+                mc_cmd0="{} {} -OutMrc {} -Iter 7 -Tol 0.5 -Kv {} -PixSize {} -FmDose {} -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.75 -Gpu {}"
                 mc_cmd1=mc_cmd0+" -Gain {} -Throw {} -Trunc {}"
                 mc_cmd2=mc_cmd0+" -Gain {}"
                 mc_cmd3=mc_cmd0+" -Throw {} -Trunc {}"
@@ -659,7 +660,7 @@ class PipelineWorkflow:
                 ##slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
                 slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                 self.wf.add_jobs(slack_notify_job)
-            self.no_of_processed+=1
+                self.no_of_processed+=1
             #fastcounter+=1
         
         
