@@ -316,7 +316,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/imagemagick_wrapper2.sh"),
             is_stageable=False
         )
-        magick.add_pegasus_profile( cores="1",
+        magick2.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
@@ -441,7 +441,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/imagemagick_wrapper2_dual.sh"),
             is_stageable=False
         )
-        magick_dual.add_pegasus_profile( cores="2",
+        magick2_dual.add_pegasus_profile( cores="2",
                                         runtime="600",
                                         memory="16384",
                                         glite_arguments=self.glite_arguments
@@ -569,7 +569,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/imagemagick_wrapper2_quad.sh"),
             is_stageable=False
         )
-        magick_quad.add_pegasus_profile( cores="4",
+        magick2_quad.add_pegasus_profile( cores="4",
                                         runtime="600",
                                         memory="32736",
                                         glite_arguments=self.glite_arguments
@@ -612,6 +612,7 @@ class PipelineWorkflow:
         self.tc.add_transformations(motionCor2_dual_tt)
         self.tc.add_transformations(gctf_dual)
         self.tc.add_transformations(e2proc2d_dual)
+        self.tc.add_transformations(e2proc2d2_dual)
         self.tc.add_transformations(magick_dual)
         self.tc.add_transformations(magick2_dual)
         self.tc.add_transformations(slack_notify_dual)
@@ -622,6 +623,7 @@ class PipelineWorkflow:
         self.tc.add_transformations(motionCor2_quad_tt)
         self.tc.add_transformations(gctf_quad)
         self.tc.add_transformations(e2proc2d_quad)
+        self.tc.add_transformations(e2proc2d2_quad)
         self.tc.add_transformations(magick_quad)
         self.tc.add_transformations(magick2_quad)
         self.tc.add_transformations(slack_notify_quad)
