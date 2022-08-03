@@ -42,10 +42,30 @@ echo "Current working directory is `pwd`"
 echo `hostname`
 #echo `nvidia-smi`
 echo $CUDA_VISIBLE_DEVICES
+
+mcin=$1
+kev=$2
+pxsize=$3
+fmdose=$4
+gainref=$5
+file0_in=$6
+file0_out=$7
+file0_stderr=$8
+file0_stdout=$9
+file1_in=$10
+file1_out=$11
+file1_stderr=$12
+file1_stdout=$13
+
+
+
 echo
-echo "MotionCor2 $@" 
-echo
-MotionCor2 "$@" 
+MotionCor2 $mcin $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.2 -Gpu 0 -Gain $gainref 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
+MotionCor2 $mcin $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.2 -Gpu 1 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
+
+wait $PIDONE
+wait $PIDTWO
+
 
 exit $?
 
