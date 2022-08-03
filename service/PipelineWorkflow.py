@@ -80,8 +80,6 @@ class PipelineWorkflow:
             logger.info("account {}".format(self.account))
             logger.info("glite_arguments {}".format(self.glite_arguments))
             logger.info("no_of_gpus {}".format(self.no_of_gpus))
-            logger.info("gctf_glite_arguments {}".format(self.gctf_glite_arguments))
-            logger.info("glite_for_cryoem_partition {}".format(self.glite_for_cryoem_partition))
             logger.info("pgss_stgt_clusters {}".format(self.pgss_stgt_clusters))
             logger.info("maxjobs {}".format(self.maxjobs))
             logger.info("debug_maxjobs {}".format(self.debug_maxjobs))
