@@ -44,10 +44,9 @@ class PipelineWorkflow:
 
     # --- Init ----------------------------------------------------------------
     def __init__(self, base_dir, session_dir, inputs_dir, outputs_dir, debug=True, partition="debug", \
-                    account="osinski_703", glite_arguments="--gres=gpu:k40:2", \
-                    gctf_glite_arguments="--gres=gpu:k40:2", glite_for_cryoem_partition="", \
+                    account="osinski_703", glite_arguments="--gres=gpu:p100:2", \
                     maxjobs=100, debug_maxjobs=10, pgss_stgt_clusters=10, cluster_size=10, \
-                    no_of_files_to_proc_in_cycle=-1):
+                    no_of_files_to_proc_in_cycle=-1,no_of_gpus=2):
         self.wf_name = "motioncor2"
         self.debug = debug
         logger.info("PipelineWorkflow init")
@@ -66,14 +65,12 @@ class PipelineWorkflow:
         self.outputs_dir = outputs_dir
         self.partition = partition
         self.account = account
-        self.glite_arguments = glite_arguments
-        self.gctf_glite_arguments = gctf_glite_arguments
-        self.glite_for_cryoem_partition = glite_for_cryoem_partition
         self.pgss_stgt_clusters = pgss_stgt_clusters
         self.maxjobs = maxjobs
         self.debug_maxjobs = debug_maxjobs
         self.cluster_size = cluster_size
         self.no_of_files_to_proc_in_cycle = no_of_files_to_proc_in_cycle
+        self.no_of_gpus = no_of_gpus
         if self.debug:
             logger.info("sbase_dir {}".format(self.base_dir))
             logger.info("session_dir {}".format(self.session_dir))
@@ -82,6 +79,7 @@ class PipelineWorkflow:
             logger.info("partition {}".format(self.partition))
             logger.info("account {}".format(self.account))
             logger.info("glite_arguments {}".format(self.glite_arguments))
+            logger.info("no_of_gpus {}".format(self.no_of_gpus))
             logger.info("gctf_glite_arguments {}".format(self.gctf_glite_arguments))
             logger.info("glite_for_cryoem_partition {}".format(self.glite_for_cryoem_partition))
             logger.info("pgss_stgt_clusters {}".format(self.pgss_stgt_clusters))
@@ -141,9 +139,6 @@ class PipelineWorkflow:
         )
         shared_scratch_dir = os.path.join(self.wf_dir, "scratch")
         self.shared_scratch_dir = shared_scratch_dir
-        #TODO: for future tune up
-        # .add_profiles(Namespace.PEGASUS, key="glite.arguments", \
-        #                                   value=self.glite_for_cryoem_partition)
         exec_site = (
             Site(exec_site_name)
             .add_profiles(Namespace.CONDOR, key="grid_resource", value="batch slurm")
@@ -178,7 +173,7 @@ class PipelineWorkflow:
         dm2mrc_gainref.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
-                                        glite_arguments=self.glite_for_cryoem_partition
+                                        glite_arguments=self.glite_arguments
         )
         tif2mrc_gainref = Transformation(
             "tif2mrc_gainref",
@@ -189,7 +184,7 @@ class PipelineWorkflow:
         tif2mrc_gainref.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
-                                        glite_arguments=self.glite_for_cryoem_partition
+                                        glite_arguments=self.glite_arguments
         )
         newstack_gainref = Transformation(
             "newstack_gainref",
@@ -200,7 +195,7 @@ class PipelineWorkflow:
         newstack_gainref.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
-                                        glite_arguments=self.glite_for_cryoem_partition
+                                        glite_arguments=self.glite_arguments
         )
         clip_gainref = Transformation(
             "clip_gainref",
@@ -211,7 +206,7 @@ class PipelineWorkflow:
         clip_gainref.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
-                                        glite_arguments=self.glite_for_cryoem_partition
+                                        glite_arguments=self.glite_arguments
         )
         clip_gainref_superres = Transformation(
             "clip_gainref_superres",
@@ -222,7 +217,7 @@ class PipelineWorkflow:
         clip_gainref_superres.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
-                                        glite_arguments=self.glite_for_cryoem_partition
+                                        glite_arguments=self.glite_arguments
         )
         # second - let's try to get the Defect map file:
         dm2mrc_defect_map = Transformation(
@@ -234,7 +229,7 @@ class PipelineWorkflow:
         dm2mrc_defect_map.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
-                                        glite_arguments=self.glite_for_cryoem_partition
+                                        glite_arguments=self.glite_arguments
         )
         
         #temporarily commented out
@@ -261,9 +256,10 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size).add_profiles(Namespace.PEGASUS, key="job.aggregator.arguments", value="-n auto")
+        ).add_profiles(Namespace.PEGASUS, key="job.aggregator.arguments", value="-n auto")
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size).add_profiles(Namespace.PEGASUS, key="job.aggregator.arguments", value="-n auto")
         
-        
+        #single GPU
         motionCor2 = Transformation(
             "MotionCor2",
             site=exec_site_name,
@@ -274,7 +270,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         gctf = Transformation(
             "gctf",
@@ -285,8 +282,9 @@ class PipelineWorkflow:
         gctf.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
-                                        glite_arguments=self.gctf_glite_arguments
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+                                        glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         e2proc2d = Transformation(
             "e2proc2d",
@@ -297,8 +295,9 @@ class PipelineWorkflow:
         e2proc2d.add_pegasus_profile(cores="1",
                                      runtime="600",
                                      memory="4096",
-                                     glite_arguments=self.glite_for_cryoem_partition
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+                                     glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         magick = Transformation(
             "magick",
@@ -309,8 +308,9 @@ class PipelineWorkflow:
         magick.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
-                                        glite_arguments=self.glite_for_cryoem_partition
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+                                        glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         magick2 = Transformation(
             "magick2",
@@ -321,8 +321,9 @@ class PipelineWorkflow:
         magick.add_pegasus_profile( cores="1",
                                         runtime="600",
                                         memory="4096",
-                                        glite_arguments=self.glite_for_cryoem_partition
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+                                        glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         slack_notify = Transformation(
             "slack_notify",
@@ -333,8 +334,167 @@ class PipelineWorkflow:
         slack_notify.add_pegasus_profile( cores="1",
                                         runtime="300",
                                         memory="2048",
-                                        glite_arguments=self.glite_for_cryoem_partition
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+                                        glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+
+        #dual GPU
+        motionCor2_dual = Transformation(
+            "MotionCor2",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/motioncor2_wrapper_dual.sh"),
+            is_stageable=False
+        )
+        motionCor2_dual.add_pegasus_profile( cores="2",
+                                        runtime="600",
+                                        memory="8192",
+                                        glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+
+        gctf_dual = Transformation(
+            "gctf",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/gctf_wrapper_dual.sh"),
+            is_stageable=False
+        )
+        gctf_dual.add_pegasus_profile( cores="2",
+                                        runtime="600",
+                                        memory="16384",
+                                        glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+
+        e2proc2d_dual = Transformation(
+            "e2proc2d",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/e2proc2d_wrapper_dual.sh"),
+            is_stageable=False
+        )
+        e2proc2d_dual.add_pegasus_profile(cores="2",
+                                     runtime="600",
+                                     memory="16384",
+                                     glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+
+        magick_dual = Transformation(
+            "magick",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/imagemagick_wrapper_dual.sh"),
+            is_stageable=False
+        )
+        magick_dual.add_pegasus_profile( cores="2",
+                                        runtime="600",
+                                        memory="16384",
+                                        glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+
+        magick2_dual = Transformation(
+            "magick2",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/imagemagick_wrapper2_dual.sh"),
+            is_stageable=False
+        )
+        magick_dual.add_pegasus_profile( cores="2",
+                                        runtime="600",
+                                        memory="16384",
+                                        glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+
+        slack_notify_dual = Transformation(
+            "slack_notify",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/slack_notify_dual.sh"),
+            is_stageable=False
+        )
+        slack_notify_dual.add_pegasus_profile( cores="2",
+                                        runtime="300",
+                                        memory="16384",
+                                        glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+
+        #quad GPU
+        motionCor2_quad = Transformation(
+            "MotionCor2",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/motioncor2_wrapper_quad.sh"),
+            is_stageable=False
+        )
+        motionCor2_quad.add_pegasus_profile( cores="4",
+                                        runtime="600",
+                                        memory="32736",
+                                        glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+
+        gctf_quad = Transformation(
+            "gctf",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/gctf_wrapper_quad.sh"),
+            is_stageable=False
+        )
+        gctf_quad.add_pegasus_profile( cores="4",
+                                        runtime="600",
+                                        memory="32736",
+                                        glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+
+        e2proc2d_quad = Transformation(
+            "e2proc2d",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/e2proc2d_wrapper_quad.sh"),
+            is_stageable=False
+        )
+        e2proc2d_quad.add_pegasus_profile(cores="4",
+                                     runtime="600",
+                                     memory="32736",
+                                     glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+
+        magick_quad = Transformation(
+            "magick",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/imagemagick_wrapper_quad.sh"),
+            is_stageable=False
+        )
+        magick_quad.add_pegasus_profile( cores="4",
+                                        runtime="600",
+                                        memory="32736",
+                                        glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+
+        magick2_quad = Transformation(
+            "magick2",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/imagemagick_wrapper2_quad.sh"),
+            is_stageable=False
+        )
+        magick_quad.add_pegasus_profile( cores="4",
+                                        runtime="600",
+                                        memory="32736",
+                                        glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+
+        slack_notify_quad = Transformation(
+            "slack_notify",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/slack_notify_quad.sh"),
+            is_stageable=False
+        )
+        slack_notify_quad.add_pegasus_profile( cores="4",
+                                        runtime="300",
+                                        memory="32736",
+                                        glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         #dealing with gain reference and similar
         self.tc.add_transformations(dm2mrc_gainref)
@@ -345,12 +505,27 @@ class PipelineWorkflow:
         self.tc.add_transformations(dm2mrc_defect_map)
         #dealing with motioncor and ctf
         #self.tc.add_transformations(copy_jpeg) # cannot be used; might be removed soon
+        #single gpu
         self.tc.add_transformations(motionCor2)
         self.tc.add_transformations(gctf)
         self.tc.add_transformations(e2proc2d)
         self.tc.add_transformations(magick)
         self.tc.add_transformations(magick2)
         self.tc.add_transformations(slack_notify)
+        #dual gpu
+        self.tc.add_transformations(motionCor2_dual)
+        self.tc.add_transformations(gctf_dual)
+        self.tc.add_transformations(e2proc2d_dual)
+        self.tc.add_transformations(magick_dual)
+        self.tc.add_transformations(magick2_dual)
+        self.tc.add_transformations(slack_notify_dual)
+        #quad gpu
+        self.tc.add_transformations(motionCor2_quad)
+        self.tc.add_transformations(gctf_quad)
+        self.tc.add_transformations(e2proc2d_quad)
+        self.tc.add_transformations(magick_quad)
+        self.tc.add_transformations(magick2_quad)
+        self.tc.add_transformations(slack_notify_quad)
 
     # --- Replica Catalog ------------------------------------------------------
     def create_replica_catalog(self,exec_site_name="slurm"):
@@ -490,178 +665,169 @@ class PipelineWorkflow:
             self.basename_extension="tiff"
             self.basename_suffix="fractions"
 
-        #prepare for labelling
-        #fastcounter=0
-        #slowcounter=0
-        #prep list of 4 elems
-        list_of_lists_of_files_to_process=split_into_n(self._file_list_to_process, 5)
+        #prepare for labelling to cluster more jobs (fastcounter tells how many images (and all jobs per image) to bundle in a cluster se;f.cluster_size) (slowcounter is the varying part of the label)
+        fastcounter=0
+        slowcounter=0
+        #prep list of self.no_of_gpus elems
+        list_of_lists_of_files_to_process=split_into_n(self._file_list_to_process, self.no_of_gpus)
+        #prepare jobs
         for element in list_of_lists_of_files_to_process:
             joblabel_index= list_of_lists_of_files_to_process.index(element)
-            #if fastcounter % 30 == 0:
-            #    slowcounter+=1
-            for fraction_file_path in element:
-                #ffp_index = element.index(fraction_file_path)
-                ffp_index = 0
-                
-                fraction_file_name = os.path.basename(fraction_file_path)
-                fraction_file = File(fraction_file_name)
-                self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))
-
-                # generated files will be named based on the input
-                basename = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name)
-                mrc_file_name="{}.mrc".format(basename)
-                dw_file_name="{}_DW.mrc".format(basename)
-                mc2_stdout_file_name="{}_DW.stdout.txt".format(basename)
-                mc2_stderr_file_name="{}_DW.stderr.txt".format(basename)
-                mrc_file = File(mrc_file_name)
-                dw_file = File(dw_file_name)
-                mc2_stdout = File(mc2_stdout_file_name)
-                mc2_stderr = File(mc2_stderr_file_name)
-
-                # MotionCor2
-                #adjust for one of three different extensions: mrc, tiff or eer
-                if self.basename_extension=="tiff":
-                    mc2_in="-InTiff"
-                elif self.basename_extension=="mrc":
-                    mc2_in="-InMrc"
-                elif self.basename_extension=="eer":
-                    mc2_in="-InEer"
-                else:
-                    logger.info("Unknown image extension - {}".format(self.basename_extension))
-                    sys.exit(1)
-                mc_cmd0="{} {} -OutMrc {} -Iter 7 -Tol 0.5 -Kv {} -PixSize {} -FmDose {} -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.75 -Gpu {}"
-                mc_cmd1=mc_cmd0+" -Gain {} -Throw {} -Trunc {}"
-                mc_cmd2=mc_cmd0+" -Gain {}"
-                mc_cmd3=mc_cmd0+" -Throw {} -Trunc {}"
-                if len(Gain_Ref_SR_name) != 0:
-                    #case where we have gain reference file and superresolution
-                    if self.superresolution == True:
-                        if FlipY or Gain_Ref:
-                            if str(self.kev) == "300":
-                                gff=FlipY_SR
-                            elif str(self.kev) == "200":
-                                gff=Gain_Ref_SR
-                            else:
-                                gff=None
+            if fastcounter % self.cluster_size == 0:
+                slowcounter+=1
+            if self.no_of_gpus==1:
+                for fraction_file_path in element:
+                    #ffp_index is the gpu id
+                    ffp_index = element.index(fraction_file_path)
+                    fraction_file_name = os.path.basename(fraction_file_path)
+                    fraction_file = File(fraction_file_name)
+                    self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))
+                    # generated files will be named based on the input
+                    basename = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name)
+                    mrc_file_name="{}.mrc".format(basename)
+                    dw_file_name="{}_DW.mrc".format(basename)
+                    mc2_stdout_file_name="{}_DW.stdout.txt".format(basename)
+                    mc2_stderr_file_name="{}_DW.stderr.txt".format(basename)
+                    mrc_file = File(mrc_file_name)
+                    dw_file = File(dw_file_name)
+                    mc2_stdout = File(mc2_stdout_file_name)
+                    mc2_stderr = File(mc2_stderr_file_name)
+                    # MotionCor2
+                    #adjust for one of three different extensions: mrc, tiff or eer
+                    if self.basename_extension=="tiff": mc2_in="-InTiff"
+                    elif self.basename_extension=="mrc": mc2_in="-InMrc"
+                    elif self.basename_extension=="eer": mc2_in="-InEer"
                     else:
-                        if FlipY or Gain_Ref:
-                            if str(self.kev) == "300":
-                                gff=FlipY
-                            elif str(self.kev) == "200":
-                                gff=Gain_Ref
-                            else:
-                                gff=None
-                    if gff!=None:
-                        if self.throw!=0 and self.trunc!=0:
-                            motionCor_job = Job("MotionCor2").add_args(mc_cmd1.format(mc2_in, "./{}".format(fraction_file_name), \
-                                            mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index, gff, self.throw, self.trunc))
+                        logger.info("Unknown image extension - {}".format(self.basename_extension))
+                        sys.exit(1)
+                    mc_cmd0="{} {} -OutMrc {} -Iter 7 -Tol 0.5 -Kv {} -PixSize {} -FmDose {} -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.75 -Gpu {}"
+                    mc_cmd1=mc_cmd0+" -Gain {} -Throw {} -Trunc {}"
+                    mc_cmd2=mc_cmd0+" -Gain {}"
+                    mc_cmd3=mc_cmd0+" -Throw {} -Trunc {}"
+                    if len(Gain_Ref_SR_name) != 0:
+                        #case where we have gain reference file and superresolution
+                        if self.superresolution == True:
+                            if FlipY or Gain_Ref:
+                                if str(self.kev) == "300": gff=FlipY_SR
+                                elif str(self.kev) == "200": gff=Gain_Ref_SR
+                                else: gff=None
                         else:
-                            motionCor_job = Job("MotionCor2").add_args(mc_cmd2.format(mc2_in, "./{}".format(fraction_file_name), \
-                                            mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index, gff))
-                        motionCor_job.add_inputs(gff)
+                            if FlipY or Gain_Ref:
+                                if str(self.kev) == "300": gff=FlipY
+                                elif str(self.kev) == "200": gff=Gain_Ref
+                                else: gff=None
+                        if gff!=None:
+                            if self.throw!=0 and self.trunc!=0:
+                                motionCor_job = Job("MotionCor2").add_args(mc_cmd1.format(mc2_in, "./{}".format(fraction_file_name), \
+                                                mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index, gff, self.throw, self.trunc))
+                            else:
+                                motionCor_job = Job("MotionCor2").add_args(mc_cmd2.format(mc2_in, "./{}".format(fraction_file_name), \
+                                                mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index, gff))
+                            motionCor_job.add_inputs(gff)
+                        else:
+                            #do bare mc
+                            motionCor_job = Job("MotionCor2").add_args(mc_cmd0.format(mc2_in, "./{}".format(fraction_file_name), \
+                                                mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index))
                     else:
-                        #do bare mc
-                        motionCor_job = Job("MotionCor2").add_args(mc_cmd0.format(mc2_in, "./{}".format(fraction_file_name), \
+                        #case where we do not have gain referencee file
+                        if self.throw!=0 and self.trunc!=0:
+                            motionCor_job = Job("MotionCor2").add_args(mc_cmd3.format(mc2_in, "./{}".format(fraction_file_name), \
+                                            mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index, self.throw, self.trunc))
+                        else:
+                            motionCor_job = Job("MotionCor2").add_args(mc_cmd0.format(mc2_in, "./{}".format(fraction_file_name), \
                                             mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index))
-                else:
-                    #case where we do not have gain referencee file
-                    if self.throw!=0 and self.trunc!=0:
-                        motionCor_job = Job("MotionCor2").add_args(mc_cmd3.format(mc2_in, "./{}".format(fraction_file_name), \
-                                        mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index, self.throw, self.trunc))
-                    else:
-                        motionCor_job = Job("MotionCor2").add_args(mc_cmd0.format(mc2_in, "./{}".format(fraction_file_name), \
-                                        mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index))
-                motionCor_job.add_inputs(fraction_file)
-                motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
-                motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
-                motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
-                motionCor_job.set_stderr(mc2_stderr, stage_out=True, register_replica=False)
-                ##motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
-                #motionCor_job.add_profiles(Namespace.PEGASUS, "label", "mc2")
-                self.wf.add_jobs(motionCor_job)
+                    motionCor_job.add_inputs(fraction_file)
+                    motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
+                    motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
+                    motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
+                    motionCor_job.set_stderr(mc2_stderr, stage_out=True, register_replica=False)
+                    ##motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
+                    motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
+                    #motionCor_job.add_profiles(Namespace.PEGASUS, "label", "mc2")
+                    self.wf.add_jobs(motionCor_job)
 
-                # gctf
-                ctf_star_file = File(mrc_file_name.replace(".mrc",".star"))
-                #ctf_pf_file = File(mrc_file_name.replace(".mrc","_pf.mrc"))
-                ctf_file = File(mrc_file_name.replace(".mrc",".ctf"))
-                gctf_log_file = File(mrc_file_name.replace(".mrc","_gctf.log"))
-                gctf_stdout_file_name=mrc_file_name.replace(".mrc","_gctf_stdout.txt")
-                gctf_stderr_file_name=mrc_file_name.replace(".mrc","_gctf_stderr.txt")
-                gctf_stdout = File(gctf_stdout_file_name)
-                gctf_stderr = File(gctf_stderr_file_name)
-                gctf_job = (
-                    Job("gctf").add_args("--apix {} --kV {} --Cs 2.7 --ac 0.1 --ctfstar {} --boxsize 1024 {} --gid {}".format(\
-                    self.apix, self.kev, ctf_star_file, mrc_file, ffp_index))
-                )
-                gctf_job.add_inputs(mrc_file)
-                gctf_job.add_outputs(ctf_star_file, stage_out=True, register_replica=False)
-                #gctf_job.add_outputs(ctf_pf_file, stage_out=True, register_replica=True)
-                gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
-                gctf_job.set_stdout(gctf_stdout, stage_out=True, register_replica=False)
-                gctf_job.set_stderr(gctf_stderr, stage_out=True, register_replica=False)
-                ##gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
-                #gctf_job.add_profiles(Namespace.PEGASUS, "label", "gctf")
-                self.wf.add_jobs(gctf_job)
+                    # gctf
+                    ctf_star_file = File(mrc_file_name.replace(".mrc",".star"))
+                    #ctf_pf_file = File(mrc_file_name.replace(".mrc","_pf.mrc"))
+                    ctf_file = File(mrc_file_name.replace(".mrc",".ctf"))
+                    gctf_log_file = File(mrc_file_name.replace(".mrc","_gctf.log"))
+                    gctf_stdout_file_name=mrc_file_name.replace(".mrc","_gctf_stdout.txt")
+                    gctf_stderr_file_name=mrc_file_name.replace(".mrc","_gctf_stderr.txt")
+                    gctf_stdout = File(gctf_stdout_file_name)
+                    gctf_stderr = File(gctf_stderr_file_name)
+                    gctf_job = (
+                        Job("gctf").add_args("--apix {} --kV {} --Cs 2.7 --ac 0.1 --ctfstar {} --boxsize 1024 {} --gid {}".format(\
+                        self.apix, self.kev, ctf_star_file, mrc_file, ffp_index))
+                    )
+                    gctf_job.add_inputs(mrc_file)
+                    gctf_job.add_outputs(ctf_star_file, stage_out=True, register_replica=False)
+                    #gctf_job.add_outputs(ctf_pf_file, stage_out=True, register_replica=True)
+                    gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
+                    gctf_job.set_stdout(gctf_stdout, stage_out=True, register_replica=False)
+                    gctf_job.set_stderr(gctf_stderr, stage_out=True, register_replica=False)
+                    ##gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
+                    gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
+                    #gctf_job.add_profiles(Namespace.PEGASUS, "label", "gctf")
+                    self.wf.add_jobs(gctf_job)
 
-                # e2proc2d - motion-corrected to jpg, then resize to 20% size
-                dw_jpg_name = dw_file_name.replace("_DW.mrc","_DW_fs.jpg")
-                dw_jpg_file = File(dw_jpg_name)
-                e2proc2d_job1 = Job("e2proc2d")            
-                e2proc2d_job1.add_inputs(dw_file)
-                e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
-                e2proc2d_job1.add_args("--process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane", dw_file, dw_jpg_file)
-                ##e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
-                e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))                
-                self.wf.add_jobs(e2proc2d_job1)
+                    # e2proc2d - motion-corrected to jpg, then resize to 20% size
+                    dw_jpg_name = dw_file_name.replace("_DW.mrc","_DW_fs.jpg")
+                    dw_jpg_file = File(dw_jpg_name)
+                    e2proc2d_job1 = Job("e2proc2d")            
+                    e2proc2d_job1.add_inputs(dw_file)
+                    e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
+                    e2proc2d_job1.add_args("--process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane", dw_file, dw_jpg_file)
+                    ##e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
+                    e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))                
+                    self.wf.add_jobs(e2proc2d_job1)
+                    
+                    #imagemagick - resize the input jpg from about 5k to 1k px
+                    magick_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg",".jpg"))
+                    magick_resize = Job("magick")
+                    magick_resize.add_inputs(dw_jpg_file)
+                    magick_resize.add_outputs(magick_jpg_file, stage_out=True, register_replica=False)
+                    magick_resize.add_args("convert", "-resize", '20%', dw_jpg_file, magick_jpg_file)
+                    ##magick_resize.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
+                    magick_resize.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
+                    self.wf.add_jobs(magick_resize)
+
+                    # e2proc2d - ctf to jpg
+                    jpg_ctf_file = File(mrc_file_name.replace(".mrc","_ctf.jpg"))
+                    e2proc2d_job2 = Job("e2proc2d")            
+                    e2proc2d_job2.add_inputs(ctf_file)
+                    e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True, register_replica=False)
+                    e2proc2d_job2.add_args("--fixintscaling=sane", ctf_file, jpg_ctf_file)
+                    ##e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
+                    e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
+                    self.wf.add_jobs(e2proc2d_job2)
+
+                    #imagemagick - stitch together resized jpg and add text
+                    magick_combined_jpg_fn = dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg")
+                    magick_combined_jpg_file = File(magick_combined_jpg_fn)
+                    magick_convert = Job("magick2")
+                    magick_convert.add_inputs(magick_jpg_file)
+                    magick_convert.add_inputs(jpg_ctf_file)
+                    magick_convert.add_inputs(gctf_log_file)
+                    magick_convert.add_inputs(mc2_stdout)
+                    magick_convert.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
+                    magick_convert.add_args(magick_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn)
+                    ##magick_convert.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
+                    magick_convert.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
+                    self.wf.add_jobs(magick_convert)
+
+                    #send notification to the slack channel
+                    slack_notify_out=File(mrc_file_name.replace(".mrc","_slack_msg.txt"))
+                    slack_notify_job = Job("slack_notify")
+                    slack_notify_job.add_inputs(magick_combined_jpg_file)
+                    slack_notify_job.add_outputs(slack_notify_out, stage_out=True, register_replica=False)
+                    slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), slack_notify_out)
+                    ##slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
+                    slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
+                    self.wf.add_jobs(slack_notify_job)
+                    self.no_of_processed+=1
+                fastcounter+=1
                 
-                #imagemagick - resize the input jpg from about 5k to 1k px
-                magick_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg",".jpg"))
-                magick_resize = Job("magick")
-                magick_resize.add_inputs(dw_jpg_file)
-                magick_resize.add_outputs(magick_jpg_file, stage_out=True, register_replica=False)
-                magick_resize.add_args("convert", "-resize", '20%', dw_jpg_file, magick_jpg_file)
-                ##magick_resize.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
-                magick_resize.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
-                self.wf.add_jobs(magick_resize)
-
-                # e2proc2d - ctf to jpg
-                jpg_ctf_file = File(mrc_file_name.replace(".mrc","_ctf.jpg"))
-                e2proc2d_job2 = Job("e2proc2d")            
-                e2proc2d_job2.add_inputs(ctf_file)
-                e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True, register_replica=False)
-                e2proc2d_job2.add_args("--fixintscaling=sane", ctf_file, jpg_ctf_file)
-                ##e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
-                e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
-                self.wf.add_jobs(e2proc2d_job2)
-
-                #imagemagick - stitch together resized jpg and add text
-                magick_combined_jpg_fn = dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg")
-                magick_combined_jpg_file = File(magick_combined_jpg_fn)
-                magick_convert = Job("magick2")
-                magick_convert.add_inputs(magick_jpg_file)
-                magick_convert.add_inputs(jpg_ctf_file)
-                magick_convert.add_inputs(gctf_log_file)
-                magick_convert.add_inputs(mc2_stdout)
-                magick_convert.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
-                magick_convert.add_args(magick_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn)
-                ##magick_convert.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
-                magick_convert.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
-                self.wf.add_jobs(magick_convert)
-
-                #send notification to the slack channel
-                slack_notify_out=File(mrc_file_name.replace(".mrc","_slack_msg.txt"))
-                slack_notify_job = Job("slack_notify")
-                slack_notify_job.add_inputs(magick_combined_jpg_file)
-                slack_notify_job.add_outputs(slack_notify_out, stage_out=True, register_replica=False)
-                slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), slack_notify_out)
-                ##slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
-                slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
-                self.wf.add_jobs(slack_notify_job)
-                self.no_of_processed+=1
-            #fastcounter+=1
 
 
     def set_params(self, datum):

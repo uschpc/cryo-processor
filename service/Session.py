@@ -545,8 +545,6 @@ class Session:
                                     self._processed_dir,
                                     debug=self._config.getboolean("general", "debug"),
                                     glite_arguments=self._config.get("params", "glite_arguments"),
-                                    gctf_glite_arguments=self._config.get("params", "gctf_glite_arguments"),
-                                    glite_for_cryoem_partition=self._config.get("params", "glite_for_cryoem_partition"),
                                     maxjobs=self._config.get("params", "maxjobs"),
                                     debug_maxjobs=self._config.get("params", "debug_maxjobs"),
                                     partition=self._config.get("params", "partition"),
@@ -554,6 +552,7 @@ class Session:
                                     pgss_stgt_clusters=pegasus_stageout_clusters,
                                     cluster_size=self._config.get("params", "cluster_size"),
                                     no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
+                                    no_of_gpus=self._config.getint("params", "no_of_gpus"),
                                     )
         try:
             #do final check on required params
