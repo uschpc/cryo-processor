@@ -66,8 +66,9 @@ MotionCor2 $mcin $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize
 wait $PIDONE
 wait $PIDTWO
 
-echo "MotionCor2 $mcin $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.2 -Gpu 0 -Gain $gainref 2> $file0_stderr 1> $file0_stdout" >> $file0_stdout
-echo "MotionCor2 $mcin $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.2 -Gpu 1 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!" >> $file1_stdout
+
+echo "MotionCor2 $mcin $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.2 -Gpu 0 -Gain $gainref 2> $file0_stderr 1> $file0_stdout" >> $file0_stderr
+echo "MotionCor2 $mcin $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.2 -Gpu 1 -Gain $gainref 2> $file1_stderr 1> $file1_stdout" >> $file1_stderr
 
 
 exit $?

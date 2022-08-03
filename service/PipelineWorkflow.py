@@ -982,12 +982,12 @@ class PipelineWorkflow:
                                             mc2_in, str(self.kev), self.apix, self.fmdose, gff, self.throw, self.trunc,\
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
-                                            "./{}".format(mc2_stdout_file_name0), \
                                             "./{}".format(mc2_stderr_file_name0), \
+                                            "./{}".format(mc2_stdout_file_name0), \
                                             "./{}".format(fraction_file_name1), \
                                             mrc_file1, \
-                                            "./{}".format(mc2_stdout_file_name1), \
                                             "./{}".format(mc2_stderr_file_name1), \
+                                            "./{}".format(mc2_stdout_file_name1), \
                                             )
                             motionCor_job.add_inputs(gff)
                             motionCor_job.add_inputs(fraction_file0)
