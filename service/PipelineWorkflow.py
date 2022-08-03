@@ -60,7 +60,7 @@ class PipelineWorkflow:
         self._run_dir = os.path.join(self.wf_dir, 'motioncor2')
         self._scratch_dir = os.path.join(self.wf_dir, 'scratch')
         
-        
+        self.glite_arguments=glite_arguments
         self.inputs_dir = inputs_dir
         self.outputs_dir = outputs_dir
         self.partition = partition
