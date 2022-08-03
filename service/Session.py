@@ -550,7 +550,7 @@ class Session:
                                     partition=self._config.get("params", "partition"),
                                     account=self._config.get("params", "account"),
                                     pgss_stgt_clusters=pegasus_stageout_clusters,
-                                    cluster_size=self._config.get("params", "cluster_size"),
+                                    cluster_size=self._config.getint("params", "cluster_size"),
                                     no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
                                     no_of_gpus=self._config.getint("params", "no_of_gpus"),
                                     )
