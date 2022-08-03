@@ -1006,12 +1006,12 @@ class PipelineWorkflow:
                                             mc2_in, str(self.kev), self.apix, self.fmdose, gff,\
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
-                                            "./{}".format(mc2_stdout_file_name0), \
                                             "./{}".format(mc2_stderr_file_name0), \
+                                            "./{}".format(mc2_stdout_file_name0), \
                                             "./{}".format(fraction_file_name1), \
                                             mrc_file1, \
-                                            "./{}".format(mc2_stdout_file_name1), \
                                             "./{}".format(mc2_stderr_file_name1), \
+                                            "./{}".format(mc2_stdout_file_name1), \
                                             )
                             motionCor_job.add_inputs(gff, fraction_file0, fraction_file1)
                             motionCor_job.add_outputs(mrc_file0, stage_out=False, register_replica=False)
@@ -1028,12 +1028,12 @@ class PipelineWorkflow:
                                             mc2_in, str(self.kev), self.apix, self.fmdose,\
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
-                                            "./{}".format(mc2_stdout_file_name0), \
                                             "./{}".format(mc2_stderr_file_name0), \
+                                            "./{}".format(mc2_stdout_file_name0), \
                                             "./{}".format(fraction_file_name1), \
                                             mrc_file1, \
-                                            "./{}".format(mc2_stdout_file_name1), \
                                             "./{}".format(mc2_stderr_file_name1), \
+                                            "./{}".format(mc2_stdout_file_name1), \
                                             )
                         motionCor_job.add_inputs(fraction_file0)
                         motionCor_job.add_inputs(fraction_file1)
@@ -1052,12 +1052,12 @@ class PipelineWorkflow:
                                             mc2_in, str(self.kev), self.apix, self.fmdose, self.throw, self.trunc,\
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
-                                            "./{}".format(mc2_stdout_file_name0), \
                                             "./{}".format(mc2_stderr_file_name0), \
+                                            "./{}".format(mc2_stdout_file_name0), \
                                             "./{}".format(fraction_file_name1), \
                                             mrc_file1, \
-                                            "./{}".format(mc2_stdout_file_name1), \
                                             "./{}".format(mc2_stderr_file_name1), \
+                                            "./{}".format(mc2_stdout_file_name1), \
                                             )
                         motionCor_job.add_inputs(fraction_file0)
                         motionCor_job.add_inputs(fraction_file1)
@@ -1075,12 +1075,12 @@ class PipelineWorkflow:
                                             mc2_in, str(self.kev), self.apix, self.fmdose,\
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
-                                            "./{}".format(mc2_stdout_file_name0), \
                                             "./{}".format(mc2_stderr_file_name0), \
+                                            "./{}".format(mc2_stdout_file_name0), \
                                             "./{}".format(fraction_file_name1), \
                                             mrc_file1, \
-                                            "./{}".format(mc2_stdout_file_name1), \
                                             "./{}".format(mc2_stderr_file_name1), \
+                                            "./{}".format(mc2_stdout_file_name1), \
                                             )
                         motionCor_job.add_inputs(fraction_file0)
                         motionCor_job.add_inputs(fraction_file1)
