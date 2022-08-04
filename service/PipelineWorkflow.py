@@ -882,7 +882,7 @@ class PipelineWorkflow:
                     ctf_file = File(mrc_file_name.replace(".mrc",".ctf"))
                     
                     gctf_log_file_name = mrc_file_name.replace(".mrc","_gctf.log")
-                    gctf_log_file = File(gctf_log_file_name))
+                    gctf_log_file = File(gctf_log_file_name)
                     gctf_stdout_file_name=mrc_file_name.replace(".mrc","_gctf_stdout.txt")
                     gctf_stderr_file_name=mrc_file_name.replace(".mrc","_gctf_stderr.txt")
                     gctf_stdout = File(gctf_stdout_file_name)
