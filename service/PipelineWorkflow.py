@@ -931,6 +931,7 @@ class PipelineWorkflow:
             elif self.no_of_gpus==2:
                 #logger.info("no_of_gpus in the loop {}".format(self.no_of_gpus))
                 #logger.info("no_of_gpus {}".format(self.no_of_gpus))
+                logger.info("element {}".format(element))
                 fraction_file_path0 = element[0]
                 fraction_file_path1 = element[1]
                 fraction_file_name0 = os.path.basename(fraction_file_path0)
@@ -1102,8 +1103,10 @@ class PipelineWorkflow:
                 ctf_star_file1 = File(mrc_file_name1.replace(".mrc",".star"))
                 ctf_file0 = File(mrc_file_name0.replace(".mrc",".ctf"))
                 ctf_file1 = File(mrc_file_name1.replace(".mrc",".ctf"))
-                gctf_log_file0 = File(mrc_file_name0.replace(".mrc","_gctf.log"))
-                gctf_log_file1 = File(mrc_file_name1.replace(".mrc","_gctf.log"))
+                gctf_log_file_name0 = mrc_file_name0.replace(".mrc","_gctf.log")
+                gctf_log_file_name1 = mrc_file_name1.replace(".mrc","_gctf.log")
+                gctf_log_file0 = File(gctf_log_file_name0)
+                gctf_log_file1 = File(gctf_log_file_name1)
                 gctf_stdout_file_name0=mrc_file_name0.replace(".mrc","_gctf_stdout.txt")
                 gctf_stdout_file_name1=mrc_file_name1.replace(".mrc","_gctf_stdout.txt")
                 gctf_stderr_file_name0=mrc_file_name0.replace(".mrc","_gctf_stderr.txt")
@@ -1190,8 +1193,8 @@ class PipelineWorkflow:
                 magick_convert.add_outputs(magick_combined_jpg_file0, stage_out=True, register_replica=False)
                 magick_convert.add_outputs(magick_combined_jpg_file1, stage_out=True, register_replica=False)
                 magick_convert.add_args(\
-                        magick_jpg_file0, jpg_ctf_file0, magick_combined_jpg_file0, gctf_log_file0.lfn, mc2_stdout0.lfn,\
-                        magick_jpg_file1, jpg_ctf_file1, magick_combined_jpg_file1, gctf_log_file1.lfn, mc2_stdout1.lfn,\
+                        magick_jpg_file0, jpg_ctf_file0, magick_combined_jpg_file0, gctf_log_file_name0, mc2_stdout_file_name0,\
+                        magick_jpg_file1, jpg_ctf_file1, magick_combined_jpg_file1, gctf_log_file_name1, mc2_stdout_file_name1,\
                         )
                 magick_convert.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                 ##magick_convert.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
