@@ -39,7 +39,7 @@ file1_stderr=$10
 
 
 gctf --apix $pxsize --kV $kev --Cs 2.7 --ac 0.1 --ctfstar $file0_star --boxsize 1024 $file0_in --gid 0 2> $file0_stderr 1> $file0_stdout
-gctf --apix $pxsize --kV $kev --Cs 2.7 --ac 0.1 --ctfstar $file1_star --boxsize 1024 $file1_in --gid 0 2> $file1_stderr 1> $file1_stdout
+gctf --apix $pxsize --kV $kev --Cs 2.7 --ac 0.1 --ctfstar $file1_star --boxsize 1024 $file1_in --gid 1 2> $file1_stderr 1> $file1_stdout
 #gctf --apix $pxsize --kV $kev --Cs 2.7 --ac 0.1 --ctfstar $file0_star --boxsize 1024 $file0_in --gid 0 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
 #gctf --apix $pxsize --kV $kev --Cs 2.7 --ac 0.1 --ctfstar $file1_star --boxsize 1024 $file1_in --gid 1 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
 

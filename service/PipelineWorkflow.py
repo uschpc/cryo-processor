@@ -1173,7 +1173,7 @@ class PipelineWorkflow:
                 e2proc2d_job2.add_outputs(jpg_ctf_file0, stage_out=True, register_replica=False)
                 e2proc2d_job2.add_outputs(jpg_ctf_file1, stage_out=True, register_replica=False)
                 e2proc2d_job2.add_args(ctf_file0, jpg_ctf_file0, ctf_file1, jpg_ctf_file1)
-                e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
+                e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                 ##e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                 self.wf.add_jobs(e2proc2d_job2)
 
@@ -1193,7 +1193,7 @@ class PipelineWorkflow:
                         magick_jpg_file0, jpg_ctf_file0, magick_combined_jpg_file0, gctf_log_file0.lfn, mc2_stdout0.lfn,\
                         magick_jpg_file1, jpg_ctf_file1, magick_combined_jpg_file1, gctf_log_file1.lfn, mc2_stdout1.lfn,\
                         )
-                magick_convert.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
+                magick_convert.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                 ##magick_convert.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                 self.wf.add_jobs(magick_convert)
                 
@@ -1207,7 +1207,7 @@ class PipelineWorkflow:
                 slack_notify_job.add_outputs(slack_notify_out1, stage_out=True, register_replica=False)
                 slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn0), slack_notify_out0)
                 slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn1), slack_notify_out1)
-                slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
+                slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                 ##slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                 self.wf.add_jobs(slack_notify_job)
                 self.no_of_processed+=1
