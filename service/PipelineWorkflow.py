@@ -844,6 +844,7 @@ class PipelineWorkflow:
                             else:
                                 #motionCor_job = Job("MotionCor2").add_args(mc_cmd2.format(mc2_in, "./{}".format(fraction_file_name), \
                                 #                mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index, gff))
+                                motionCor_job = Job("MotionCor2")
                                 motionCor_job.add_args(\
                                                 mc2_in, self.kev, self.apix, self.fmdose, gff,\
                                                 "./{}".format(fraction_file_name), \
