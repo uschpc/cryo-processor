@@ -261,7 +261,7 @@ class PipelineWorkflow:
         motionCor2 = Transformation(
             "MotionCor2",
             site=exec_site_name,
-            pfn=os.path.join(self.base_dir, "workflow/scripts/motioncor2_wrapper.sh"),
+            pfn=os.path.join(self.base_dir, "workflow/scripts/motioncor2_wrapperX.sh"),
             is_stageable=False
         )
         motionCor2.add_pegasus_profile( cores="1",
@@ -274,7 +274,7 @@ class PipelineWorkflow:
         gctf = Transformation(
             "gctf",
             site=exec_site_name,
-            pfn=os.path.join(self.base_dir, "workflow/scripts/gctf_wrapper.sh"),
+            pfn=os.path.join(self.base_dir, "workflow/scripts/gctf_wrapperX.sh"),
             is_stageable=False
         )
         gctf.add_pegasus_profile( cores="1",
@@ -287,7 +287,7 @@ class PipelineWorkflow:
         e2proc2d = Transformation(
             "e2proc2d",
             site=exec_site_name,
-            pfn=os.path.join(self.base_dir, "workflow/scripts/e2proc2d_wrapper.sh"),
+            pfn=os.path.join(self.base_dir, "workflow/scripts/e2proc2d_wrapperX.sh"),
             is_stageable=False
         )
         e2proc2d.add_pegasus_profile(cores="1",
@@ -297,10 +297,23 @@ class PipelineWorkflow:
         )
         #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
+        e2proc2d2 = Transformation(
+            "e2proc2d",
+            site=exec_site_name,
+            pfn=os.path.join(self.base_dir, "workflow/scripts/e2proc2d2_wrapperX.sh"),
+            is_stageable=False
+        )
+        e2proc2d2.add_pegasus_profile(cores="1",
+                                     runtime="600",
+                                     memory="4096",
+                                     glite_arguments=self.glite_arguments
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+
         magick = Transformation(
             "magick",
             site=exec_site_name,
-            pfn=os.path.join(self.base_dir, "workflow/scripts/imagemagick_wrapper.sh"),
+            pfn=os.path.join(self.base_dir, "workflow/scripts/imagemagick_wrapperX.sh"),
             is_stageable=False
         )
         magick.add_pegasus_profile( cores="1",
@@ -313,7 +326,7 @@ class PipelineWorkflow:
         magick2 = Transformation(
             "magick2",
             site=exec_site_name,
-            pfn=os.path.join(self.base_dir, "workflow/scripts/imagemagick_wrapper2.sh"),
+            pfn=os.path.join(self.base_dir, "workflow/scripts/imagemagick_wrapper2X.sh"),
             is_stageable=False
         )
         magick2.add_pegasus_profile( cores="1",
@@ -326,7 +339,7 @@ class PipelineWorkflow:
         slack_notify = Transformation(
             "slack_notify",
             site=exec_site_name,
-            pfn=os.path.join(self.base_dir, "workflow/scripts/slack_notify.sh"),
+            pfn=os.path.join(self.base_dir, "workflow/scripts/slack_notifyX.sh"),
             is_stageable=False
         )
         slack_notify.add_pegasus_profile( cores="1",
@@ -605,6 +618,7 @@ class PipelineWorkflow:
         self.tc.add_transformations(motionCor2)
         self.tc.add_transformations(gctf)
         self.tc.add_transformations(e2proc2d)
+        self.tc.add_transformations(e2proc2d2)
         self.tc.add_transformations(magick)
         self.tc.add_transformations(magick2)
         self.tc.add_transformations(slack_notify)
@@ -777,7 +791,7 @@ class PipelineWorkflow:
         #prepare jobs
         logger.info("no_of_gpus bef loop {}".format(self.no_of_gpus))
         for element in list_of_lists_of_files_to_process:
-            joblabel_index= list_of_lists_of_files_to_process.index(element)
+            #joblabel_index= list_of_lists_of_files_to_process.index(element)
             if fastcounter % self.cluster_size == 0:
                 slowcounter+=1
             if self.no_of_gpus==1:
@@ -828,8 +842,15 @@ class PipelineWorkflow:
                                 motionCor_job = Job("MotionCor2").add_args(mc_cmd1.format(mc2_in, "./{}".format(fraction_file_name), \
                                                 mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index, gff, self.throw, self.trunc))
                             else:
-                                motionCor_job = Job("MotionCor2").add_args(mc_cmd2.format(mc2_in, "./{}".format(fraction_file_name), \
-                                                mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index, gff))
+                                #motionCor_job = Job("MotionCor2").add_args(mc_cmd2.format(mc2_in, "./{}".format(fraction_file_name), \
+                                #                mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index, gff))
+                                motionCor_job.add_args(\
+                                                mc2_in, self.kev, self.apix, self.fmdose, gff,\
+                                                "./{}".format(fraction_file_name), \
+                                                mrc_file, \
+                                                "./{}".format(mc2_stderr_file_name), \
+                                                "./{}".format(mc2_stdout_file_name), \
+                                                )
                             motionCor_job.add_inputs(gff)
                         else:
                             #do bare mc
@@ -846,10 +867,12 @@ class PipelineWorkflow:
                     motionCor_job.add_inputs(fraction_file)
                     motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
                     motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
-                    motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
-                    motionCor_job.set_stderr(mc2_stderr, stage_out=True, register_replica=False)
-                    ##motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                    motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
+                    motionCor_job.add_outputs(mc2_stdout, stage_out=True, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stderr, stage_out=True, register_replica=False)
+                    #motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
+                    #motionCor_job.set_stderr(mc2_stderr, stage_out=True, register_replica=False)
+                    motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
+                    ##motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                     #motionCor_job.add_profiles(Namespace.PEGASUS, "label", "mc2")
                     self.wf.add_jobs(motionCor_job)
                     # gctf
@@ -861,19 +884,25 @@ class PipelineWorkflow:
                     gctf_stderr_file_name=mrc_file_name.replace(".mrc","_gctf_stderr.txt")
                     gctf_stdout = File(gctf_stdout_file_name)
                     gctf_stderr = File(gctf_stderr_file_name)
-                    gctf_job = (
-                        Job("gctf").add_args("--apix {} --kV {} --Cs 2.7 --ac 0.1 --ctfstar {} --boxsize 1024 {} --gid {}".format(\
-                        self.apix, self.kev, ctf_star_file, mrc_file, ffp_index))
-                    )
+                    #gctf_job = (
+                    #    Job("gctf").add_args("--apix {} --kV {} --Cs 2.7 --ac 0.1 --ctfstar {} --boxsize 1024 {} --gid {}".format(\
+                    #    self.apix, self.kev, ctf_star_file, mrc_file, ffp_index))
+                    #)
+                    gctf_job = Job("gctf")
+                    gctf_job.add_args(self.kev, self.apix,\
+                        ctf_star_file, mrc_file, gctf_stdout, gctf_stderr,\
+                        )
                     gctf_job.add_inputs(mrc_file)
                     gctf_job.add_outputs(ctf_star_file, stage_out=True, register_replica=False)
                     #gctf_job.add_outputs(ctf_pf_file, stage_out=True, register_replica=True)
                     gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=False)
                     gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
-                    gctf_job.set_stdout(gctf_stdout, stage_out=True, register_replica=False)
-                    gctf_job.set_stderr(gctf_stderr, stage_out=True, register_replica=False)
-                    ##gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                    gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
+                    gctf_job.add_outputs(gctf_stdout, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_stderr, stage_out=True, register_replica=False)
+                    #gctf_job.set_stdout(gctf_stdout, stage_out=True, register_replica=False)
+                    #gctf_job.set_stderr(gctf_stderr, stage_out=True, register_replica=False)
+                    gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
+                    ##gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                     self.wf.add_jobs(gctf_job)
                     # e2proc2d - motion-corrected to jpg, then resize to 20% size
                     dw_jpg_name = dw_file_name.replace("_DW.mrc","_DW_fs.jpg")
@@ -881,27 +910,30 @@ class PipelineWorkflow:
                     e2proc2d_job1 = Job("e2proc2d")            
                     e2proc2d_job1.add_inputs(dw_file)
                     e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
-                    e2proc2d_job1.add_args("--process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane", dw_file, dw_jpg_file)
-                    ##e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
-                    e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))                
+                    #e2proc2d_job1.add_args("--process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane", dw_file, dw_jpg_file)
+                    e2proc2d_job1.add_args(dw_file, dw_jpg_file)
+                    e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
+                    ##e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))                
                     self.wf.add_jobs(e2proc2d_job1)
                     #imagemagick - resize the input jpg from about 5k to 1k px
                     magick_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg",".jpg"))
                     magick_resize = Job("magick")
                     magick_resize.add_inputs(dw_jpg_file)
                     magick_resize.add_outputs(magick_jpg_file, stage_out=True, register_replica=False)
-                    magick_resize.add_args("convert", "-resize", '20%', dw_jpg_file, magick_jpg_file)
-                    ##magick_resize.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
-                    magick_resize.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
+                    magick_resize.add_args(dw_jpg_file, magick_jpg_file)
+                    #magick_resize.add_args("convert", "-resize", '20%', dw_jpg_file, magick_jpg_file)
+                    magick_resize.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
+                    ##magick_resize.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                     self.wf.add_jobs(magick_resize)
                     # e2proc2d - ctf to jpg
                     jpg_ctf_file = File(mrc_file_name.replace(".mrc","_ctf.jpg"))
-                    e2proc2d_job2 = Job("e2proc2d")            
+                    e2proc2d_job2 = Job("e2proc2d2")            
                     e2proc2d_job2.add_inputs(ctf_file)
                     e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True, register_replica=False)
-                    e2proc2d_job2.add_args("--fixintscaling=sane", ctf_file, jpg_ctf_file)
-                    ##e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
-                    e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
+                    #e2proc2d_job2.add_args("--fixintscaling=sane", ctf_file, jpg_ctf_file)
+                    e2proc2d_job2.add_args(ctf_file, jpg_ctf_file)
+                    e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
+                    ##e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                     self.wf.add_jobs(e2proc2d_job2)
                     #imagemagick - stitch together resized jpg and add text
                     magick_combined_jpg_fn = dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg")
@@ -912,18 +944,24 @@ class PipelineWorkflow:
                     magick_convert.add_inputs(gctf_log_file)
                     magick_convert.add_inputs(mc2_stdout)
                     magick_convert.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
-                    magick_convert.add_args(magick_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn)
-                    ##magick_convert.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
-                    magick_convert.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
+                    #magick_convert.add_args(magick_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn)
+                    magick_convert.add_args(\
+                        magick_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file_name, mc2_stdout_file_name,\
+                        )
+                    magick_convert.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
+                    ##magick_convert.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                     self.wf.add_jobs(magick_convert)
                     #send notification to the slack channel
                     slack_notify_out=File(mrc_file_name.replace(".mrc","_slack_msg.txt"))
                     slack_notify_job = Job("slack_notify")
                     slack_notify_job.add_inputs(magick_combined_jpg_file)
                     slack_notify_job.add_outputs(slack_notify_out, stage_out=True, register_replica=False)
-                    slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), slack_notify_out)
-                    ##slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "2-{}".format(slowcounter))
-                    slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
+                    #slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), slack_notify_out)
+                    slack_notify_job.add_args(\
+                                os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), slack_notify_out, \
+                                )
+                    slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
+                    ##slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                     self.wf.add_jobs(slack_notify_job)
                     self.no_of_processed+=1
                 fastcounter+=1
@@ -1163,7 +1201,10 @@ class PipelineWorkflow:
                 magick_resize.add_inputs(dw_jpg_file1)
                 magick_resize.add_outputs(magick_jpg_file0, stage_out=True, register_replica=False)
                 magick_resize.add_outputs(magick_jpg_file1, stage_out=True, register_replica=False)
-                magick_resize.add_args(dw_jpg_file0, magick_jpg_file0, dw_jpg_file0, magick_jpg_file0)
+                magick_resize.add_args(\
+                                    dw_jpg_file0, magick_jpg_file0, \
+                                    dw_jpg_file1, magick_jpg_file1,\
+                                    )
                 magick_resize.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                 ##magick_resize.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                 self.wf.add_jobs(magick_resize)
@@ -1208,8 +1249,10 @@ class PipelineWorkflow:
                 slack_notify_job.add_inputs(magick_combined_jpg_file1)
                 slack_notify_job.add_outputs(slack_notify_out0, stage_out=True, register_replica=False)
                 slack_notify_job.add_outputs(slack_notify_out1, stage_out=True, register_replica=False)
-                slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn0), slack_notify_out0)
-                slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn1), slack_notify_out1)
+                slack_notify_job.add_args(\
+                                os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn0), slack_notify_out0, \
+                                os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn1), slack_notify_out1, \
+                                )
                 slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                 ##slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                 self.wf.add_jobs(slack_notify_job)
