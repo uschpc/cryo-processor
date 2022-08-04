@@ -786,12 +786,6 @@ class PipelineWorkflow:
         #prepare for labelling to cluster more jobs (fastcounter tells how many images (and all jobs per image) to bundle in a cluster se;f.cluster_size) (slowcounter is the varying part of the label)
         fastcounter=0
         slowcounter=0
-        s
-        
-        
-        # check if size of file is not empty
-        
-        
         
         #prep list of self.no_of_gpus elem
         list_of_lists_of_files_to_process=split_into_n(self._file_list_to_process, self.no_of_gpus)
