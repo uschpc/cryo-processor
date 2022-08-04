@@ -786,7 +786,14 @@ class PipelineWorkflow:
         #prepare for labelling to cluster more jobs (fastcounter tells how many images (and all jobs per image) to bundle in a cluster se;f.cluster_size) (slowcounter is the varying part of the label)
         fastcounter=0
         slowcounter=0
-        #prep list of self.no_of_gpus elems
+        s
+        
+        
+        # check if size of file is not empty
+        
+        
+        
+        #prep list of self.no_of_gpus elem
         list_of_lists_of_files_to_process=split_into_n(self._file_list_to_process, self.no_of_gpus)
         #prepare jobs
         logger.info("no_of_gpus bef loop {}".format(self.no_of_gpus))
@@ -796,6 +803,7 @@ class PipelineWorkflow:
                 slowcounter+=1
             if self.no_of_gpus==1:
                 for fraction_file_path in element:
+                    if os.stat(fraction_file_path).st_size == 0: pass
                     #ffp_index is the gpu id
                     #ffp_index = element.index(fraction_file_path)
                     #single gpu, so ffp_index is 0
@@ -870,42 +878,28 @@ class PipelineWorkflow:
                     motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
                     motionCor_job.add_outputs(mc2_stdout, stage_out=True, register_replica=False)
                     motionCor_job.add_outputs(mc2_stderr, stage_out=True, register_replica=False)
-                    #motionCor_job.set_stdout(mc2_stdout, stage_out=True, register_replica=False)
-                    #motionCor_job.set_stderr(mc2_stderr, stage_out=True, register_replica=False)
                     motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                    ##motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
-                    #motionCor_job.add_profiles(Namespace.PEGASUS, "label", "mc2")
                     self.wf.add_jobs(motionCor_job)
                     # gctf
                     ctf_star_file = File(mrc_file_name.replace(".mrc",".star"))
-                    #ctf_pf_file = File(mrc_file_name.replace(".mrc","_pf.mrc"))
                     ctf_file = File(mrc_file_name.replace(".mrc",".ctf"))
-                    
                     gctf_log_file_name = mrc_file_name.replace(".mrc","_gctf.log")
                     gctf_log_file = File(gctf_log_file_name)
                     gctf_stdout_file_name=mrc_file_name.replace(".mrc","_gctf_stdout.txt")
                     gctf_stderr_file_name=mrc_file_name.replace(".mrc","_gctf_stderr.txt")
                     gctf_stdout = File(gctf_stdout_file_name)
                     gctf_stderr = File(gctf_stderr_file_name)
-                    #gctf_job = (
-                    #    Job("gctf").add_args("--apix {} --kV {} --Cs 2.7 --ac 0.1 --ctfstar {} --boxsize 1024 {} --gid {}".format(\
-                    #    self.apix, self.kev, ctf_star_file, mrc_file, ffp_index))
-                    #)
                     gctf_job = Job("gctf")
                     gctf_job.add_args(self.kev, self.apix,\
                         ctf_star_file, mrc_file, gctf_stdout, gctf_stderr,\
                         )
                     gctf_job.add_inputs(mrc_file)
                     gctf_job.add_outputs(ctf_star_file, stage_out=True, register_replica=False)
-                    #gctf_job.add_outputs(ctf_pf_file, stage_out=True, register_replica=True)
                     gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=False)
                     gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
                     gctf_job.add_outputs(gctf_stdout, stage_out=True, register_replica=False)
                     gctf_job.add_outputs(gctf_stderr, stage_out=True, register_replica=False)
-                    #gctf_job.set_stdout(gctf_stdout, stage_out=True, register_replica=False)
-                    #gctf_job.set_stderr(gctf_stderr, stage_out=True, register_replica=False)
                     gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                    ##gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                     self.wf.add_jobs(gctf_job)
                     # e2proc2d - motion-corrected to jpg, then resize to 20% size
                     dw_jpg_name = dw_file_name.replace("_DW.mrc","_DW_fs.jpg")
@@ -913,10 +907,8 @@ class PipelineWorkflow:
                     e2proc2d_job1 = Job("e2proc2d")            
                     e2proc2d_job1.add_inputs(dw_file)
                     e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
-                    #e2proc2d_job1.add_args("--process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane", dw_file, dw_jpg_file)
                     e2proc2d_job1.add_args(dw_file, dw_jpg_file)
-                    e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                    ##e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))                
+                    e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))           
                     self.wf.add_jobs(e2proc2d_job1)
                     #imagemagick - resize the input jpg from about 5k to 1k px
                     magick_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg",".jpg"))
@@ -924,19 +916,15 @@ class PipelineWorkflow:
                     magick_resize.add_inputs(dw_jpg_file)
                     magick_resize.add_outputs(magick_jpg_file, stage_out=True, register_replica=False)
                     magick_resize.add_args(dw_jpg_file, magick_jpg_file)
-                    #magick_resize.add_args("convert", "-resize", '20%', dw_jpg_file, magick_jpg_file)
                     magick_resize.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                    ##magick_resize.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                     self.wf.add_jobs(magick_resize)
                     # e2proc2d - ctf to jpg
                     jpg_ctf_file = File(mrc_file_name.replace(".mrc","_ctf.jpg"))
                     e2proc2d_job2 = Job("e2proc2d2")            
                     e2proc2d_job2.add_inputs(ctf_file)
                     e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True, register_replica=False)
-                    #e2proc2d_job2.add_args("--fixintscaling=sane", ctf_file, jpg_ctf_file)
                     e2proc2d_job2.add_args(ctf_file, jpg_ctf_file)
                     e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                    ##e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                     self.wf.add_jobs(e2proc2d_job2)
                     #imagemagick - stitch together resized jpg and add text
                     magick_combined_jpg_fn = dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg")
@@ -947,34 +935,31 @@ class PipelineWorkflow:
                     magick_convert.add_inputs(gctf_log_file)
                     magick_convert.add_inputs(mc2_stdout)
                     magick_convert.add_outputs(magick_combined_jpg_file, stage_out=True, register_replica=False)
-                    #magick_convert.add_args(magick_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file.lfn, mc2_stdout.lfn)
                     magick_convert.add_args(\
                         magick_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file_name, mc2_stdout_file_name,\
                         )
                     magick_convert.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                    ##magick_convert.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                     self.wf.add_jobs(magick_convert)
                     #send notification to the slack channel
                     slack_notify_out=File(mrc_file_name.replace(".mrc","_slack_msg.txt"))
                     slack_notify_job = Job("slack_notify")
                     slack_notify_job.add_inputs(magick_combined_jpg_file)
                     slack_notify_job.add_outputs(slack_notify_out, stage_out=True, register_replica=False)
-                    #slack_notify_job.add_args(os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), slack_notify_out)
                     slack_notify_job.add_args(\
                                 os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), slack_notify_out, \
                                 )
                     slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                    ##slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                     self.wf.add_jobs(slack_notify_job)
                     self.no_of_processed+=1
                 fastcounter+=1
                 
             elif self.no_of_gpus==2:
-                #logger.info("no_of_gpus in the loop {}".format(self.no_of_gpus))
-                #logger.info("no_of_gpus {}".format(self.no_of_gpus))
                 logger.info("element {}".format(element))
                 fraction_file_path0 = element[0]
                 fraction_file_path1 = element[1]
+                #skip loop if one of the files is zero bytes; will get pulled in the next round
+                if os.stat(fraction_file_path0).st_size == 0: pass
+                if os.stat(fraction_file_path1).st_size == 0: pass
                 fraction_file_name0 = os.path.basename(fraction_file_path0)
                 fraction_file_name1 = os.path.basename(fraction_file_path1)
                 fraction_file0 = File(fraction_file_name0)
@@ -1020,9 +1005,10 @@ class PipelineWorkflow:
                             else: gff=None
                     if gff!=None:
                         if self.throw!=0 and self.trunc!=0:
-                            motionCor_job = Job("MotionCor2_dual_gtt").add_args(\
-                                            mc2_in, str(self.kev), self.apix, self.fmdose, gff, self.throw, self.trunc,\
-                                            "./{}".format(fraction_file_name0), \
+                            motionCor_job = Job("MotionCor2_dual_gtt")
+                            motionCor_job.add_args(\
+                                            mc2_in, self.kev, self.apix, self.fmdose, gff, self.throw, self.trunc,\
+                                            "./{}".format(fraction_file_name0), 
                                             mrc_file0, \
                                             "./{}".format(mc2_stderr_file_name0), \
                                             "./{}".format(mc2_stdout_file_name0), \
@@ -1031,21 +1017,11 @@ class PipelineWorkflow:
                                             "./{}".format(mc2_stderr_file_name1), \
                                             "./{}".format(mc2_stdout_file_name1), \
                                             )
-                            motionCor_job.add_inputs(gff)
-                            motionCor_job.add_inputs(fraction_file0)
-                            motionCor_job.add_inputs(fraction_file1)
-                            motionCor_job.add_outputs(mrc_file0, stage_out=False, register_replica=False)
-                            motionCor_job.add_outputs(mrc_file1, stage_out=False, register_replica=False)
-                            motionCor_job.add_outputs(dw_file0, stage_out=True, register_replica=False)
-                            motionCor_job.add_outputs(dw_file1, stage_out=True, register_replica=False)
-                            motionCor_job.add_outputs(mc2_stdout0, stage_out=True, register_replica=False)
-                            motionCor_job.add_outputs(mc2_stdout1, stage_out=True, register_replica=False)
-                            motionCor_job.add_outputs(mc2_stderr0, stage_out=True, register_replica=False)
-                            motionCor_job.add_outputs(mc2_stderr1, stage_out=True, register_replica=False)
                         else:
+                            #most cases
                             motionCor_job = Job("MotionCor2_dual_g")
                             motionCor_job.add_args(\
-                                            mc2_in, str(self.kev), self.apix, self.fmdose, gff,\
+                                            mc2_in, self.kev, self.apix, self.fmdose, gff,\
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
                                             "./{}".format(mc2_stderr_file_name0), \
@@ -1055,19 +1031,12 @@ class PipelineWorkflow:
                                             "./{}".format(mc2_stderr_file_name1), \
                                             "./{}".format(mc2_stdout_file_name1), \
                                             )
-                            motionCor_job.add_inputs(gff, fraction_file0, fraction_file1)
-                            motionCor_job.add_outputs(mrc_file0, stage_out=False, register_replica=False)
-                            motionCor_job.add_outputs(mrc_file1, stage_out=False, register_replica=False)
-                            motionCor_job.add_outputs(dw_file0, stage_out=True, register_replica=False)
-                            motionCor_job.add_outputs(dw_file1, stage_out=True, register_replica=False)
-                            motionCor_job.add_outputs(mc2_stdout0, stage_out=True, register_replica=False)
-                            motionCor_job.add_outputs(mc2_stdout1, stage_out=True, register_replica=False)
-                            motionCor_job.add_outputs(mc2_stderr0, stage_out=True, register_replica=False)
-                            motionCor_job.add_outputs(mc2_stderr1, stage_out=True, register_replica=False)
+                        motionCor_job.add_inputs(gff)
                     else:
                         #do bare mc
-                        motionCor_job = Job("MotionCor2_dual").add_args(\
-                                            mc2_in, str(self.kev), self.apix, self.fmdose,\
+                        motionCor_job = Job("MotionCor2_dual")
+                        motionCor_job.add_args(\
+                                            mc2_in, self.kev, self.apix, self.fmdose,\
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
                                             "./{}".format(mc2_stderr_file_name0), \
@@ -1077,21 +1046,12 @@ class PipelineWorkflow:
                                             "./{}".format(mc2_stderr_file_name1), \
                                             "./{}".format(mc2_stdout_file_name1), \
                                             )
-                        motionCor_job.add_inputs(fraction_file0)
-                        motionCor_job.add_inputs(fraction_file1)
-                        motionCor_job.add_outputs(mrc_file0, stage_out=False, register_replica=False)
-                        motionCor_job.add_outputs(mrc_file1, stage_out=False, register_replica=False)
-                        motionCor_job.add_outputs(dw_file0, stage_out=True, register_replica=False)
-                        motionCor_job.add_outputs(dw_file1, stage_out=True, register_replica=False)
-                        motionCor_job.add_outputs(mc2_stdout0, stage_out=True, register_replica=False)
-                        motionCor_job.add_outputs(mc2_stdout1, stage_out=True, register_replica=False)
-                        motionCor_job.add_outputs(mc2_stderr0, stage_out=True, register_replica=False)
-                        motionCor_job.add_outputs(mc2_stderr1, stage_out=True, register_replica=False)
                 else:
                     #case where we do not have gain referencee file
                     if self.throw!=0 and self.trunc!=0:
-                        motionCor_job = Job("MotionCor2_dual_tt").add_args(\
-                                            mc2_in, str(self.kev), self.apix, self.fmdose, self.throw, self.trunc,\
+                        motionCor_job = Job("MotionCor2_dual_tt")
+                        motionCor_job.add_args(\
+                                            mc2_in, self.kev, self.apix, self.fmdose, self.throw, self.trunc,\
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
                                             "./{}".format(mc2_stderr_file_name0), \
@@ -1101,20 +1061,11 @@ class PipelineWorkflow:
                                             "./{}".format(mc2_stderr_file_name1), \
                                             "./{}".format(mc2_stdout_file_name1), \
                                             )
-                        motionCor_job.add_inputs(fraction_file0)
-                        motionCor_job.add_inputs(fraction_file1)
-                        motionCor_job.add_outputs(mrc_file0, stage_out=False, register_replica=False)
-                        motionCor_job.add_outputs(mrc_file1, stage_out=False, register_replica=False)
-                        motionCor_job.add_outputs(dw_file0, stage_out=True, register_replica=False)
-                        motionCor_job.add_outputs(dw_file1, stage_out=True, register_replica=False)
-                        motionCor_job.add_outputs(mc2_stdout0, stage_out=True, register_replica=False)
-                        motionCor_job.add_outputs(mc2_stdout1, stage_out=True, register_replica=False)
-                        motionCor_job.add_outputs(mc2_stderr0, stage_out=True, register_replica=False)
-                        motionCor_job.add_outputs(mc2_stderr1, stage_out=True, register_replica=False)
                     else:
                         #do bare mc (just in case as a fallback)
-                        motionCor_job = Job("MotionCor2_dual").add_args(\
-                                            mc2_in, str(self.kev), self.apix, self.fmdose,\
+                        motionCor_job = Job("MotionCor2_dual")
+                        motionCor_job.add_args(\
+                                            mc2_in, self.kev, self.apix, self.fmdose,\
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
                                             "./{}".format(mc2_stderr_file_name0), \
@@ -1124,19 +1075,17 @@ class PipelineWorkflow:
                                             "./{}".format(mc2_stderr_file_name1), \
                                             "./{}".format(mc2_stdout_file_name1), \
                                             )
-                        motionCor_job.add_inputs(fraction_file0)
-                        motionCor_job.add_inputs(fraction_file1)
-                        motionCor_job.add_outputs(mrc_file0, stage_out=False, register_replica=False)
-                        motionCor_job.add_outputs(mrc_file1, stage_out=False, register_replica=False)
-                        motionCor_job.add_outputs(dw_file0, stage_out=True, register_replica=False)
-                        motionCor_job.add_outputs(dw_file1, stage_out=True, register_replica=False)
-                        motionCor_job.add_outputs(mc2_stdout0, stage_out=True, register_replica=False)
-                        motionCor_job.add_outputs(mc2_stdout1, stage_out=True, register_replica=False)
-                        motionCor_job.add_outputs(mc2_stderr0, stage_out=True, register_replica=False)
-                        motionCor_job.add_outputs(mc2_stderr1, stage_out=True, register_replica=False)
+                motionCor_job.add_inputs(fraction_file0)
+                motionCor_job.add_inputs(fraction_file1)
+                motionCor_job.add_outputs(mrc_file0, stage_out=False, register_replica=False)
+                motionCor_job.add_outputs(mrc_file1, stage_out=False, register_replica=False)
+                motionCor_job.add_outputs(dw_file0, stage_out=True, register_replica=False)
+                motionCor_job.add_outputs(dw_file1, stage_out=True, register_replica=False)
+                motionCor_job.add_outputs(mc2_stdout0, stage_out=True, register_replica=False)
+                motionCor_job.add_outputs(mc2_stdout1, stage_out=True, register_replica=False)
+                motionCor_job.add_outputs(mc2_stderr0, stage_out=True, register_replica=False)
+                motionCor_job.add_outputs(mc2_stderr1, stage_out=True, register_replica=False)
                 motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                ##motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
-                #motionCor_job.add_profiles(Namespace.PEGASUS, "label", "mc2")
                 self.wf.add_jobs(motionCor_job)
 
                 # gctf
@@ -1174,12 +1123,7 @@ class PipelineWorkflow:
                 gctf_job.add_outputs(gctf_stderr0, stage_out=True, register_replica=False)
                 gctf_job.add_outputs(gctf_stderr1, stage_out=True, register_replica=False)
                 gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                ##gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
-                #gctf_job.add_profiles(Namespace.PEGASUS, "label", "gctf")
                 self.wf.add_jobs(gctf_job)
-
-
-
 
                 # e2proc2d - motion-corrected to jpg, then resize to 20% size
                 dw_jpg_name0 = dw_file_name0.replace("_DW.mrc","_DW_fs.jpg")
@@ -1191,9 +1135,11 @@ class PipelineWorkflow:
                 e2proc2d_job1.add_inputs(dw_file1)
                 e2proc2d_job1.add_outputs(dw_jpg_file0, stage_out=True, register_replica=False)
                 e2proc2d_job1.add_outputs(dw_jpg_file1, stage_out=True, register_replica=False)
-                e2proc2d_job1.add_args(dw_file0, dw_jpg_file0, dw_file1, dw_jpg_file1)
-                e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                ##e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))                
+                e2proc2d_job1.add_args(\
+                                    dw_file0, dw_jpg_file0, \
+                                    dw_file1, dw_jpg_file1, \
+                                    )
+                e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))     
                 self.wf.add_jobs(e2proc2d_job1)
 
                 #imagemagick - resize the input jpg from about 5k to 1k px
@@ -1209,19 +1155,21 @@ class PipelineWorkflow:
                                     dw_jpg_file1, magick_jpg_file1,\
                                     )
                 magick_resize.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                ##magick_resize.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                 self.wf.add_jobs(magick_resize)
 
                 # e2proc2d - ctf to jpg
                 jpg_ctf_file0 = File(mrc_file_name0.replace(".mrc","_ctf.jpg"))
                 jpg_ctf_file1 = File(mrc_file_name1.replace(".mrc","_ctf.jpg"))
                 e2proc2d_job2 = Job("e2proc2d2_dual")
-                e2proc2d_job2.add_inputs(ctf_file0, ctf_file1)
+                e2proc2d_job2.add_inputs(ctf_file0)
+                e2proc2d_job2.add_inputs(ctf_file1)
                 e2proc2d_job2.add_outputs(jpg_ctf_file0, stage_out=True, register_replica=False)
                 e2proc2d_job2.add_outputs(jpg_ctf_file1, stage_out=True, register_replica=False)
-                e2proc2d_job2.add_args(ctf_file0, jpg_ctf_file0, ctf_file1, jpg_ctf_file1)
+                e2proc2d_job2.add_args(\
+                                    ctf_file0, jpg_ctf_file0, \
+                                    ctf_file1, jpg_ctf_file1, \
+                                    )
                 e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                ##e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                 self.wf.add_jobs(e2proc2d_job2)
 
                 #imagemagick - stitch together resized jpg and add text
@@ -1241,7 +1189,6 @@ class PipelineWorkflow:
                         magick_jpg_file1, jpg_ctf_file1, magick_combined_jpg_file1, gctf_log_file_name1, mc2_stdout_file_name1,\
                         )
                 magick_convert.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                ##magick_convert.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                 self.wf.add_jobs(magick_convert)
                 
                 #send notification to the slack channel
@@ -1257,7 +1204,6 @@ class PipelineWorkflow:
                                 os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn1), slack_notify_out1, \
                                 )
                 slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                ##slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))
                 self.wf.add_jobs(slack_notify_job)
                 self.no_of_processed+=1
 
