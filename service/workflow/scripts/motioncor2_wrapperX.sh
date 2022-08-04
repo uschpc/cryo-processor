@@ -52,11 +52,15 @@ file0_out=$6
 file0_stderr=$7
 file0_stdout=$8
 
-
-
-
 echo
-MotionCor2 $mcin $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.2 -Gpu 0 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
+
+if [ "$mcin"=="InTiff" ]; then
+  MotionCor2 -InTiff $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.2 -Gpu 0 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
+elif [ "$mcin"=="InMrc" ]; then
+  MotionCor2 -InMrc $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.2 -Gpu 0 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
+elif [ "$mcin"=="InEer" ]; then
+  MotionCor2 -InEer $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.2 -Gpu 0 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
+fi
 
 wait $PIDONE
 

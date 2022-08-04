@@ -815,9 +815,9 @@ class PipelineWorkflow:
                     mc2_stderr = File(mc2_stderr_file_name)
                     # MotionCor2
                     #adjust for one of three different extensions: mrc, tiff or eer
-                    if self.basename_extension=="tiff": mc2_in="-InTiff"
-                    elif self.basename_extension=="mrc": mc2_in="-InMrc"
-                    elif self.basename_extension=="eer": mc2_in="-InEer"
+                    if self.basename_extension=="tiff": mc2_in="InTiff"
+                    elif self.basename_extension=="mrc": mc2_in="InMrc"
+                    elif self.basename_extension=="eer": mc2_in="InEer"
                     else:
                         logger.info("Unknown image extension - {}".format(self.basename_extension))
                         sys.exit(1)
@@ -1000,9 +1000,9 @@ class PipelineWorkflow:
                 mc2_stdout1 = File(mc2_stdout_file_name1)
                 mc2_stderr0 = File(mc2_stderr_file_name0)
                 mc2_stderr1 = File(mc2_stderr_file_name1)
-                if self.basename_extension=="tiff": mc2_in="-InTiff"
-                elif self.basename_extension=="mrc": mc2_in="-InMrc"
-                elif self.basename_extension=="eer": mc2_in="-InEer"
+                if self.basename_extension=="tiff": mc2_in="InTiff"
+                elif self.basename_extension=="mrc": mc2_in="InMrc"
+                elif self.basename_extension=="eer": mc2_in="InEer"
                 else:
                     logger.info("Unknown image extension - {}".format(self.basename_extension))
                     sys.exit(1)
