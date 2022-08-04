@@ -254,8 +254,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #).add_profiles(Namespace.PEGASUS, key="job.aggregator.arguments", value="-n auto")
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size).add_profiles(Namespace.PEGASUS, key="job.aggregator.arguments", value="-n auto")
+        ).add_profiles(Namespace.PEGASUS, key="job.aggregator.arguments", value="-n auto")
+        ##).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size).add_profiles(Namespace.PEGASUS, key="job.aggregator.arguments", value="-n auto")
         
         #single GPU
         motionCor2 = Transformation(
@@ -268,8 +268,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         gctf = Transformation(
             "gctf",
@@ -281,8 +281,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         e2proc2d = Transformation(
             "e2proc2d",
@@ -294,8 +294,8 @@ class PipelineWorkflow:
                                      runtime="600",
                                      memory="4096",
                                      glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         magick = Transformation(
             "magick",
@@ -307,8 +307,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         magick2 = Transformation(
             "magick2",
@@ -320,8 +320,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         slack_notify = Transformation(
             "slack_notify",
@@ -333,8 +333,8 @@ class PipelineWorkflow:
                                         runtime="300",
                                         memory="2048",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         #dual GPU
         motionCor2_dual = Transformation(
@@ -347,8 +347,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         motionCor2_dual_g = Transformation(
             "MotionCor2_dual_g",
             site=exec_site_name,
@@ -359,8 +359,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         motionCor2_dual_gtt = Transformation(
             "MotionCor2_dual_gtt",
             site=exec_site_name,
@@ -371,8 +371,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         motionCor2_dual_tt = Transformation(
             "MotionCor2_dual_tt",
             site=exec_site_name,
@@ -383,8 +383,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         gctf_dual = Transformation(
             "gctf_dual",
@@ -396,8 +396,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         e2proc2d_dual = Transformation(
             "e2proc2d_dual",
@@ -409,8 +409,8 @@ class PipelineWorkflow:
                                      runtime="600",
                                      memory="4096",
                                      glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         e2proc2d2_dual = Transformation(
             "e2proc2d2_dual",
@@ -422,8 +422,8 @@ class PipelineWorkflow:
                                      runtime="600",
                                      memory="4096",
                                      glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         magick_dual = Transformation(
             "magick_dual",
@@ -435,8 +435,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         magick2_dual = Transformation(
             "magick2_dual",
@@ -448,8 +448,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         slack_notify_dual = Transformation(
             "slack_notify_dual",
@@ -461,8 +461,8 @@ class PipelineWorkflow:
                                         runtime="300",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         #quad GPU
         motionCor2_quad = Transformation(
@@ -475,8 +475,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         motionCor2_quad_g = Transformation(
             "MotionCor2_quad_g",
             site=exec_site_name,
@@ -487,8 +487,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         motionCor2_quad_gtt = Transformation(
             "MotionCor2_quad_gtt",
             site=exec_site_name,
@@ -499,8 +499,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         motionCor2_quad_tt = Transformation(
             "MotionCor2_quad_tt",
             site=exec_site_name,
@@ -511,8 +511,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         gctf_quad = Transformation(
             "gctf_quad",
@@ -524,8 +524,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         e2proc2d_quad = Transformation(
             "e2proc2d_quad",
@@ -537,8 +537,8 @@ class PipelineWorkflow:
                                      runtime="600",
                                      memory="4096",
                                      glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         e2proc2d2_quad = Transformation(
             "e2proc2d2_quad",
@@ -550,8 +550,8 @@ class PipelineWorkflow:
                                      runtime="600",
                                      memory="4096",
                                      glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         magick_quad = Transformation(
             "magick_quad",
@@ -563,8 +563,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         magick2_quad = Transformation(
             "magick2_quad",
@@ -576,8 +576,8 @@ class PipelineWorkflow:
                                         runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         slack_notify_quad = Transformation(
             "slack_notify_quad",
@@ -589,8 +589,8 @@ class PipelineWorkflow:
                                         runtime="300",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
-        #)
-        ).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
+        )
+        #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         #dealing with gain reference and similar
         self.tc.add_transformations(dm2mrc_gainref)

@@ -22,9 +22,9 @@ export LD_LIBRARY_PATH=/home1/cryoemadmin/software/gctf_libs_from_c10.1.243_to_w
 
 #debug
 #ldd `which gctf`
-echo `hostname`
-echo $CUDA_VISIBLE_DEVICES
-echo
+#echo `hostname`
+#echo $CUDA_VISIBLE_DEVICES
+#echo
 
 kev=$1
 pxsize=$2
