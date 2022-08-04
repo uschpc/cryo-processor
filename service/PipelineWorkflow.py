@@ -298,7 +298,7 @@ class PipelineWorkflow:
         #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
 
         e2proc2d2 = Transformation(
-            "e2proc2d",
+            "e2proc2d2",
             site=exec_site_name,
             pfn=os.path.join(self.base_dir, "workflow/scripts/e2proc2d2_wrapperX.sh"),
             is_stageable=False
