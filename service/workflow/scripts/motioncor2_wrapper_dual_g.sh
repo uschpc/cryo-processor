@@ -64,35 +64,35 @@ echo
 if [ "$GPU_NAME" = "K40m" ] || [ "$GPU_NAME" = "P100-PCIE-16GB" ] ; then
   if [ "$mcin"=="InTiff" ] ; then
     MotionCor2 -InTiff $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 0 -Gain $gainref 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
-	MotionCor2 -InTiff $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 0 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
+	MotionCor2 -InTiff $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 1 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
   elif [ "$mcin"=="InMrc" ] ; then
     MotionCor2 -InMrc $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 0 -Gain $gainref 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
-	MotionCor2 -InMrc $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 0 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
+	MotionCor2 -InMrc $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 1 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
   elif [ "$mcin"=="InEer" ] ; then
     MotionCor2 -InEer $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 0 -Gain $gainref 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
-	MotionCor2 -InEer $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 0 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
+	MotionCor2 -InEer $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 1 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
   fi
 elif [ "$GPU_NAME" = "A40" ] ; then
   if [ "$mcin"=="InTiff" ] ; then
     MotionCor2 -InTiff $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 0 -Gain $gainref 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
-	MotionCor2 -InTiff $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 0 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
+	MotionCor2 -InTiff $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 1 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
   elif [ "$mcin"=="InMrc" ] ; then
     MotionCor2 -InMrc $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 0 -Gain $gainref 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
-	MotionCor2 -InMrc $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 0 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
+	MotionCor2 -InMrc $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 1 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
   elif [ "$mcin"=="InEer" ] ; then
     MotionCor2 -InEer $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 0 -Gain $gainref 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
-	MotionCor2 -InEer $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 0 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
+	MotionCor2 -InEer $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 1 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
   fi
 else
   if [ "$mcin"=="InTiff" ] ; then
     MotionCor2 -InTiff $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 0 -Gain $gainref 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
-	MotionCor2 -InTiff $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 0 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
+	MotionCor2 -InTiff $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 1 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
   elif [ "$mcin"=="InMrc" ] ; then
     MotionCor2 -InMrc $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 0 -Gain $gainref 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
-	MotionCor2 -InMrc $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 0 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
+	MotionCor2 -InMrc $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 1 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
   elif [ "$mcin"=="InEer" ] ; then
     MotionCor2 -InEer $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 0 -Gain $gainref 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
-	MotionCor2 -InEer $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 0 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
+	MotionCor2 -InEer $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.45 -Gpu 1 -Gain $gainref 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
   fi
 fi
 
