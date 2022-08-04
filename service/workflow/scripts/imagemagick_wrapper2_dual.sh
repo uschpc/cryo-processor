@@ -18,20 +18,20 @@ PROGNAME=`type $0 | awk '{print $3}'`  # search for executable on path
 PROGDIR=`dirname $PROGNAME`            # extract directory of program
 PROGNAME=`basename $PROGNAME`          # base name of program
 
-jpg0_in
-jpgctf0_in
-combined0
-ctflog0
-mclog0
+jpg0_in=$1
+jpgctf0_in=$2
+combined0=$3
+ctflog0=$4
+mclog0=$5
 resolution0="`$PROGDIR/get_data.sh ctf_r $ctflog0`"
 asti0="`$PROGDIR/get_data.sh ctf_a $ctflog0`"
 shifts0="`$PROGDIR/get_data.sh mc $mclog0`"
 
-jpg1_in
-jpgctf1_in
-combined1
-ctflog1
-mclog1
+jpg1_in=$6
+jpgctf1_in=$7
+combined1=$8
+ctflog1=$9
+mclog1=$10
 resolution1="`$PROGDIR/get_data.sh ctf_r $ctflog1`"
 asti1="`$PROGDIR/get_data.sh ctf_a $ctflog1`"
 shifts1="`$PROGDIR/get_data.sh mc $mclog1`"
