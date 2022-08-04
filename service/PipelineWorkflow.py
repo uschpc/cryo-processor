@@ -1147,7 +1147,7 @@ class PipelineWorkflow:
                 e2proc2d_job1.add_inputs(dw_file1)
                 e2proc2d_job1.add_outputs(dw_jpg_file0, stage_out=True, register_replica=False)
                 e2proc2d_job1.add_outputs(dw_jpg_file1, stage_out=True, register_replica=False)
-                e2proc2d_job1.add_args(dw_file0, dw_jpg_file0,dw_file1, dw_jpg_file1)
+                e2proc2d_job1.add_args(dw_file0, dw_jpg_file0, dw_file1, dw_jpg_file1)
                 e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                 ##e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(joblabel_index))                
                 self.wf.add_jobs(e2proc2d_job1)
