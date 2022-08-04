@@ -43,19 +43,19 @@ fi
 #echo `nvidia-smi`
 #echo $CUDA_VISIBLE_DEVICES
 
-mcin=$1
-kev=$2
-pxsize=$3
-fmdose=$4
-gainref=$5
-file0_in=$6
-file0_out=$7
-file0_stderr=$8
-file0_stdout=$9
-file1_in=$10
-file1_out=$11
-file1_stderr=$12
-file1_stdout=$13
+mcin=${1}
+kev=${2}
+pxsize=${3}
+fmdose=${4}
+gainref=${5}
+file0_in=${6}
+file0_out=${7}
+file0_stderr=${8}
+file0_stdout=${9}
+file1_in=${10}
+file1_out=${11}
+file1_stderr=${12}
+file1_stdout=${13}
 
 
 

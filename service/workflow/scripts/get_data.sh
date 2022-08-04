@@ -22,4 +22,4 @@ PROGNAME=`basename $PROGNAME`          # base name of program
 #echo $PROGNAME
 #echo $PROGDIR
 
-python3 $PROGDIR/get_data.py $1 $2
+python3 $PROGDIR/get_data.py ${1} ${2}

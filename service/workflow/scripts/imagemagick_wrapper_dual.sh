@@ -18,10 +18,10 @@ export XDG_DATA_DIRS=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/pango-1.41.0-ts3
 export XDG_DATA_DIRS=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/shared-mime-info-1.9-sttvs5aj7qp4w7rawclgis7t45f5cuit/share:$XDG_DATA_DIRS
 export XDG_DATA_DIRS=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/gtkplus-3.20.10-dukwopcup426l3mgedykk7w4kyuh4af4/share:$XDG_DATA_DIRS
 
-file0_in=$1
-file0_out=$2
-file1_in=$3
-file1_out=$4
+file0_in=${1}
+file0_out=${2}
+file1_in=${3}
+file1_out=${4}
 
 magick convert -resize 20% $file0_in $file0_out & PIDONE=$!
 magick convert -resize 20% $file1_in $file1_out & PIDTWO=$!

@@ -1,8 +1,8 @@
 #!/bin/bash
-img_file_path0=$1
-slack_notify_out_fn0=$2
-img_file_path1=$3
-slack_notify_out_fn1=$4
+img_file_path0=${1}
+slack_notify_out_fn0=${2}
+img_file_path1=${3}
+slack_notify_out_fn1=${4}
 
 curl -k --data-urlencode "file=${img_file_path0}" -X POST 'https://hpcaccount.usc.edu/public/cryoem/slack/postimage.php'
 echo "`date --iso-8601=seconds`" >> $slack_notify_out_fn0

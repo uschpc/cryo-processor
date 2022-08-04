@@ -26,16 +26,16 @@ export LD_LIBRARY_PATH=/home1/cryoemadmin/software/gctf_libs_from_c10.1.243_to_w
 #echo $CUDA_VISIBLE_DEVICES
 #echo
 
-kev=$1
-pxsize=$2
-file0_star=$3
-file0_in=$4
-file0_stdout=$5
-file0_stderr=$6
-file1_star=$7
-file1_in=$8
-file1_stdout=$9
-file1_stderr=$10
+kev=${1}
+pxsize=${2}
+file0_star=${3}
+file0_in=${4}
+file0_stdout=${5}
+file0_stderr=${6}
+file1_star=${7}
+file1_in=${8}
+file1_stdout=${9}
+file1_stderr=${10}
 
 
 gctf --apix $pxsize --kV $kev --Cs 2.7 --ac 0.1 --ctfstar $file0_star --boxsize 1024 $file0_in --gid 0 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
