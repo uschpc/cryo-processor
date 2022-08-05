@@ -34,7 +34,6 @@ else
   export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/motioncor2-1.4.4/bin:$PATH
 fi
 
-echo
 mcin=${1}
 kev=${2}
 pxsize=${3}

@@ -34,26 +34,27 @@ else
   export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/motioncor2-1.4.4/bin:$PATH
 fi
 
-kev=${1}
-pxsize=${2}
-fmdose=${3}
-gainref=${4}
-file0_in=${5}
-file0_out=${6}
-file0_stderr=${7}
-file0_stdout=${8}
-file1_in=${9}
-file1_out=${10}
-file1_stderr=${11}
-file1_stdout=${12}
-file2_in=${13}
-file2_out=${14}
-file2_stderr=${15}
-file2_stdout=${16}
-file3_in=${17}
-file3_out=${18}
-file3_stderr=${19}
-file3_stdout=${20}
+mcin=${1}
+kev=${2}
+pxsize=${3}
+fmdose=${4}
+gainref=${5}
+file0_in=${6}
+file0_out=${7}
+file0_stderr=${8}
+file0_stdout=${9}
+file1_in=${10}
+file1_out=${11}
+file1_stderr=${12}
+file1_stdout=${13}
+file2_in=${14}
+file2_out=${15}
+file2_stderr=${16}
+file2_stdout=${17}
+file3_in=${18}
+file3_out=${19}
+file3_stderr=${20}
+file3_stdout=${21}
 
 
 

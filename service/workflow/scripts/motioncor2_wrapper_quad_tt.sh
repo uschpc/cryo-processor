@@ -34,27 +34,28 @@ else
   export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/motioncor2-1.4.4/bin:$PATH
 fi
 
-kev=${1}
-pxsize=${2}
-fmdose=${3}
-throw=${4}
-trunc=${5}
-file0_in=${6}
-file0_out=${7}
-file0_stderr=${8}
-file0_stdout=${9}
-file1_in=${10}
-file1_out=${11}
-file1_stderr=${12}
-file1_stdout=${13}
-file2_in=${14}
-file2_out=${15}
-file2_stderr=${16}
-file2_stdout=${17}
-file3_in=${18}
-file3_out=${19}
-file3_stderr=${20}
-file3_stdout=${21}
+mcin=${1}
+kev=${2}
+pxsize=${3}
+fmdose=${4}
+throw=${5}
+trunc=${6}
+file0_in=${7}
+file0_out=${8}
+file0_stderr=${9}
+file0_stdout=${10}
+file1_in=${11}
+file1_out=${12}
+file1_stderr=${13}
+file1_stdout=${14}
+file2_in=${15}
+file2_out=${16}
+file2_stderr=${17}
+file2_stdout=${18}
+file3_in=${19}
+file3_out=${20}
+file3_stderr=${21}
+file3_stdout=${22}
 
 
 if [ "$mcin"=="InTiff" ] ; then
