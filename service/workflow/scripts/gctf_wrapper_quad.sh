@@ -22,28 +22,29 @@ export LD_LIBRARY_PATH=/home1/cryoemadmin/software/gctf_libs_from_c10.1.243_to_w
 
 #debug
 #ldd `which gctf`
-echo `hostname`
-echo $CUDA_VISIBLE_DEVICES
-echo
+#echo `hostname`
+#echo $CUDA_VISIBLE_DEVICES
+#echo
 
-file0_star=$1
-file0_in=$2
-file0_stdout=$3
-file0_stderr=$4
-pxsize=$5
-kev=$6
-file1_star=$7
-file1_in=$8
-file1_stdout=$9
-file1_stderr=$10
-file2_star=$11
-file2_in=$12
-file2_stdout=$13
-file2_stderr=$14
-file3_star=$15
-file3_in=$16
-file3_stdout=$17
-file3_stderr=$18
+
+kev=${1}
+pxsize=${2}
+file0_star=${3}
+file0_in=${4}
+file0_stdout=${5}
+file0_stderr=${6}
+file1_star=${7}
+file1_in=${8}
+file1_stdout=${9}
+file1_stderr=${10}
+file2_star=${11}
+file2_in=${12}
+file2_stdout=${13}
+file2_stderr=${14}
+file3_star=${15}
+file3_in=${16}
+file3_stdout=${17}
+file3_stderr=${18}
 
 
 gctf --apix $pxsize --kV $kev --Cs 2.7 --ac 0.1 --ctfstar $file0_star --boxsize 1024 $file0_in --gid 0 2> $file0_stdout 1> $file0_stderr & PIDONE=$!

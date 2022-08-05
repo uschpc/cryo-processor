@@ -34,44 +34,47 @@ else
   export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/motioncor2-1.4.4/bin:$PATH
 fi
 
-#echo "Starting at `date`"
-echo "Running on hosts: $SLURM_NODELIST"
-echo "Running on $SLURM_NNODES nodes."
-echo "Running $SLURM_NTASKS tasks."
-echo "Current working directory is `pwd`"
-echo `hostname`
-#echo `nvidia-smi`
-echo $CUDA_VISIBLE_DEVICES
-
-file0_in=$1
-file0_out=$2
-file0_stderr=$3
-file0_stdout=$4
-kev=$5
-pxsize=$6
-fmdose=$7
-gainref=$8
-throw=$9
-trunc=$10
-file1_in=$11
-file1_out=$12
-file1_stderr=$13
-file1_stdout=$14
-file2_in=$15
-file2_out=$16
-file2_stderr=$17
-file2_stdout=$18
-file3_in=$19
-file3_out=$20
-file3_stderr=$21
-file3_stdout=$22
+kev=${1}
+pxsize=${2}
+fmdose=${3}
+gainref=${4}
+throw=${5}
+trunc=${6}
+file0_in=${7}
+file0_out=${8}
+file0_stderr=${9}
+file0_stdout=${10}
+file1_in=${11}
+file1_out=${12}
+file1_stderr=${13}
+file1_stdout=${14}
+file2_in=${15}
+file2_out=${16}
+file2_stderr=${17}
+file2_stdout=${18}
+file3_in=${19}
+file3_out=${20}
+file3_stderr=${21}
+file3_stdout=${22}
 
 
-echo
-MotionCor2 -InTiff $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.2 -Gpu 0 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
-MotionCor2 -InTiff $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.2 -Gpu 1 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
-MotionCor2 -InTiff $file2_in -OutMrc $file2_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.2 -Gpu 2 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file2_stderr 1> $file2_stdout & PIDTHREE=$!
-MotionCor2 -InTiff $file3_in -OutMrc $file3_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.2 -Gpu 3 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file3_stderr 1> $file3_stdout & PIDFOUR=$!
+
+if [ "$mcin"=="InTiff" ] ; then
+  MotionCor2 -InTiff $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 0 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
+  MotionCor2 -InTiff $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 1 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
+  MotionCor2 -InTiff $file2_in -OutMrc $file2_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 2 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file2_stderr 1> $file2_stdout & PIDTHREE=$!
+  MotionCor2 -InTiff $file3_in -OutMrc $file3_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 3 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file3_stderr 1> $file3_stdout & PIDFOUR=$!
+elif [ "$mcin"=="InMrc" ] ; then
+  MotionCor2 -InMrc $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 0 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
+  MotionCor2 -InMrc $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 1 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
+  MotionCor2 -InMrc $file2_in -OutMrc $file2_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 2 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file2_stderr 1> $file2_stdout & PIDTHREE=$!
+  MotionCor2 -InMrc $file3_in -OutMrc $file3_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 3 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file3_stderr 1> $file3_stdout & PIDFOUR=$!
+elif [ "$mcin"=="InEer" ] ; then
+  MotionCor2 -InEer $file0_in -OutMrc $file0_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 0 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
+  MotionCor2 -InEer $file1_in -OutMrc $file1_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 1 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file1_stderr 1> $file1_stdout & PIDTWO=$!
+  MotionCor2 -InEer $file2_in -OutMrc $file2_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 2 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file2_stderr 1> $file2_stdout & PIDTHREE=$!
+  MotionCor2 -InEer $file3_in -OutMrc $file3_out -Iter 7 -Tol 0.5 -Kv $kev -PixSize $pxsize -FmDose $fmdose -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.25 -Gpu 3 -Gain $gainref -Throw $throw -Trunc $trunc 2> $file3_stderr 1> $file3_stdout & PIDFOUR=$!
+fi
 
 wait $PIDONE
 wait $PIDTWO

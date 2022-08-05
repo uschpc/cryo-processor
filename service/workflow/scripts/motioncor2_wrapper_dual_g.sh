@@ -34,14 +34,6 @@ else
   export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/motioncor2-1.4.4/bin:$PATH
 fi
 
-#echo "Starting at `date`"
-#echo "Running on hosts: $SLURM_NODELIST"
-#echo "Running on $SLURM_NNODES nodes."
-#echo "Running $SLURM_NTASKS tasks."
-#echo "Current working directory is `pwd`"
-#echo `hostname`
-#echo `nvidia-smi`
-#echo $CUDA_VISIBLE_DEVICES
 
 mcin=${1}
 kev=${2}
@@ -55,11 +47,7 @@ file0_stdout=${9}
 file1_in=${10}
 file1_out=${11}
 file1_stderr=${12}
-file1_stdout=${13}
-
-
-
-echo 
+file1_stdout=${13} 
 
 if [ "$GPU_NAME" = "K40m" ] || [ "$GPU_NAME" = "P100-PCIE-16GB" ] ; then
   if [ "$mcin"=="InTiff" ] ; then
