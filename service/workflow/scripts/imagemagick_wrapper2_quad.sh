@@ -23,48 +23,52 @@ jpgctfX_in=${2}
 combinedX=${3}
 ctflogX=${4}
 mclogX=${5}
-resolutionX="`$PROGDIR/get_data.py ctf_r $ctflogX`"
-astiX="`$PROGDIR/get_data.py ctf_a $ctflogX`"
-shiftsX="`$PROGDIR/get_data.py mc $mclogX`"
 
 jpgY_in=${6}
 jpgctfY_in=${7}
 combinedY=${8}
 ctflogY=${9}
 mclogY=${10}
-resolutionY="`$PROGDIR/get_data.py ctf_r $ctflogY`"
-astiY="`$PROGDIR/get_data.py ctf_a $ctflogY`"
-shiftsY="`$PROGDIR/get_data.py mc $mclogY`"
 
 jpgZ_in=${11}
 jpgctfZ_in=${12}
 combinedZ=${13}
 ctflogZ=${14}
 mclogZ=${15}
-resolutionZ="`$PROGDIR/get_data.py ctf_r $ctflogZ`"
-astiZ="`$PROGDIR/get_data.py ctf_a $ctflogZ`"
-shiftsZ="`$PROGDIR/get_data.py mc $mclogZ`"
 
 jpgW_in=${16}
 jpgctfW_in=${17}
 combinedW=${18}
 ctflogW=${19}
 mclogW=${20}
-resolutionW="`$PROGDIR/get_data.py ctf_r $ctflogW`"
-astiW="`$PROGDIR/get_data.py ctf_a $ctflogW`"
-shiftsW="`$PROGDIR/get_data.py mc $mclogW`"
+
+#resolutionX="`$PROGDIR/get_data.py ctf_r $ctflogX`"
+#astiX="`$PROGDIR/get_data.py ctf_a $ctflogX`"
+#shiftsX="`$PROGDIR/get_data.py mc $mclogX`"
+
+#resolutionY="`$PROGDIR/get_data.py ctf_r $ctflogY`"
+#astiY="`$PROGDIR/get_data.py ctf_a $ctflogY`"
+#shiftsY="`$PROGDIR/get_data.py mc $mclogY`"
+
+#resolutionZ="`$PROGDIR/get_data.py ctf_r $ctflogZ`"
+#astiZ="`$PROGDIR/get_data.py ctf_a $ctflogZ`"
+#shiftsZ="`$PROGDIR/get_data.py mc $mclogZ`"
+
+#resolutionW="`$PROGDIR/get_data.py ctf_r $ctflogW`"
+#astiW="`$PROGDIR/get_data.py ctf_a $ctflogW`"
+#shiftsW="`$PROGDIR/get_data.py mc $mclogW`"
 
 #magick convert +append $jpg0_in $jpgctf0_in -resize x1024 - | magick convert - -font DejaVu-Sans -fill LightGoldenrod2 -pointsize 80 -interline-spacing 12 -gravity NorthWest -annotate +40+40 "R: ${resolution}Å" -annotate +40+140 "A: ${asti}" -annotate +40+240 "S: ${shifts/_/ }" $combined0 & PIDONE=$!
 #magick convert +append $jpg1_in $jpgctf1_in -resize x1024 - | magick convert - -font DejaVu-Sans -fill LightGoldenrod2 -pointsize 80 -interline-spacing 12 -gravity NorthWest -annotate +40+40 "R: ${resolution}Å" -annotate +40+140 "A: ${asti}" -annotate +40+240 "S: ${shifts/_/ }" $combined1 & PIDTWO=$!
-magick convert +append $jpgX_in $jpgctfX_in -resize x1024 - | magick convert - -font DejaVu-Sans -fill LightGoldenrod2 -pointsize 80 -interline-spacing 12 -gravity NorthWest -annotate +40+40 "R: ${resolutionX}Å" -annotate +40+140 "A: ${astiX}" -annotate +40+240 "S: ${shiftsX/_/ }" $combinedX
-magick convert +append $jpgY_in $jpgctfY_in -resize x1024 - | magick convert - -font DejaVu-Sans -fill LightGoldenrod2 -pointsize 80 -interline-spacing 12 -gravity NorthWest -annotate +40+40 "R: ${resolutionY}Å" -annotate +40+140 "A: ${astiY}" -annotate +40+240 "S: ${shiftsY/_/ }" $combinedY
-magick convert +append $jpgZ_in $jpgctfZ_in -resize x1024 - | magick convert - -font DejaVu-Sans -fill LightGoldenrod2 -pointsize 80 -interline-spacing 12 -gravity NorthWest -annotate +40+40 "R: ${resolutionZ}Å" -annotate +40+140 "A: ${astiZ}" -annotate +40+240 "S: ${shiftsZ/_/ }" $combinedZ
-magick convert +append $jpgW_in $jpgctfW_in -resize x1024 - | magick convert - -font DejaVu-Sans -fill LightGoldenrod2 -pointsize 80 -interline-spacing 12 -gravity NorthWest -annotate +40+40 "R: ${resolutionW}Å" -annotate +40+140 "A: ${astiW}" -annotate +40+240 "S: ${shiftsW/_/ }" $combinedW
+(magick convert +append $jpgX_in $jpgctfX_in -resize x1024 - | magick convert - -font DejaVu-Sans -fill LightGoldenrod2 -pointsize 80 -interline-spacing 12 -gravity NorthWest -annotate +40+40 "R: `$PROGDIR/get_data.py ctf_r $ctflogX`Å" -annotate +40+140 "A: `$PROGDIR/get_data.py ctf_a $ctflogX`" -annotate +40+240 "S: `$PROGDIR/get_data.py mc $mclogX`" $combinedX) & PIDONE=$!
+(magick convert +append $jpgY_in $jpgctfY_in -resize x1024 - | magick convert - -font DejaVu-Sans -fill LightGoldenrod2 -pointsize 80 -interline-spacing 12 -gravity NorthWest -annotate +40+40 "R: `$PROGDIR/get_data.py ctf_r $ctflogY`Å" -annotate +40+140 "A: `$PROGDIR/get_data.py ctf_a $ctflogY`" -annotate +40+240 "S: `$PROGDIR/get_data.py mc $mclogY`" $combinedY) & PIDTWO=$!
+(magick convert +append $jpgZ_in $jpgctfZ_in -resize x1024 - | magick convert - -font DejaVu-Sans -fill LightGoldenrod2 -pointsize 80 -interline-spacing 12 -gravity NorthWest -annotate +40+40 "R: `$PROGDIR/get_data.py ctf_r $ctflogZ`Å" -annotate +40+140 "A: `$PROGDIR/get_data.py ctf_a $ctflogZ`" -annotate +40+240 "S: `$PROGDIR/get_data.py mc $mclogZ`" $combinedZ) & PIDTHREE=$!
+(magick convert +append $jpgW_in $jpgctfW_in -resize x1024 - | magick convert - -font DejaVu-Sans -fill LightGoldenrod2 -pointsize 80 -interline-spacing 12 -gravity NorthWest -annotate +40+40 "R: `$PROGDIR/get_data.py ctf_r $ctflogW`Å" -annotate +40+140 "A: `$PROGDIR/get_data.py ctf_a $ctflogW`" -annotate +40+240 "S: `$PROGDIR/get_data.py mc $mclogW`" $combinedW) & PIDFOUR=$!
 
-
-
-#wait $PIDONE
-#wait $PIDTWO
+wait $PIDONE
+wait $PIDTWO
+wait $PIDTHREE
+wait $PIDFOUR
 
 exit $?
 
