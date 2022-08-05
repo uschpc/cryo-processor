@@ -14,7 +14,7 @@ file3_out=${8}
 e2proc2d.py --process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane $file0_in $file0_out & PIDONE=$!
 e2proc2d.py --process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane $file1_in $file1_out & PIDTWO=$!
 e2proc2d.py --process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane $file2_in $file2_out & PIDTHREE=$!
-e2proc2d.py --process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane $file2_in $file2_out & PIDFOUR=$!
+e2proc2d.py --process=filter.lowpass.gauss:cutoff_freq=0.1 --fixintscaling=sane $file3_in $file3_out & PIDFOUR=$!
 
 wait $PIDONE
 wait $PIDTWO
