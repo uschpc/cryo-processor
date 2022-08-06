@@ -537,7 +537,7 @@ class Session:
         except Exception as e:
             log.exception(e)
         #try fallback
-        pegasus_stageout_clusters=self._config.getint("params", "pegasus_stageout_clusters", fallback=int(len(self._file_list_to_process)/10))
+        #pegasus_stageout_clusters=self._config.getint("params", "pegasus_stageout_clusters", fallback=int(len(self._file_list_to_process)/10))
 
         self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
                                     self._session_dir,
@@ -549,9 +549,9 @@ class Session:
                                     debug_maxjobs=self._config.get("params", "debug_maxjobs"),
                                     partition=self._config.get("params", "partition"),
                                     account=self._config.get("params", "account"),
-                                    pgss_stgt_clusters=pegasus_stageout_clusters,
                                     cluster_size=self._config.getint("params", "cluster_size"),
                                     no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
+                                    pgss_stgt_clusters=self._config.getint("params", "pegasus_stageout_clusters", fallback=int(no_of_files_to_proc_in_cycle/10)),
                                     no_of_gpus=self._config.getint("params", "no_of_gpus"),
                                     )
         try:
