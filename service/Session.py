@@ -537,7 +537,7 @@ class Session:
         except Exception as e:
             log.exception(e)
         #try fallback
-        pegasus_stageout_clusters=self._config.getint("params", "pegasus_stageout_clusters", fallback="{}".format(int(len(self._sent_for_processing)/10)))
+        pegasus_stageout_clusters=self._config.getint("params", "pegasus_stageout_clusters", fallback="{}".format(int(len(self._file_list_to_process)/10)))
 
         self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
                                     self._session_dir,
