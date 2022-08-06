@@ -46,7 +46,7 @@ class PipelineWorkflow:
     def __init__(self, base_dir, session_dir, inputs_dir, outputs_dir, debug=True, partition="debug", \
                     account="osinski_703", glite_arguments="--gres=gpu:p100:2", \
                     maxjobs=100, debug_maxjobs=10, cluster_size=10, \
-                    no_of_files_to_proc_in_cycle=100, pgss_stgt_clusters=10, no_of_gpus=2):
+                    no_of_files_to_proc_in_cycle=100, pgss_stgt_clusters="10", no_of_gpus=2):
         self.wf_name = "motioncor2"
         self.debug = debug
         logger.info("PipelineWorkflow init")
