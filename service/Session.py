@@ -551,7 +551,7 @@ class Session:
                                     account=self._config.get("params", "account"),
                                     cluster_size=self._config.getint("params", "cluster_size"),
                                     no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
-                                    pgss_stgt_clusters=self._config.getint("params", "pegasus_stageout_clusters", fallback=int(self._config.getint("params", "no_of_files_to_proc_in_cycle")/10)),
+                                    pgss_stgt_clusters=int(self._config.getint("params", "pegasus_stageout_clusters", fallback=int(self._config.getint("params", "no_of_files_to_proc_in_cycle")/10))),
                                     no_of_gpus=self._config.getint("params", "no_of_gpus"),
                                     )
         try:
