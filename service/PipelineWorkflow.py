@@ -1090,7 +1090,7 @@ class PipelineWorkflow:
                 self.wf.add_jobs(slack_notify_job)
                 self.no_of_processed+=1
 
-                fastcounter+=1
+                #fastcounter+=1
                 
             elif lenelement==4:
                 fraction_file_path0 = element[0]
@@ -1497,7 +1497,7 @@ class PipelineWorkflow:
                 self.wf.add_jobs(slack_notify_job)
                 self.no_of_processed+=1
 
-                fastcounter+=1
+                #fastcounter+=1
             else:
                 for fraction_file_path in element:
                     if os.stat(fraction_file_path).st_size == 0: pass
@@ -1648,7 +1648,7 @@ class PipelineWorkflow:
                     slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                     self.wf.add_jobs(slack_notify_job)
                     self.no_of_processed+=1
-                fastcounter+=1
+            fastcounter+=1
 
 
     def set_params(self, datum):
