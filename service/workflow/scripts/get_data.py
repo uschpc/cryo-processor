@@ -27,18 +27,21 @@ def get_avg_shifts(strdata):
         shifts_2=[float(x[1]) for x in all_shifts]
         avg_shifts_1=str(round(sum(shifts_1)/len(shifts_1),2))
         avg_shifts_2=str(round(sum(shifts_2)/len(shifts_2),2))
-        avg_shifts="%s_%s"%(avg_shifts_1, avg_shifts_2)
+        avg_shifts="%s %s"%(avg_shifts_1, avg_shifts_2)
         return avg_shifts
     else:
         return "0 0"
         
 
 if __name__ == '__main__':
-    with open(sys.argv[2]) as f:
-        gf=f.read()
-        if sys.argv[1]=="ctf_a":
-            print("%s"%get_asti(gf))
-        elif sys.argv[1]=="ctf_r":
-            print("%s"%get_reso(gf))
-        elif sys.argv[1]=="mc":
-            print("%s"%get_avg_shifts(gf))
+    try:
+        with open(sys.argv[2]) as f:
+            gf=f.read()
+            if sys.argv[1]=="ctf_a":
+                print("%s"%get_asti(gf))
+            elif sys.argv[1]=="ctf_r":
+                print("%s"%get_reso(gf))
+            elif sys.argv[1]=="mc":
+                print("%s"%get_avg_shifts(gf))
+    except:
+        print("ErrGD")

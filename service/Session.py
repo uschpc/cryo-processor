@@ -537,7 +537,7 @@ class Session:
         except Exception as e:
             log.exception(e)
         #try fallback
-        pegasus_stageout_clusters=self._config.get("params", "pegasus_stageout_clusters", fallback="{}".format(int(len(self._sent_for_processing)/10)))
+        #pegasus_stageout_clusters=self._config.getint("params", "pegasus_stageout_clusters", fallback=int(len(self._file_list_to_process)/10))
 
         self.wf = PipelineWorkflow(self._config.get("general", "base_dir"),
                                     self._session_dir,
@@ -545,15 +545,14 @@ class Session:
                                     self._processed_dir,
                                     debug=self._config.getboolean("general", "debug"),
                                     glite_arguments=self._config.get("params", "glite_arguments"),
-                                    gctf_glite_arguments=self._config.get("params", "gctf_glite_arguments"),
-                                    glite_for_cryoem_partition=self._config.get("params", "glite_for_cryoem_partition"),
                                     maxjobs=self._config.get("params", "maxjobs"),
                                     debug_maxjobs=self._config.get("params", "debug_maxjobs"),
                                     partition=self._config.get("params", "partition"),
                                     account=self._config.get("params", "account"),
-                                    pgss_stgt_clusters=pegasus_stageout_clusters,
-                                    cluster_size=self._config.get("params", "cluster_size"),
+                                    cluster_size=self._config.getint("params", "cluster_size"),
                                     no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
+                                    pgss_stgt_clusters=str(self._config.getint("params", "pegasus_stageout_clusters", fallback=str(self._config.getint("params", "no_of_files_to_proc_in_cycle")/10))),
+                                    no_of_gpus=self._config.getint("params", "no_of_gpus"),
                                     )
         try:
             #do final check on required params
