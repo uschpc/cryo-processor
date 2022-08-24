@@ -47,7 +47,6 @@ Create a config file under `~/.cryoem.conf` with the contents like:
     [api]
     
     port = 8115
-	#production is running on 8113
     token = somesecret
     
     [params]
