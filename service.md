@@ -54,17 +54,18 @@ Create a config file under `~/.cryoem.conf` with the contents like:
     
     maxjobs = 100
     debug_maxjobs = 50
-    partition = cryoem
-    account = osinski_703
-    glite_arguments = --gres=gpu:a40:4 --exclusive --exclude=e17-[20-24],d23-[11-12],a13-06
-	gctf_glite_arguments = --gres=gpu:a40:4 --exclusive --exclude=e17-[20-24],d23-[11-12],a13-06
-	glite_for_cryoem_partition = --exclude=d23-[11-12],a13-06
-    cluster_size = 10
+    partition = cryoem_partition
+    account = trojan_123
+    glite_arguments = --gres=gpu:a40:4 --exclusive
+    #cluster size tells how many small batches of files to submit. Multiply by the number of GPUs
+    #set to at least the number of nodes
+    cluster_size = 5
+    #how many gpus utilize. values are 2, 4 or 1. If other value is used it defaults to 1
+    no_of_gpus = 4
     no_of_files_to_proc_in_cycle = 100
-	#Optional for debug. 
 	#When not defined here it is being adjusted automatically 
-	#to the number of files processed in a cycle
-	#pegasus_stageout_clusters = 25
+	#to the 10% of the number of files processed in a cycle
+	pegasus_stageout_clusters = 10
 
 
 
