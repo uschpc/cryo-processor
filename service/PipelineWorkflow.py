@@ -1499,6 +1499,7 @@ class PipelineWorkflow:
 
                 #fastcounter+=1
             else:
+                logger.info("Element {}".format(element))
                 for fraction_file_path in element:
                     if os.stat(fraction_file_path).st_size == 0: pass
                     fraction_file_name = os.path.basename(fraction_file_path)
