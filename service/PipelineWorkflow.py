@@ -1501,10 +1501,6 @@ class PipelineWorkflow:
             else:
                 for fraction_file_path in element:
                     if os.stat(fraction_file_path).st_size == 0: pass
-                    #ffp_index is the gpu id
-                    #ffp_index = element.index(fraction_file_path)
-                    #single gpu, so ffp_index is 0
-                    ffp_index = 0
                     fraction_file_name = os.path.basename(fraction_file_path)
                     fraction_file = File(fraction_file_name)
                     self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))
@@ -1545,10 +1541,10 @@ class PipelineWorkflow:
                         if gff!=None:
                             if self.throw!=0 and self.trunc!=0:
                                 motionCor_job = Job("MotionCor2_gtt").add_args(mc_cmd1.format(mc2_in, "./{}".format(fraction_file_name), \
-                                                mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index, gff, self.throw, self.trunc))
+                                                mrc_file, str(self.kev), self.apix, self.fmdose, gff, self.throw, self.trunc))
                             else:
                                 #motionCor_job = Job("MotionCor2").add_args(mc_cmd2.format(mc2_in, "./{}".format(fraction_file_name), \
-                                #                mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index, gff))
+                                #                mrc_file, str(self.kev), self.apix, self.fmdose, gff))
                                 motionCor_job = Job("MotionCor2_g")
                                 motionCor_job.add_args(\
                                                 mc2_in, self.kev, self.apix, self.fmdose, gff,\
@@ -1561,15 +1557,15 @@ class PipelineWorkflow:
                         else:
                             #do bare mc
                             motionCor_job = Job("MotionCor2").add_args(mc_cmd0.format(mc2_in, "./{}".format(fraction_file_name), \
-                                                mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index))
+                                                mrc_file, str(self.kev), self.apix, self.fmdose))
                     else:
                         #case where we do not have gain referencee file
                         if self.throw!=0 and self.trunc!=0:
                             motionCor_job = Job("MotionCor2_tt").add_args(mc_cmd3.format(mc2_in, "./{}".format(fraction_file_name), \
-                                            mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index, self.throw, self.trunc))
+                                            mrc_file, str(self.kev), self.apix, self.fmdose, self.throw, self.trunc))
                         else:
                             motionCor_job = Job("MotionCor2").add_args(mc_cmd0.format(mc2_in, "./{}".format(fraction_file_name), \
-                                            mrc_file, str(self.kev), self.apix, self.fmdose, ffp_index))
+                                            mrc_file, str(self.kev), self.apix, self.fmdose))
                     motionCor_job.add_inputs(fraction_file)
                     motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
                     motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
