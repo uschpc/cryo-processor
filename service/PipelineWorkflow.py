@@ -1572,7 +1572,7 @@ class PipelineWorkflow:
                     motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
                     motionCor_job.add_outputs(mc2_stdout, stage_out=True, register_replica=False)
                     motionCor_job.add_outputs(mc2_stderr, stage_out=True, register_replica=False)
-                    motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
+                    motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-last-{}".format(slowcounter))
                     self.wf.add_jobs(motionCor_job)
                     # gctf
                     ctf_star_file = File(mrc_file_name.replace(".mrc",".star"))
@@ -1593,7 +1593,7 @@ class PipelineWorkflow:
                     gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
                     gctf_job.add_outputs(gctf_stdout, stage_out=True, register_replica=False)
                     gctf_job.add_outputs(gctf_stderr, stage_out=True, register_replica=False)
-                    gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
+                    gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-last-{}".format(slowcounter))
                     self.wf.add_jobs(gctf_job)
                     # e2proc2d - motion-corrected to jpg, then resize to 20% size
                     dw_jpg_name = dw_file_name.replace("_DW.mrc","_DW_fs.jpg")
@@ -1602,7 +1602,7 @@ class PipelineWorkflow:
                     e2proc2d_job1.add_inputs(dw_file)
                     e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
                     e2proc2d_job1.add_args(dw_file, dw_jpg_file)
-                    e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))           
+                    e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-last-{}".format(slowcounter))           
                     self.wf.add_jobs(e2proc2d_job1)
                     #imagemagick - resize the input jpg from about 5k to 1k px
                     magick_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg",".jpg"))
@@ -1610,7 +1610,7 @@ class PipelineWorkflow:
                     magick_resize.add_inputs(dw_jpg_file)
                     magick_resize.add_outputs(magick_jpg_file, stage_out=True, register_replica=False)
                     magick_resize.add_args(dw_jpg_file, magick_jpg_file)
-                    magick_resize.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
+                    magick_resize.add_profiles(Namespace.PEGASUS, "label", "1-last-{}".format(slowcounter))
                     self.wf.add_jobs(magick_resize)
                     # e2proc2d - ctf to jpg
                     jpg_ctf_file = File(mrc_file_name.replace(".mrc","_ctf.jpg"))
@@ -1618,7 +1618,7 @@ class PipelineWorkflow:
                     e2proc2d_job2.add_inputs(ctf_file)
                     e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True, register_replica=False)
                     e2proc2d_job2.add_args(ctf_file, jpg_ctf_file)
-                    e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
+                    e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "1-last-{}".format(slowcounter))
                     self.wf.add_jobs(e2proc2d_job2)
                     #imagemagick - stitch together resized jpg and add text
                     magick_combined_jpg_fn = dw_jpg_name.replace("_DW_fs.jpg","_combined.jpg")
@@ -1632,7 +1632,7 @@ class PipelineWorkflow:
                     magick_convert.add_args(\
                         magick_jpg_file, jpg_ctf_file, magick_combined_jpg_file, gctf_log_file_name, mc2_stdout_file_name,\
                         )
-                    magick_convert.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
+                    magick_convert.add_profiles(Namespace.PEGASUS, "label", "1-last-{}".format(slowcounter))
                     self.wf.add_jobs(magick_convert)
                     #send notification to the slack channel
                     slack_notify_out=File(mrc_file_name.replace(".mrc","_slack_msg.txt"))
@@ -1642,7 +1642,7 @@ class PipelineWorkflow:
                     slack_notify_job.add_args(\
                                 os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), slack_notify_out, \
                                 )
-                    slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
+                    slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-last-{}".format(slowcounter))
                     self.wf.add_jobs(slack_notify_job)
                     self.no_of_processed+=1
             fastcounter+=1
