@@ -390,7 +390,7 @@ class Session:
             return
  
         # time to submit a new one? 
-        if self._next_processing_time > 0 and self._next_processing_time < time.time() and self.retries < 5:
+        if self._next_processing_time > 0 and self._next_processing_time < time.time() and self.retries < 30:
             # space the workflows a little bit in case of failure
             log.info("IMPORTANT: SESSION SENT FOR PROCESSING")
             log.info("self._next_processing_time {}".format(self._next_processing_time))
@@ -400,7 +400,7 @@ class Session:
             #log.info("IMPORTANT-1: RETRIES RESET {}".format(self.retries))
             
             
-        elif self._next_processing_time > 0 and self._no_of_processed > 0 and self._no_of_processed < self._no_of_raw and self._is_loaded == True and self._next_processing_time < time.time() and self.retries < 5:
+        elif self._next_processing_time > 0 and self._no_of_processed > 0 and self._no_of_processed < self._no_of_raw and self._is_loaded == True and self._next_processing_time < time.time() and self.retries < 30:
             # time to submit a new one after an unscheduled shutdown mid-processing
             # space the workflows a little bit in case of failure
             log.info("IMPORTANT: SESSION LOADED - TRYING TO RESUME")
@@ -412,7 +412,7 @@ class Session:
             #self.retries = 0
             #log.info("IMPORTANT-2: RETRIES RESET {}".format(self.retries))
             
-        elif self._state == self._STATE_INCOMPLETE_OR_EMPTY and self.retries == 5:
+        elif self._state == self._STATE_INCOMPLETE_OR_EMPTY and self.retries == 30:
             log.info("Marking as failed")
             self._next_processing_time = 0
             self._state = self._STATE_PROCESSING_FAILURE
@@ -517,12 +517,12 @@ class Session:
             log.info("self._file_list_to_process: len {}".format(len(self._file_list_to_process)))
             log.info("self._sent_for_processing BEFOR: len {}".format(len(self._sent_for_processing)))
             #mark as incomplete if no files are found
-            if len(self._file_list_to_process)==0 and self.retries <=5:
+            if len(self._file_list_to_process)==0 and self.retries <=30:
                 self._state = self._STATE_INCOMPLETE_OR_EMPTY
                 self.retries+=1
                 log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS FAILURE. Next try in 120s".format(6-self.retries))
                 return False
-            elif len(self._file_list_to_process)==0 and self.retries > 5:
+            elif len(self._file_list_to_process)==0 and self.retries > 30:
                 log.info("Marking as failed")
                 self._next_processing_time = 0
                 self._state = self._STATE_PROCESSING_FAILURE
