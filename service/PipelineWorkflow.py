@@ -662,7 +662,7 @@ class PipelineWorkflow:
         self.tc.add_transformations(motionCor2)
         self.tc.add_transformations(motionCor2_g)
         self.tc.add_transformations(motionCor2_gtt)
-        self.tc.add_transformations(motionCor2_tt
+        self.tc.add_transformations(motionCor2_tt)
         self.tc.add_transformations(gctf)
         self.tc.add_transformations(e2proc2d)
         self.tc.add_transformations(e2proc2d2)
