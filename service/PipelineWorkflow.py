@@ -1585,22 +1585,21 @@ class PipelineWorkflow:
                     # self.wf.add_jobs(motionCor_job)
                     
                     ################################
-                    fraction_file_path0 = fraction_file_path
                     #skip loop if one of the files is zero bytes; will get pulled in the next round
-                    if os.stat(fraction_file_path0).st_size == 0: pass
-                    fraction_file_name0 = os.path.basename(fraction_file_path0)
-                    fraction_file0 = File(fraction_file_name0)
-                    self.rc.add_replica("slurm", fraction_file_name0, "file://{}".format(fraction_file_path0))
+                    if os.stat(fraction_file_path).st_size == 0: pass
+                    fraction_file_name = os.path.basename(fraction_file_path)
+                    fraction_file = File(fraction_file_name)
+                    self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))
                     # generated files will be named based on the input
-                    basename0 = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name0)
-                    mrc_file_name0="{}.mrc".format(basename0)
-                    dw_file_name0="{}_DW.mrc".format(basename0)
-                    mc2_stdout_file_name0="{}_DW.stdout.txt".format(basename0)
-                    mc2_stderr_file_name0="{}_DW.stderr.txt".format(basename0)
-                    mrc_file0 = File(mrc_file_name0)
-                    dw_file0 = File(dw_file_name0)
-                    mc2_stdout0 = File(mc2_stdout_file_name0)
-                    mc2_stderr0 = File(mc2_stderr_file_name0)
+                    basename = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name)
+                    mrc_file_name="{}.mrc".format(basename)
+                    dw_file_name="{}_DW.mrc".format(basename)
+                    mc2_stdout_file_name="{}_DW.stdout.txt".format(basename)
+                    mc2_stderr_file_name="{}_DW.stderr.txt".format(basename)
+                    mrc_file = File(mrc_file_name)
+                    dw_file = File(dw_file_name)
+                    mc2_stdout = File(mc2_stdout_file_name)
+                    mc2_stderr = File(mc2_stderr_file_name)
                     if self.basename_extension=="tiff": mc2_in="InTiff"
                     elif self.basename_extension=="mrc": mc2_in="InMrc"
                     elif self.basename_extension=="eer": mc2_in="InEer"
@@ -1624,20 +1623,20 @@ class PipelineWorkflow:
                                 motionCor_job = Job("MotionCor2_gtt")
                                 motionCor_job.add_args(\
                                                 mc2_in, self.kev, self.apix, self.fmdose, gff, self.throw, self.trunc,\
-                                                "./{}".format(fraction_file_name0), 
-                                                mrc_file0, \
-                                                "./{}".format(mc2_stderr_file_name0), \
-                                                "./{}".format(mc2_stdout_file_name0), \
+                                                "./{}".format(fraction_file_name), 
+                                                mrc_file, \
+                                                "./{}".format(mc2_stderr_file_name), \
+                                                "./{}".format(mc2_stdout_file_name), \
                                                 )
                             else:
                                 #most cases
                                 motionCor_job = Job("MotionCor2_g")
                                 motionCor_job.add_args(\
                                                 mc2_in, self.kev, self.apix, self.fmdose, gff,\
-                                                "./{}".format(fraction_file_name0), \
-                                                mrc_file0, \
-                                                "./{}".format(mc2_stderr_file_name0), \
-                                                "./{}".format(mc2_stdout_file_name0), \
+                                                "./{}".format(fraction_file_name), \
+                                                mrc_file, \
+                                                "./{}".format(mc2_stderr_file_name), \
+                                                "./{}".format(mc2_stdout_file_name), \
                                                 )
                             motionCor_job.add_inputs(gff)
                         else:
@@ -1645,10 +1644,10 @@ class PipelineWorkflow:
                             motionCor_job = Job("MotionCor2")
                             motionCor_job.add_args(\
                                                 mc2_in, self.kev, self.apix, self.fmdose,\
-                                                "./{}".format(fraction_file_name0), \
-                                                mrc_file0, \
-                                                "./{}".format(mc2_stderr_file_name0), \
-                                                "./{}".format(mc2_stdout_file_name0), \
+                                                "./{}".format(fraction_file_name), \
+                                                mrc_file, \
+                                                "./{}".format(mc2_stderr_file_name), \
+                                                "./{}".format(mc2_stdout_file_name), \
                                                 )
                     else:
                         #case where we do not have gain referencee file
@@ -1656,26 +1655,26 @@ class PipelineWorkflow:
                             motionCor_job = Job("MotionCor2_tt")
                             motionCor_job.add_args(\
                                                 mc2_in, self.kev, self.apix, self.fmdose, self.throw, self.trunc,\
-                                                "./{}".format(fraction_file_name0), \
-                                                mrc_file0, \
-                                                "./{}".format(mc2_stderr_file_name0), \
-                                                "./{}".format(mc2_stdout_file_name0), \
+                                                "./{}".format(fraction_file_name), \
+                                                mrc_file, \
+                                                "./{}".format(mc2_stderr_file_name), \
+                                                "./{}".format(mc2_stdout_file_name), \
                                                 )
                         else:
                             #do bare mc (just in case as a fallback)
                             motionCor_job = Job("MotionCor2")
                             motionCor_job.add_args(\
                                                 mc2_in, self.kev, self.apix, self.fmdose,\
-                                                "./{}".format(fraction_file_name0), \
-                                                mrc_file0, \
-                                                "./{}".format(mc2_stderr_file_name0), \
-                                                "./{}".format(mc2_stdout_file_name0), \
+                                                "./{}".format(fraction_file_name), \
+                                                mrc_file, \
+                                                "./{}".format(mc2_stderr_file_name), \
+                                                "./{}".format(mc2_stdout_file_name), \
                                                 )
-                    motionCor_job.add_inputs(fraction_file0)
-                    motionCor_job.add_outputs(mrc_file0, stage_out=False, register_replica=False)
-                    motionCor_job.add_outputs(dw_file0, stage_out=True, register_replica=False)
-                    motionCor_job.add_outputs(mc2_stdout0, stage_out=True, register_replica=False)
-                    motionCor_job.add_outputs(mc2_stderr0, stage_out=True, register_replica=False)
+                    motionCor_job.add_inputs(fraction_file)
+                    motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
+                    motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stdout, stage_out=True, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stderr, stage_out=True, register_replica=False)
                     motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                     self.wf.add_jobs(motionCor_job)
                     

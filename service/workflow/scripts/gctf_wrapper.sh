@@ -22,14 +22,29 @@ export LD_LIBRARY_PATH=/home1/cryoemadmin/software/gctf_libs_from_c10.1.243_to_w
 
 #debug
 #ldd `which gctf`
-echo `hostname`
-echo $CUDA_VISIBLE_DEVICES
-echo
-echo "gctf $@"
-echo
-gctf "$@"
+# echo `hostname`
+# echo $CUDA_VISIBLE_DEVICES
+# echo
+# echo "gctf $@"
+# echo
+# gctf "$@"
+
+# exit $?
+
+
+
+kev=${1}
+pxsize=${2}
+file0_star=${3}
+file0_in=${4}
+file0_stdout=${5}
+file0_stderr=${6}
+
+
+gctf --apix $pxsize --kV $kev --Cs 2.7 --ac 0.1 --ctfstar $file0_star --boxsize 1024 $file0_in --gid 0 2> $file0_stderr 1> $file0_stdout & PIDONE=$!
+
+wait $PIDONE
+
+echo "gctf --apix $pxsize --kV $kev --Cs 2.7 --ac 0.1 --ctfstar $file0_star --boxsize 1024 $file0_in --gid 0 2> $file0_stderr 1> $file0_stdout" >> $file0_stderr
 
 exit $?
-
-
-
