@@ -1504,7 +1504,6 @@ class PipelineWorkflow:
 
                 #fastcounter+=1
             else:
-                continue
                 #logger.info("Element {}".format(element))
                 for fraction_file_path in element:
                     #skip loop if one of the files is zero bytes; will get pulled in the next round
