@@ -23,10 +23,7 @@ import pprint
 import threading
 import time
 from logging.config import dictConfig
-logging.basicConfig(
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.INFO,
-    datefmt='%Y-%m-%d %H:%M:%S')
+
 from Config import Config
 from Session import Session
 
@@ -37,7 +34,7 @@ log_config = {
     "formatters": {
         "default": {
             "()": "uvicorn.logging.DefaultFormatter",
-            "fmt": "%(levelprefix)s %(message)s",
+            "fmt": "%(asctime)s %(levelprefix)s %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
@@ -52,10 +49,18 @@ log_config = {
         "cryoem": {"handlers": ["default"], "level": "DEBUG"},
     },
 }
-
+# formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s',
+                              # datefmt='%Y-%m-%d %H:%M:%S')
+                              
 dictConfig(log_config)
 
 log = logging.getLogger('cryoem')
+
+# logging.basicConfig(
+    # format='%(asctime)s %(levelname)-8s %(message)s',
+    # level=logging.INFO,
+    # datefmt='%Y-%m-%d %H:%M:%S')
+
 
 config = Config()
 

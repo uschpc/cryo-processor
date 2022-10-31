@@ -1506,88 +1506,11 @@ class PipelineWorkflow:
             else:
                 logger.info("Element {}".format(element))
                 for fraction_file_path in element:
-                    # if os.stat(fraction_file_path).st_size == 0: pass
-                    # fraction_file_name = os.path.basename(fraction_file_path)
-                    # logger.info("fraction_file_name {}".format(fraction_file_name))
-                    # fraction_file = File(fraction_file_name)
-                    # self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))
-                    # # generated files will be named based on the input
-                    # basename = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name)
-                    # mrc_file_name="{}.mrc".format(basename)
-                    # dw_file_name="{}_DW.mrc".format(basename)
-                    # mc2_stdout_file_name="{}_DW.stdout.txt".format(basename)
-                    # mc2_stderr_file_name="{}_DW.stderr.txt".format(basename)
-                    # mrc_file = File(mrc_file_name)
-                    # dw_file = File(dw_file_name)
-                    # mc2_stdout = File(mc2_stdout_file_name)
-                    # mc2_stderr = File(mc2_stderr_file_name)
-                    # # MotionCor2
-                    # #adjust for one of three different extensions: mrc, tiff or eer
-                    # if self.basename_extension=="tiff": mc2_in="InTiff"
-                    # elif self.basename_extension=="mrc": mc2_in="InMrc"
-                    # elif self.basename_extension=="eer": mc2_in="InEer"
-                    # else:
-                        # logger.info("Unknown image extension - {}".format(self.basename_extension))
-                        # sys.exit(1)
-                        
-                        
-                    ########################
-                    # mc_cmd0="{} {} -OutMrc {} -Iter 7 -Tol 0.5 -Kv {} -PixSize {} -FmDose {} -Serial 0 -OutStack 0 -SumRange 0 0 -GpuMemUsage 0.75 -Gpu {}"
-                    # mc_cmd1=mc_cmd0+" -Gain {} -Throw {} -Trunc {}"
-                    # mc_cmd2=mc_cmd0+" -Gain {}"
-                    # mc_cmd3=mc_cmd0+" -Throw {} -Trunc {}"
-                    # if len(Gain_Ref_SR_name) != 0:
-                        # #case where we have gain reference file and superresolution
-                        # if self.superresolution == True:
-                            # if FlipY or Gain_Ref:
-                                # if str(self.kev) == "300": gff=FlipY_SR
-                                # elif str(self.kev) == "200": gff=Gain_Ref_SR
-                                # else: gff=None
-                        # else:
-                            # if FlipY or Gain_Ref:
-                                # if str(self.kev) == "300": gff=FlipY
-                                # elif str(self.kev) == "200": gff=Gain_Ref
-                                # else: gff=None
-                        # if gff!=None:
-                            # if self.throw!=0 and self.trunc!=0:
-                                # motionCor_job = Job("MotionCor2_gtt").add_args(mc_cmd1.format(mc2_in, "./{}".format(fraction_file_name), \
-                                                # mrc_file, str(self.kev), self.apix, self.fmdose, gff, self.throw, self.trunc))
-                            # else:
-                                # #motionCor_job = Job("MotionCor2").add_args(mc_cmd2.format(mc2_in, "./{}".format(fraction_file_name), \
-                                # #                mrc_file, str(self.kev), self.apix, self.fmdose, gff))
-                                # motionCor_job = Job("MotionCor2_g")
-                                # motionCor_job.add_args(\
-                                                # mc2_in, self.kev, self.apix, self.fmdose, gff,\
-                                                # "./{}".format(fraction_file_name), \
-                                                # mrc_file, \
-                                                # "./{}".format(mc2_stderr_file_name), \
-                                                # "./{}".format(mc2_stdout_file_name), \
-                                                # )
-                            # motionCor_job.add_inputs(gff)
-                        # else:
-                            # #do bare mc
-                            # motionCor_job = Job("MotionCor2").add_args(mc_cmd0.format(mc2_in, "./{}".format(fraction_file_name), \
-                                                # mrc_file, str(self.kev), self.apix, self.fmdose))
-                    # else:
-                        # #case where we do not have gain referencee file
-                        # if self.throw!=0 and self.trunc!=0:
-                            # motionCor_job = Job("MotionCor2_tt").add_args(mc_cmd3.format(mc2_in, "./{}".format(fraction_file_name), \
-                                            # mrc_file, str(self.kev), self.apix, self.fmdose, self.throw, self.trunc))
-                        # else:
-                            # motionCor_job = Job("MotionCor2").add_args(mc_cmd0.format(mc2_in, "./{}".format(fraction_file_name), \
-                                            # mrc_file, str(self.kev), self.apix, self.fmdose))
-                    # motionCor_job.add_inputs(fraction_file)
-                    # motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
-                    # motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
-                    # motionCor_job.add_outputs(mc2_stdout, stage_out=True, register_replica=False)
-                    # motionCor_job.add_outputs(mc2_stderr, stage_out=True, register_replica=False)
-                    # motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
-                    # self.wf.add_jobs(motionCor_job)
-                    
-                    ################################
                     #skip loop if one of the files is zero bytes; will get pulled in the next round
                     if os.stat(fraction_file_path).st_size == 0: pass
                     fraction_file_name = os.path.basename(fraction_file_path)
+                    
+                    logger.info("fraction_file_path {}".format(fraction_file_path))
                     fraction_file = File(fraction_file_name)
                     self.rc.add_replica("slurm", fraction_file_name, "file://{}".format(fraction_file_path))
                     # generated files will be named based on the input
@@ -1678,28 +1601,6 @@ class PipelineWorkflow:
                     motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                     self.wf.add_jobs(motionCor_job)
                     
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    ######################################
                     # gctf
                     ctf_star_file = File(mrc_file_name.replace(".mrc",".star"))
                     ctf_file = File(mrc_file_name.replace(".mrc",".ctf"))
