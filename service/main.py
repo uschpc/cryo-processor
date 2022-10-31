@@ -49,10 +49,14 @@ log_config = {
         "cryoem": {"handlers": ["default"], "level": "DEBUG"},
     },
 }
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 # formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s',
                               # datefmt='%Y-%m-%d %H:%M:%S')
                               
-dictConfig(log_config)
+#dictConfig(log_config)
 
 log = logging.getLogger('cryoem')
 
