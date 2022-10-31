@@ -4,6 +4,11 @@ import os
 import configparser
 import logging
 
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
+
 log = logging.getLogger('cryoem')
 
 class EnvInterpolation(configparser.BasicInterpolation):
