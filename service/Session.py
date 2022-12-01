@@ -6,6 +6,7 @@ import pprint
 import shutil
 import time
 import glob
+import subprocess
 
 from Pegasus.api import *
 
@@ -63,7 +64,7 @@ class Session:
         self._state = self._STATE_UNKNOWN
         # defaults to get us started
         self.apix = None
-        self.fmdose = None
+        
         self.kev = None
         self.superresolution = False
         self.rawgainref = None
@@ -76,6 +77,13 @@ class Session:
         self.raw_location = ""
         self.possible_raw_files = ""
         self.particle_size = 0
+        
+        #fmdose: was dose per frame, now we will try to guess if it is per image or per frame
+        self.fmdose = None
+        self.dose_per_img = None
+        self.dose = None
+        self.image_probed = False
+        
         #handling files for processing moved here
         self._gainref_done = False
         self._gain_ref_fn = []
@@ -110,6 +118,7 @@ class Session:
             "next_processing_time": self._next_processing_time,
             "apix": self.apix,
             "fmdose": self.fmdose,
+            "dose_per_img": self.dose_per_img,
             "kev": self.kev,
             "superresolution": self.superresolution,
             "rawgainref": self.rawgainref,
@@ -129,6 +138,7 @@ class Session:
         self._is_loaded = True
         self.apix = session_data["apix"]
         self.fmdose = session_data["fmdose"]
+        self.dose_per_img = session_data["dose_per_img"]
         self.kev = session_data["kev"]
         self.superresolution = session_data["superresolution"]
         self.rawgainref = session_data["rawgainref"]
@@ -140,6 +150,7 @@ class Session:
         self.trunc = session_data["trunc"]
         self.particle_size = session_data["particle_size"]
         self.retries = session_data["retries"]
+        self.no_of_frames = session_data["no_of_frames"]
         #try to guess how many files were proceesed
         self._no_of_processed = self.count_processed_files()
         self._sent_for_processing = [os.path.basename(x).replace('_DW.mrc','') for x in self._processed_files_list]
@@ -155,11 +166,64 @@ class Session:
         log.info("session loaded")
 
 
+    def probe_image(self, fname):
+        import subprocess
+        probe_img_cmd = '''
+        export IMOD_DIR=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3
+        export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3/bin:$PATH
+        header -size %s'
+        '''%fname
+        img_data=subprocess.check_output(probe_img_cmd, shell=True).split()
+        img_size=img_data[0:1]
+        no_of_frames=img_data[2]
+        self.img_size=img_size
+        self.no_of_frames=no_of_frames
+        self.get_upsampling_factor(img_size)
+        return img_size, no_of_frames
+        
+        
+    def get_upsampling_factor(self,img_size):
+        #k3 5760x4092
+        
+        #f4 4096x4096
+        
+        return upsampling_factor
+        
+    def get_electron_doses(self, fname, dose):
+            if dose < 2:
+                fmdose=float(dose)
+                if self.no_of_frames <= 65:
+                    #not eer
+                    dose_per_img=fmdose*self.no_of_frames
+                    dose_per_eer_frame=0
+                else:
+                    #eer
+                    dose_per_img=fmdose*self.eer_rendered_frames
+                    dose_per_eer_frame=self.no_of_frames/float(dose_per_img)
+            else:
+                dose_per_img=dose
+                if self.no_of_frames > 65:
+                    #eer
+                    fmdose=self.eer_rendered_frames/float(dose)
+                    dose_per_eer_frame=self.no_of_frames/float(dose)
+                else:
+                    #not eer
+                    fmdose=self.no_of_frames/float(dose)
+                    dose_per_eer_frame=0
+            self.fmdose=fmdose
+            self.dose_per_img=dose_per_img
+            self.dose_per_eer_frame=dose_per_eer_frame
+        return dose, fmdose, dose_per_eer_frame
+
+
     def count_raw_files(self):
         if self.raw_location != "" and self.possible_raw_files != "":
             log.info("using raw_location dir %s and %s as regex"%(self.raw_location,self.possible_raw_files))
             self._file_list = self._find_files(self.raw_location[0], self.raw_location[1])
             log.info("No. of raw files in (shortcut) %i"%len(self._file_list))
+            if self.image_probed == False:
+                self.get_electron_doses(self._file_list[0], dose_per_img)
+                self.image_probed = True
             return len(self._file_list)
         else:
             try:
@@ -188,6 +252,9 @@ class Session:
                     break
                 #log.info("RAW files are in %s"%os.path.join(os.path.join(self._session_dir, "raw")))
                 #log.info("No. of raw files %i"%len(self._file_list))
+                if self.image_probed == False:
+                    self.get_electron_doses(self._file_list[0], dose_per_img)
+                    self.image_probed = True
                 return len(self._file_list)
             except Exception as e:
                 log.info(e)
@@ -221,18 +288,20 @@ class Session:
         return response
 
     
-    def start_processing(self, apix, fmdose, kev, superresolution, **data):
+    def start_processing(self, apix, dose, kev, superresolution, **data):
         self.apix = apix # pixel size
-        self.fmdose = fmdose # dose in e-/A^2 per frame
+        self.dose = dose
+
         self.kev = kev # voltage
         self.superresolution = superresolution # bool
         log.info("apix: %s"%self.apix)
-        log.info("fmdose: %s"%self.fmdose)
+        log.info("dose: %s"%self.dose)
+        #log.info("no_of_frames: %s"%self.no_of_frames)
+        #log.info("fmdose: %s"%self.fmdose)
         log.info("kev: %s"%self.kev)
         log.info("superresolution: %s"%self.superresolution)
         #default - will not produce optimal results, but will prevent from failing
         if self.apix == None: self.apix = 0.813
-        if self.fmdose == None: self.fmdose = 1.224
         if self.kev == None: self.kev = 300
         if self.superresolution == None: self.superresolution = False
         #self.rawgainref = data.get(rawgainref, default=None)
@@ -557,6 +626,7 @@ class Session:
                                     no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
                                     pgss_stgt_clusters=str(self._config.getint("params", "pegasus_stageout_clusters", fallback=str(self._config.getint("params", "no_of_files_to_proc_in_cycle")/10))),
                                     no_of_gpus=self._config.getint("params", "no_of_gpus"),
+                                    eer_rendered_frames=self._config.getint("params", "eer_rendered_frames"),
                                     )
         try:
             #do final check on required params
