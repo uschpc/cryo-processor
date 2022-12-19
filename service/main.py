@@ -220,7 +220,7 @@ async def start_processing(project_id: str,
                            apix: float,
                            dose: float,
                            kev: int,
-                           superresolution: bool,
+                           #superresolution: bool,
                            api_key: APIKey = Depends(get_api_key)
                            ):
 
@@ -238,7 +238,7 @@ async def start_processing(project_id: str,
         s.start_processing(apix = apix,
             dose = dose,
             kev = kev,
-            superresolution = superresolution,
+            #superresolution = superresolution,
             )
 
     return {"result": "ok"}
@@ -251,7 +251,7 @@ async def resume_processing(project_id: str,
                            apix: float,
                            dose: float,
                            kev: int,
-                           superresolution: bool,
+                           #superresolution: bool,
                            api_key: APIKey = Depends(get_api_key)
                            ):
 
@@ -269,7 +269,7 @@ async def resume_processing(project_id: str,
         s.start_processing(apix = apix,
             dose = dose,
             kev = kev,
-            superresolution = superresolution,
+            #superresolution = superresolution,
             )
 
     return {"result": "ok"}

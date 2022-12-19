@@ -303,7 +303,8 @@ class Session:
         return response
 
     
-    def start_processing(self, apix, dose, kev, superresolution, **data):
+    #def start_processing(self, apix, dose, kev, superresolution, **data):
+    def start_processing(self, apix, dose, kev, **data):
         self.apix = apix # pixel size
         self.dose = dose
 
@@ -314,7 +315,7 @@ class Session:
         #log.info("no_of_frames: %s"%self.no_of_frames)
         #log.info("fmdose: %s"%self.fmdose)
         log.info("kev: %s"%self.kev)
-        log.info("superresolution: %s"%self.superresolution)
+        #log.info("superresolution: %s"%self.superresolution)
         #default - will not produce optimal results, but will prevent from failing
         if self.apix == None: self.apix = 0.813
         if self.kev == None: self.kev = 300
