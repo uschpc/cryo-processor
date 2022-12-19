@@ -279,6 +279,7 @@ class Session:
                 #log.info("RAW files are in %s"%os.path.join(os.path.join(self._session_dir, "raw")))
                 #log.info("No. of raw files %i"%len(self._file_list))
                 if self.image_probed == False:
+                    log.info(40*"V")
                     self.get_electron_doses(self._file_list[0], dose_per_img)
                     self.image_probed = True
                 return len(self._file_list)
