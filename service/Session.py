@@ -168,6 +168,8 @@ class Session:
 
     def probe_image(self, fname):
         import subprocess
+        log.info(40*"Z")
+        log.info("Start image probing")
         probe_img_cmd = '''
         export IMOD_DIR=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3
         export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3/bin:$PATH
@@ -177,8 +179,12 @@ class Session:
         img_size=[int(img_data[0]),int(img_data[1])]
         no_of_frames=img_data[2]
         self.img_size=img_size
+        log.info("img_probe self.img_size {}".format(self.img_size))
         self.no_of_frames=no_of_frames
+        log.info("img_probe self.no_of_frames {}".format(self.no_of_frames))
         self.get_upsampling_factor(img_size)
+        log.info("img_probe self.get_upsampling_factor {}".format(self.upsampling_factor))
+        log.info("end image probing")
         return img_size, no_of_frames
         
         
@@ -205,6 +211,7 @@ class Session:
         return upsampling_factor
         
     def get_electron_doses(self, fname, dose):
+        log.info(40*"X")
         self.probe_image(self, fname)
         if dose < 2:
             fmdose=float(dose)
@@ -233,11 +240,14 @@ class Session:
 
 
     def count_raw_files(self):
+        log.info(40*"U")
         if self.raw_location != "" and self.possible_raw_files != "":
             log.info("using raw_location dir %s and %s as regex"%(self.raw_location,self.possible_raw_files))
             self._file_list = self._find_files(self.raw_location[0], self.raw_location[1])
             log.info("No. of raw files in (shortcut) %i"%len(self._file_list))
             if self.image_probed == False:
+                #the line below should probe the image
+                log.info(40*"W")
                 self.get_electron_doses(self._file_list[0], dose_per_img)
                 self.image_probed = True
             return len(self._file_list)
@@ -401,8 +411,9 @@ class Session:
 
 
     def _update_processing(self):
-
+        #the line below should also probe the image
         self._no_of_raw = self.count_raw_files()
+        #
         self._no_of_processed = self.count_processed_files()
         
         self._percent = 0
