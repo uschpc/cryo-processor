@@ -205,6 +205,7 @@ class Session:
         return upsampling_factor
         
     def get_electron_doses(self, fname, dose):
+        self.probe_image(self, fname)
         if dose < 2:
             fmdose=float(dose)
             if self.no_of_frames <= 65:
