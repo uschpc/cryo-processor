@@ -248,7 +248,7 @@ class Session:
             if self.image_probed == False:
                 #the line below should probe the image
                 log.info(40*"W")
-                self.get_electron_doses(self._file_list[0], dose_per_img)
+                self.get_electron_doses(self._file_list[0], dose)
                 self.image_probed = True
             return len(self._file_list)
         else:
@@ -280,7 +280,7 @@ class Session:
                 #log.info("No. of raw files %i"%len(self._file_list))
                 if self.image_probed == False:
                     log.info(40*"V")
-                    self.get_electron_doses(self._file_list[0], dose_per_img)
+                    self.get_electron_doses(self._file_list[0], dose)
                     self.image_probed = True
                 return len(self._file_list)
             except Exception as e:
