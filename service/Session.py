@@ -174,7 +174,7 @@ class Session:
         header -size %s'
         '''%fname
         img_data=subprocess.check_output(probe_img_cmd, shell=True).split()
-        img_size=img_data[0:1]
+        img_size=[int(img_data[0]),int(img_data[1])]
         no_of_frames=img_data[2]
         self.img_size=img_size
         self.no_of_frames=no_of_frames
@@ -183,36 +183,51 @@ class Session:
         
         
     def get_upsampling_factor(self,img_size):
+        img_width=img_size[0]
         #k3 5760x4092
-        
+        if img_width==5760:
+            upsampling_factor = 1
+        elif img_width==11520:
+            upsampling_factor = 2
+        elif img_width==23040:
+            upsampling_factor = 4
         #f4 4096x4096
-        
+        elif img_width==4096:
+            upsampling_factor = 1
+        elif img_width==8192:
+            upsampling_factor = 2
+        elif img_width==16384:
+            upsampling_factor = 4
+        #whatever. it is ok to have it here
+        else:
+            upsampling_factor = 1
+        self.upsampling_factor=upsampling_factor
         return upsampling_factor
         
     def get_electron_doses(self, fname, dose):
-            if dose < 2:
-                fmdose=float(dose)
-                if self.no_of_frames <= 65:
-                    #not eer
-                    dose_per_img=fmdose*self.no_of_frames
-                    dose_per_eer_frame=0
-                else:
-                    #eer
-                    dose_per_img=fmdose*self.eer_rendered_frames
-                    dose_per_eer_frame=self.no_of_frames/float(dose_per_img)
+        if dose < 2:
+            fmdose=float(dose)
+            if self.no_of_frames <= 65:
+                #not eer
+                dose_per_img=fmdose*self.no_of_frames
+                dose_per_eer_frame=0
             else:
-                dose_per_img=dose
-                if self.no_of_frames > 65:
-                    #eer
-                    fmdose=self.eer_rendered_frames/float(dose)
-                    dose_per_eer_frame=self.no_of_frames/float(dose)
-                else:
-                    #not eer
-                    fmdose=self.no_of_frames/float(dose)
-                    dose_per_eer_frame=0
-            self.fmdose=fmdose
-            self.dose_per_img=dose_per_img
-            self.dose_per_eer_frame=dose_per_eer_frame
+                #eer
+                dose_per_img=fmdose*self.eer_rendered_frames
+                dose_per_eer_frame=self.no_of_frames/float(dose_per_img)
+        else:
+            dose_per_img=dose
+            if self.no_of_frames > 65:
+                #eer
+                fmdose=self.eer_rendered_frames/float(dose)
+                dose_per_eer_frame=self.no_of_frames/float(dose)
+            else:
+                #not eer
+                fmdose=self.no_of_frames/float(dose)
+                dose_per_eer_frame=0
+        self.fmdose=fmdose
+        self.dose_per_img=dose_per_img
+        self.dose_per_eer_frame=dose_per_eer_frame
         return dose, fmdose, dose_per_eer_frame
 
 
