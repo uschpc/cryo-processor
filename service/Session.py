@@ -309,7 +309,7 @@ class Session:
         self.dose = dose
 
         self.kev = kev # voltage
-        self.superresolution = superresolution # bool
+        self.superresolution = False # bool
         log.info("apix: %s"%self.apix)
         log.info("dose: %s"%self.dose)
         #log.info("no_of_frames: %s"%self.no_of_frames)
