@@ -170,7 +170,7 @@ class Session:
 
     def probe_image(self, fname):
         import subprocess
-        log.info(40*"Z")
+        log.info(40*"z")
         log.info("Start image probing")
         probe_img_cmd = '''
         export IMOD_DIR=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3
@@ -187,6 +187,7 @@ class Session:
         self.get_upsampling_factor(img_size)
         log.info("img_probe self.get_upsampling_factor {}".format(self.upsampling_factor))
         log.info("end image probing")
+        log.info(40*"Z")
         return self.img_size, self.no_of_frames
         
         
@@ -213,7 +214,7 @@ class Session:
         return upsampling_factor
         
     def get_electron_doses(self, fname):
-        log.info(40*"X")
+        log.info(40*"x")
         self.probe_image(fname)
         if self.dose < 2:
             fmdose=float(self.dose)
@@ -238,6 +239,7 @@ class Session:
         self.fmdose=fmdose
         self.dose_per_img=dose_per_img
         self.dose_per_eer_frame=dose_per_eer_frame
+        log.info(40*"X")
         return self.dose, self.fmdose, self.dose_per_eer_frame
 
     # def get_electron_doses2(self, fname, dose):
