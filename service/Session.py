@@ -187,7 +187,7 @@ class Session:
         self.get_upsampling_factor(img_size)
         log.info("img_probe self.get_upsampling_factor {}".format(self.upsampling_factor))
         log.info("end image probing")
-        return img_size, no_of_frames
+        return self.img_size, self.no_of_frames
         
         
     def get_upsampling_factor(self,img_size):
@@ -309,12 +309,12 @@ class Session:
                 #log.info("No. of raw files %i"%len(self._file_list))
                 if self.image_probed == False:
                     log.info(40*"V")
-                    self.get_electron_doses(self._file_list[0], self.dose)
+                    self.get_electron_doses(self._file_list[0])
                     self.image_probed = True
                 return len(self._file_list)
             except Exception as e:
                 log.info(e)
-                log.info("There is an issue with determining raw_location")
+                log.info("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\nThere is an issue with determining raw_location")
                 return 0
       
 
