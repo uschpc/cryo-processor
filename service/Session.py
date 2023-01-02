@@ -179,7 +179,7 @@ class Session:
         '''%fname
         img_data=subprocess.check_output(probe_img_cmd, shell=True).split()
         img_size=[int(img_data[0]),int(img_data[1])]
-        no_of_frames=img_data[2]
+        no_of_frames=int(img_data[2])
         self.img_size=img_size
         log.info("img_probe self.img_size {}".format(self.img_size))
         self.no_of_frames=no_of_frames
