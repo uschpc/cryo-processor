@@ -119,6 +119,7 @@ class Session:
             "apix": self.apix,
             "fmdose": self.fmdose,
             "dose_per_img": self.dose_per_img,
+            "dose": self.dose,
             "kev": self.kev,
             "superresolution": self.superresolution,
             "rawgainref": self.rawgainref,
@@ -139,6 +140,7 @@ class Session:
         self.apix = session_data["apix"]
         self.fmdose = session_data["fmdose"]
         self.dose_per_img = session_data["dose_per_img"]
+        self.dose = session_data["dose"]
         self.kev = session_data["kev"]
         self.superresolution = session_data["superresolution"]
         self.rawgainref = session_data["rawgainref"]
@@ -210,11 +212,11 @@ class Session:
         self.upsampling_factor=upsampling_factor
         return upsampling_factor
         
-    def get_electron_doses(self, fname, dose):
+    def get_electron_doses(self, fname):
         log.info(40*"X")
         self.probe_image(self, fname)
-        if dose < 2:
-            fmdose=float(dose)
+        if self.dose < 2:
+            fmdose=float(self.dose)
             if self.no_of_frames <= 65:
                 #not eer
                 dose_per_img=fmdose*self.no_of_frames
@@ -224,20 +226,47 @@ class Session:
                 dose_per_img=fmdose*self.eer_rendered_frames
                 dose_per_eer_frame=self.no_of_frames/float(dose_per_img)
         else:
-            dose_per_img=dose
+            dose_per_img=self.dose
             if self.no_of_frames > 65:
                 #eer
-                fmdose=self.eer_rendered_frames/float(dose)
-                dose_per_eer_frame=self.no_of_frames/float(dose)
+                fmdose=self.eer_rendered_frames/float(self.dose)
+                dose_per_eer_frame=self.no_of_frames/float(self.dose)
             else:
                 #not eer
-                fmdose=self.no_of_frames/float(dose)
+                fmdose=self.no_of_frames/float(self.dose)
                 dose_per_eer_frame=0
         self.fmdose=fmdose
         self.dose_per_img=dose_per_img
         self.dose_per_eer_frame=dose_per_eer_frame
-        return dose, fmdose, dose_per_eer_frame
+        return self.dose, self.fmdose, self.dose_per_eer_frame
 
+    # def get_electron_doses2(self, fname, dose):
+        # log.info(40*"X")
+        # self.probe_image(self, fname)
+        # if dose < 2:
+            # fmdose=float(dose)
+            # if self.no_of_frames <= 65:
+                # #not eer
+                # dose_per_img=fmdose*self.no_of_frames
+                # dose_per_eer_frame=0
+            # else:
+                # #eer
+                # dose_per_img=fmdose*self.eer_rendered_frames
+                # dose_per_eer_frame=self.no_of_frames/float(dose_per_img)
+        # else:
+            # dose_per_img=dose
+            # if self.no_of_frames > 65:
+                # #eer
+                # fmdose=self.eer_rendered_frames/float(dose)
+                # dose_per_eer_frame=self.no_of_frames/float(dose)
+            # else:
+                # #not eer
+                # fmdose=self.no_of_frames/float(dose)
+                # dose_per_eer_frame=0
+        # self.fmdose=fmdose
+        # self.dose_per_img=dose_per_img
+        # self.dose_per_eer_frame=dose_per_eer_frame
+        # return dose, fmdose, dose_per_eer_frame
 
     def count_raw_files(self):
         log.info(40*"U")
@@ -248,7 +277,7 @@ class Session:
             if self.image_probed == False:
                 #the line below should probe the image
                 log.info(40*"W")
-                self.get_electron_doses(self._file_list[0], dose)
+                self.get_electron_doses(self._file_list[0])
                 self.image_probed = True
             return len(self._file_list)
         else:
@@ -280,7 +309,7 @@ class Session:
                 #log.info("No. of raw files %i"%len(self._file_list))
                 if self.image_probed == False:
                     log.info(40*"V")
-                    self.get_electron_doses(self._file_list[0], dose)
+                    self.get_electron_doses(self._file_list[0], self.dose)
                     self.image_probed = True
                 return len(self._file_list)
             except Exception as e:
@@ -319,11 +348,10 @@ class Session:
     def start_processing(self, apix, dose, kev, **data):
         self.apix = apix # pixel size
         self.dose = dose
-
         self.kev = kev # voltage
         self.superresolution = False # bool
-        log.info("apix: %s"%self.apix)
-        log.info("dose: %s"%self.dose)
+        log.info("self.apix: %s"%self.apix)
+        log.info("self.dose: %s"%self.dose)
         #log.info("no_of_frames: %s"%self.no_of_frames)
         #log.info("fmdose: %s"%self.fmdose)
         log.info("kev: %s"%self.kev)
