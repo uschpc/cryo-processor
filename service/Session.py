@@ -175,7 +175,7 @@ class Session:
         probe_img_cmd = '''
         export IMOD_DIR=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3
         export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3/bin:$PATH
-        header -size %s'
+        header -size %s
         '''%fname
         img_data=subprocess.check_output(probe_img_cmd, shell=True).split()
         img_size=[int(img_data[0]),int(img_data[1])]
