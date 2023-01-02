@@ -240,6 +240,7 @@ class Session:
         self.dose_per_img=dose_per_img
         self.dose_per_eer_frame=dose_per_eer_frame
         log.info(40*"X")
+        
         return self.dose, self.fmdose, self.dose_per_eer_frame
 
     # def get_electron_doses2(self, fname, dose):
