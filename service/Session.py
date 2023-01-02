@@ -214,7 +214,7 @@ class Session:
         
     def get_electron_doses(self, fname):
         log.info(40*"X")
-        self.probe_image(self, fname)
+        self.probe_image(fname)
         if self.dose < 2:
             fmdose=float(self.dose)
             if self.no_of_frames <= 65:
