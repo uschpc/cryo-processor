@@ -884,6 +884,7 @@ class PipelineWorkflow:
                 else:
                     logger.info("Unknown image extension - {}".format(self.basename_extension))
                     sys.exit(1)
+                logger.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXX image extension - {}".format(self.basename_extension))
                 if len(Gain_Ref_SR_name) != 0:
                     #case where we have gain reference file and superresolution
                     if self.superresolution == True:
@@ -1172,6 +1173,7 @@ class PipelineWorkflow:
                 else:
                     logger.info("Unknown image extension - {}".format(self.basename_extension))
                     sys.exit(1)
+                logger.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX image extension - {}".format(self.basename_extension))
                 if len(Gain_Ref_SR_name) != 0:
                     #case where we have gain reference file and superresolution
                     if self.superresolution == True:
@@ -1544,6 +1546,7 @@ class PipelineWorkflow:
                     else:
                         logger.info("Unknown image extension - {}".format(self.basename_extension))
                         sys.exit(1)
+                    logger.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX image extension - {}".format(self.basename_extension))
                     if len(Gain_Ref_SR_name) != 0:
                         #case where we have gain reference file and superresolution
                         if self.superresolution == True:
