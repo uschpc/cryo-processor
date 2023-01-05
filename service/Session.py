@@ -216,6 +216,7 @@ class Session:
     def get_electron_doses(self, fname):
         log.info(40*"x")
         self.probe_image(fname)
+        self.eer_rendered_frames=self._config.getint("params", "eer_rendered_frames")
         if self.dose < 2:
             fmdose=float(self.dose)
             if self.no_of_frames <= 65:
