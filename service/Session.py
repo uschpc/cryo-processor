@@ -71,7 +71,7 @@ class Session:
         self.rawdefectsmap = None
         self.basename_prefix = 'FoilHole'
         self.basename_suffix = 'fractions'
-        self.basename_extension = 'tiff'
+        self.basename_extension = None
         self.throw=0
         self.trunc=0
         self.raw_location = ""
@@ -301,6 +301,7 @@ class Session:
                             self.basename_prefix=os.path.basename(flist[0]).split('_')[0]
                             self.basename_suffix=os.path.basename(flist[0]).split('_')[-1].split('.')[0]
                             self.basename_extension=os.path.basename(flist[0]).split('_')[-1].split('.')[-1]
+                            log.info("GGGGGGGGGGGGGGGGGGG self.basename_extension %s"%self.basename_extension)
                             self.raw_location = raw_location
                             self.possible_raw_files = possible_raw_files
                             log.info("RAW files are in %s"%os.path.join(raw_location[0],raw_location[1]))
