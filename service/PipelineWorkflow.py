@@ -161,7 +161,12 @@ class PipelineWorkflow:
             exec_site.add_profiles(Namespace.PEGASUS, key="queue", value=self.partition)
         else:
             exec_site.add_profiles(Namespace.PEGASUS, key="queue", value=self.partition)
-
+        
+        exec_site.add_pegasus_profile( cores="1",
+                                        runtime="600",
+                                        memory="4096",
+                                        glite_arguments=self.glite_arguments
+        )
         self.sc.add_sites(local, exec_site)
 
     # --- Transformation Catalog (Executables and Containers) -----------------
