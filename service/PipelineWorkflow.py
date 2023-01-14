@@ -163,7 +163,7 @@ class PipelineWorkflow:
             exec_site.add_profiles(Namespace.PEGASUS, key="queue", value=self.partition)
         
         exec_site.add_pegasus_profile( cores="1",
-                                        runtime="600",
+                                        runtime="200",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
         )
@@ -848,6 +848,7 @@ class PipelineWorkflow:
         list_of_lists_of_files_to_process=split_into_n(nzlist, self.no_of_gpus)
         #prepare jobs
         logger.info("no_of_gpus bef loop {}".format(self.no_of_gpus))
+        logger.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXX image extension - {}".format(self.basename_extension))
         for element in list_of_lists_of_files_to_process:
             if fastcounter % self.cluster_size == 0:
                 slowcounter+=1
@@ -889,7 +890,7 @@ class PipelineWorkflow:
                 else:
                     logger.info("Unknown image extension - {}".format(self.basename_extension))
                     sys.exit(1)
-                logger.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXX image extension - {}".format(self.basename_extension))
+                
                 if len(Gain_Ref_SR_name) != 0:
                     #case where we have gain reference file and superresolution
                     if self.superresolution == True:
@@ -1287,6 +1288,7 @@ class PipelineWorkflow:
                                             )
                     else:
                         #do bare mc (just in case as a fallback)
+                        logger.info("MotionCor2_quad last option")
                         motionCor_job = Job("MotionCor2_quad")
                         motionCor_job.add_args(\
                                             mc2_in, self.kev, self.apix, self.fmdose,\

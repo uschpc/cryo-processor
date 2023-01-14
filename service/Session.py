@@ -226,16 +226,16 @@ class Session:
             else:
                 #eer
                 dose_per_img=fmdose*self.eer_rendered_frames
-                dose_per_eer_frame=self.no_of_frames/float(dose_per_img)
+                dose_per_eer_frame=float(dose_per_img)/self.no_of_frames
         else:
             dose_per_img=self.dose
             if self.no_of_frames > 65:
                 #eer
                 fmdose=self.eer_rendered_frames/float(self.dose)
-                dose_per_eer_frame=self.no_of_frames/float(self.dose)
+                dose_per_eer_frame=float(self.dose)/self.no_of_frames
             else:
                 #not eer
-                fmdose=self.no_of_frames/float(self.dose)
+                fmdose=float(self.dose)/self.no_of_frames
                 dose_per_eer_frame=0
         self.fmdose=fmdose
         self.dose_per_img=dose_per_img
