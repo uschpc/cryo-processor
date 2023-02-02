@@ -163,7 +163,7 @@ class PipelineWorkflow:
             exec_site.add_profiles(Namespace.PEGASUS, key="queue", value=self.partition)
         
         exec_site.add_pegasus_profile( cores="1",
-                                        runtime="200",
+                                        runtime="600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
         )
