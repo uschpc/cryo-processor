@@ -116,6 +116,7 @@ class PipelineWorkflow:
         self.props["pegasus.stageout.clusters"] = self.pgss_stgt_clusters
         #self.props["pegasus.transfer.refiner"] = "Bundle"
         self.props["pegasus.transfer.refiner"] = "BalancedCluster"
+        self.props["pegasus.integrity.checking"] = "nosymlink"
         # debug queue means we can not put too many jobs in the queue
         # Help Pegasus developers by sharing performance data (optional)
         self.props["pegasus.monitord.encoding"] = "json"
@@ -1127,28 +1128,14 @@ class PipelineWorkflow:
                 basename1 = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name1)
                 basename2 = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name2)
                 basename3 = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name3)
-                logger.info("self.basename_suffix - {}".format(self.basename_suffix))
-                logger.info("self.basename_extension - {}".format(self.basename_extension))
-                logger.info("basename0 - {}".format(basename0))
-                logger.info("basename1 - {}".format(basename1))
-                logger.info("basename2 - {}".format(basename2))
-                logger.info("basename3 - {}".format(basename3))
                 mrc_file_name0="{}.mrc".format(basename0)
                 mrc_file_name1="{}.mrc".format(basename1)
                 mrc_file_name2="{}.mrc".format(basename2)
                 mrc_file_name3="{}.mrc".format(basename3)
-                logger.info("mrc_file_name0 - {}".format(mrc_file_name0))
-                logger.info("mrc_file_name1 - {}".format(mrc_file_name1))
-                logger.info("mrc_file_name2 - {}".format(mrc_file_name2))
-                logger.info("mrc_file_name3 - {}".format(mrc_file_name3))
                 dw_file_name0="{}_DW.mrc".format(basename0)
                 dw_file_name1="{}_DW.mrc".format(basename1)
                 dw_file_name2="{}_DW.mrc".format(basename2)
                 dw_file_name3="{}_DW.mrc".format(basename3)
-                logger.info("dw_file_name0 - {}".format(dw_file_name0))
-                logger.info("dw_file_name1 - {}".format(dw_file_name1))
-                logger.info("dw_file_name2 - {}".format(dw_file_name2))
-                logger.info("dw_file_name3 - {}".format(dw_file_name3))
                 mc2_stdout_file_name0="{}_DW.stdout.txt".format(basename0)
                 mc2_stdout_file_name1="{}_DW.stdout.txt".format(basename1)
                 mc2_stdout_file_name2="{}_DW.stdout.txt".format(basename2)
@@ -1290,9 +1277,6 @@ class PipelineWorkflow:
                         #do bare mc when no gain reference
                         logger.info("MotionCor2_quad - no gain reference file")
                         motionCor_job = Job("MotionCor2_quad")
-                        logger.info("mc2_in {} self.kev {} self.apix {} self.fmdose {} self.eer_rendered_frames {}".format(mc2_in, self.kev, self.apix, self.fmdose, self.eer_rendered_frames))
-                        logger.info("self.no_of_frames {} self.eer_divisor {} self.upsampling_factor {} self.dose_per_eer_frame {} self.eer_fmintfilepath {} fraction_file_name {}".format(self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, "./{}".format(fraction_file_name0)))
-                        logger.info("mrc_file0 {} mc2_stderr_file_name0 {} mc2_stdout_file_name0 {}".format(mrc_file0, "./{}".format(mc2_stderr_file_name0), "./{}".format(mc2_stdout_file_name0)))
                         motionCor_job.add_args(\
                                             mc2_in, self.kev, self.apix, self.fmdose,\
                                             self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
