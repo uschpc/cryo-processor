@@ -832,6 +832,8 @@ class PipelineWorkflow:
         try:
             self.basename_extension=self._file_list_to_process[0].split('.')[-1]
             self.basename_suffix=self._file_list_to_process[0].split('.')[-2].split('_')[-1]
+            logger.info("self.basename_suffix1 - {}".format(self.basename_suffix))
+            logger.info("self.basename_extension1 - {}".format(self.basename_extension))
         except:
             logger.info("Currently processing {} files. Processed list length is {}. Failed to get basename extension and suffix - using tiff and fractions".format(len(self._file_list_to_process), len(self._processed_files_list)))
             raise
@@ -1140,6 +1142,8 @@ class PipelineWorkflow:
                 basename1 = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name1)
                 basename2 = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name2)
                 basename3 = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name3)
+                logger.info("self.basename_suffix - {}".format(self.basename_suffix))
+                logger.info("self.basename_extension - {}".format(self.basename_extension))
                 logger.info("basename0 - {}".format(basename0))
                 logger.info("basename1 - {}".format(basename1))
                 logger.info("basename2 - {}".format(basename2))
