@@ -834,8 +834,7 @@ class PipelineWorkflow:
             self.basename_suffix=self._file_list_to_process[0].split('.')[-2].split('_')[-1]
         except:
             logger.info("Currently processing {} files. Processed list length is {}. Failed to get basename extension and suffix - using tiff and fractions".format(len(self._file_list_to_process), len(self._processed_files_list)))
-            self.basename_extension="tiff"
-            self.basename_suffix="fractions"
+            raise
 
         #prepare for labelling to cluster more jobs (fastcounter tells how many images (and all jobs per image) to bundle in a cluster se;f.cluster_size) (slowcounter is the varying part of the label)
         fastcounter=0
@@ -1141,14 +1140,26 @@ class PipelineWorkflow:
                 basename1 = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name1)
                 basename2 = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name2)
                 basename3 = re.sub("_%s.%s$"%(self.basename_suffix,self.basename_extension), "", fraction_file_name3)
+                logger.info("basename0 - {}".format(basename0))
+                logger.info("basename1 - {}".format(basename1))
+                logger.info("basename2 - {}".format(basename2))
+                logger.info("basename3 - {}".format(basename3))
                 mrc_file_name0="{}.mrc".format(basename0)
                 mrc_file_name1="{}.mrc".format(basename1)
                 mrc_file_name2="{}.mrc".format(basename2)
                 mrc_file_name3="{}.mrc".format(basename3)
+                logger.info("mrc_file_name0 - {}".format(mrc_file_name0))
+                logger.info("mrc_file_name1 - {}".format(mrc_file_name1))
+                logger.info("mrc_file_name2 - {}".format(mrc_file_name2))
+                logger.info("mrc_file_name3 - {}".format(mrc_file_name3))
                 dw_file_name0="{}_DW.mrc".format(basename0)
                 dw_file_name1="{}_DW.mrc".format(basename1)
                 dw_file_name2="{}_DW.mrc".format(basename2)
                 dw_file_name3="{}_DW.mrc".format(basename3)
+                logger.info("dw_file_name0 - {}".format(dw_file_name0))
+                logger.info("dw_file_name1 - {}".format(dw_file_name1))
+                logger.info("dw_file_name2 - {}".format(dw_file_name2))
+                logger.info("dw_file_name3 - {}".format(dw_file_name3))
                 mc2_stdout_file_name0="{}_DW.stdout.txt".format(basename0)
                 mc2_stdout_file_name1="{}_DW.stdout.txt".format(basename1)
                 mc2_stdout_file_name2="{}_DW.stdout.txt".format(basename2)
