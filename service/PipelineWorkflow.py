@@ -163,7 +163,7 @@ class PipelineWorkflow:
             exec_site.add_profiles(Namespace.PEGASUS, key="queue", value=self.partition)
         
         exec_site.add_pegasus_profile( cores="1",
-                                        runtime="600",
+                                        runtime="3600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
         )
@@ -255,19 +255,6 @@ class PipelineWorkflow:
         #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         
         # fourth - let's do the Motioncor2
-        
-        eer2tiff = Transformation(
-            "eer2tiff",
-            site=exec_site_name,
-            pfn=os.path.join(self.base_dir, "workflow/scripts/eer2tiff_wrapper.sh"),
-            is_stageable=False
-        )
-        eer2tiff.add_pegasus_profile( cores="1",
-                                        runtime="600",
-                                        memory="4096",
-                                        glite_arguments=self.glite_arguments
-        ).add_profiles(Namespace.PEGASUS, key="job.aggregator.arguments", value="-n auto")
-        ##).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size).add_profiles(Namespace.PEGASUS, key="job.aggregator.arguments", value="-n auto")
         
         #single GPU
         motionCor2 = Transformation(
