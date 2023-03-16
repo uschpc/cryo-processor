@@ -832,8 +832,8 @@ class PipelineWorkflow:
         try:
             self.basename_extension=self._file_list_to_process[0].split('.')[-1]
             self.basename_suffix=self._file_list_to_process[0].split('.')[-2].split('_')[-1]
-            logger.info("self.basename_suffix1 - {}".format(self.basename_suffix))
-            logger.info("self.basename_extension1 - {}".format(self.basename_extension))
+            #logger.info("self.basename_suffix1 - {}".format(self.basename_suffix))
+            #logger.info("self.basename_extension1 - {}".format(self.basename_extension))
         except:
             logger.info("Currently processing {} files. Processed list length is {}. Failed to get basename extension and suffix - using tiff and fractions".format(len(self._file_list_to_process), len(self._processed_files_list)))
             raise
@@ -849,7 +849,7 @@ class PipelineWorkflow:
         list_of_lists_of_files_to_process=split_into_n(nzlist, self.no_of_gpus)
         #prepare jobs
         logger.info("no_of_gpus bef loop {}".format(self.no_of_gpus))
-        logger.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXX image extension - {}".format(self.basename_extension))
+        logger.info("image extension - {}".format(self.basename_extension))
         for element in list_of_lists_of_files_to_process:
             if fastcounter % self.cluster_size == 0:
                 slowcounter+=1
@@ -1194,7 +1194,7 @@ class PipelineWorkflow:
                 else:
                     logger.info("Unknown image extension - {}".format(self.basename_extension))
                     sys.exit(1)
-                logger.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX image extension - {}".format(self.basename_extension))
+                #logger.info("image extension - {}".format(self.basename_extension))
                 if len(Gain_Ref_SR_name) != 0:
                     #case where we have gain reference file and superresolution
                     if self.superresolution == True:
@@ -1255,7 +1255,7 @@ class PipelineWorkflow:
                                             )
                         motionCor_job.add_inputs(gff)
                     else:
-                        #do bare mc
+                        #do bare mc in case something went wrong
                         motionCor_job = Job("MotionCor2_quad")
                         motionCor_job.add_args(\
                                             mc2_in, self.kev, self.apix, self.fmdose,\
@@ -1278,7 +1278,7 @@ class PipelineWorkflow:
                                             "./{}".format(mc2_stdout_file_name3), \
                                             )
                 else:
-                    #case where we do not have gain referencee file
+                    #case where we do not have gain reference file
                     if self.throw!=0 and self.trunc!=0:
                         motionCor_job = Job("MotionCor2_quad_tt")
                         motionCor_job.add_args(\
@@ -1302,9 +1302,12 @@ class PipelineWorkflow:
                                             "./{}".format(mc2_stdout_file_name3), \
                                             )
                     else:
-                        #do bare mc (just in case as a fallback)
-                        logger.info("MotionCor2_quad last option")
+                        #do bare mc when no gain reference
+                        logger.info("MotionCor2_quad - no gain reference file")
                         motionCor_job = Job("MotionCor2_quad")
+                        logger.info("mc2_in {} self.kev {} self.apix {} self.fmdose {} self.eer_rendered_frames {}".format(mc2_in, self.kev, self.apix, self.fmdose, self.eer_rendered_frames))
+                        logger.info("self.no_of_frames {} self.eer_divisor {} self.upsampling_factor {} self.dose_per_eer_frame {} self.eer_fmintfilepath {} fraction_file_name {}".format(self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, "./{}".format(fraction_file_name0)))
+                        logger.info("mrc_file0 {} mc2_stderr_file_name0 {} mc2_stdout_file_name0 {}".format(mrc_file0, "./{}".format(mc2_stderr_file_name0), "./{}".format(mc2_stdout_file_name0)))
                         motionCor_job.add_args(\
                                             mc2_in, self.kev, self.apix, self.fmdose,\
                                             self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
@@ -1568,7 +1571,7 @@ class PipelineWorkflow:
                     else:
                         logger.info("Unknown image extension - {}".format(self.basename_extension))
                         sys.exit(1)
-                    logger.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX image extension - {}".format(self.basename_extension))
+                    #logger.info("image extension - {}".format(self.basename_extension))
                     if len(Gain_Ref_SR_name) != 0:
                         #case where we have gain reference file and superresolution
                         if self.superresolution == True:
