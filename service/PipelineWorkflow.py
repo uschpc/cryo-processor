@@ -1111,9 +1111,7 @@ class PipelineWorkflow:
                                 )
                 slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                 self.wf.add_jobs(slack_notify_job)
-                self.no_of_processed+=1
-
-                #fastcounter+=1
+                self.no_of_processed+=2
                 
             elif lenelement==4:
                 fraction_file_path0 = element[0]
@@ -1542,11 +1540,10 @@ class PipelineWorkflow:
                                 )
                 slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                 self.wf.add_jobs(slack_notify_job)
-                self.no_of_processed+=1
+                self.no_of_processed+=4
 
-                #fastcounter+=1
             else:
-                #logger.info("Element {}".format(element))
+                logger.info("Element {}".format(element))
                 for fraction_file_path in element:
                     #skip loop if one of the files is zero bytes; will get pulled in the next round
                     if os.stat(fraction_file_path).st_size == 0: pass
@@ -1608,7 +1605,7 @@ class PipelineWorkflow:
                                                 )
                             motionCor_job.add_inputs(gff)
                         else:
-                            #do bare mc
+                            #do bare mc (just in case as a fallback)
                             motionCor_job = Job("MotionCor2")
                             motionCor_job.add_args(\
                                                 mc2_in, self.kev, self.apix, self.fmdose,\
@@ -1631,8 +1628,11 @@ class PipelineWorkflow:
                                                 "./{}".format(mc2_stdout_file_name), \
                                                 )
                         else:
-                            #do bare mc (just in case as a fallback)
+                            #do bare mc - no gaiin referencee
                             motionCor_job = Job("MotionCor2")
+                            logger.info("mc2_in {} self.kev {} self.apix {} self.fmdose {} self.eer_rendered_frames {}".format(mc2_in, self.kev, self.apix, self.fmdose, self.eer_rendered_frames))
+                            logger.info("self.no_of_frames {} self.eer_divisor {} self.upsampling_factor {} self.dose_per_eer_frame {} self.eer_fmintfilepath {} fraction_file_name {}".format(self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, "./{}".format(fraction_file_name)))
+                            logger.info("mrc_file0 {} mc2_stderr_file_name0 {} mc2_stdout_file_name0 {}".format(mrc_file, "./{}".format(mc2_stderr_file_name), "./{}".format(mc2_stdout_file_name)))
                             motionCor_job.add_args(\
                                                 mc2_in, self.kev, self.apix, self.fmdose,\
                                                 self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
