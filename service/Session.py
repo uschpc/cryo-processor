@@ -66,7 +66,7 @@ class Session:
         self.apix = None
         
         self.kev = None
-        self.superresolution = False
+        self.superresolution = True
         self.rawgainref = None
         self.rawdefectsmap = None
         self.basename_prefix = 'FoilHole'
@@ -326,7 +326,7 @@ class Session:
         self.apix = apix # pixel size
         self.dose = dose
         self.kev = kev # voltage
-        self.superresolution = False # bool
+        self.superresolution = True # bool
         log.info("self.apix: %s"%self.apix)
         log.info("self.dose: %s"%self.dose)
         #log.info("no_of_frames: %s"%self.no_of_frames)
@@ -336,7 +336,7 @@ class Session:
         #default - will not produce optimal results, but will prevent from failing
         if self.apix == None: self.apix = 0.813
         if self.kev == None: self.kev = 300
-        if self.superresolution == None: self.superresolution = False
+        #if self.superresolution == None: self.superresolution = False
         #self.rawgainref = data.get(rawgainref, default=None)
         try: self.rawgainref = data[rawgainref] # ls like regex to pickup raw gain ref file
         except: self.rawgainref = None

@@ -1735,7 +1735,8 @@ class PipelineWorkflow:
         except: pass
         try: self.trunc=datum.trunc
         except: pass
-        self.superresolution = datum.superresolution
+        #self.superresolution = datum.superresolution
+        self.superresolution = True
 
     # --- Submit Workflow -----------------------------------------------------
     def submit_workflow(self):
