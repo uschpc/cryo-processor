@@ -1275,7 +1275,6 @@ class PipelineWorkflow:
                                             )
                     else:
                         #do bare mc when no gain reference
-                        logger.info("MotionCor2_quad - no gain reference file")
                         motionCor_job = Job("MotionCor2_quad")
                         motionCor_job.add_args(\
                                             mc2_in, self.kev, self.apix, self.fmdose,\

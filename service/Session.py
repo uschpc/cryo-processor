@@ -244,34 +244,6 @@ class Session:
         
         return self.dose, self.fmdose, self.dose_per_eer_frame
 
-    # def get_electron_doses2(self, fname, dose):
-        # log.info(40*"X")
-        # self.probe_image(self, fname)
-        # if dose < 2:
-            # fmdose=float(dose)
-            # if self.no_of_frames <= 65:
-                # #not eer
-                # dose_per_img=fmdose*self.no_of_frames
-                # dose_per_eer_frame=0
-            # else:
-                # #eer
-                # dose_per_img=fmdose*self.eer_rendered_frames
-                # dose_per_eer_frame=self.no_of_frames/float(dose_per_img)
-        # else:
-            # dose_per_img=dose
-            # if self.no_of_frames > 65:
-                # #eer
-                # fmdose=self.eer_rendered_frames/float(dose)
-                # dose_per_eer_frame=self.no_of_frames/float(dose)
-            # else:
-                # #not eer
-                # fmdose=self.no_of_frames/float(dose)
-                # dose_per_eer_frame=0
-        # self.fmdose=fmdose
-        # self.dose_per_img=dose_per_img
-        # self.dose_per_eer_frame=dose_per_eer_frame
-        # return dose, fmdose, dose_per_eer_frame
-
     def count_raw_files(self):
         log.info(40*"U")
         if self.raw_location != "" and self.possible_raw_files != "":
@@ -525,7 +497,7 @@ class Session:
             return
  
         # time to submit a new one? 
-        if self._next_processing_time > 0 and self._next_processing_time < time.time() and self.retries < 30:
+        if self._next_processing_time > 0 and self._next_processing_time < time.time() and self.retries < 60:
             # space the workflows a little bit in case of failure
             log.info("IMPORTANT: SESSION SENT FOR PROCESSING")
             log.info("self._next_processing_time {}".format(self._next_processing_time))
@@ -535,7 +507,7 @@ class Session:
             #log.info("IMPORTANT-1: RETRIES RESET {}".format(self.retries))
             
             
-        elif self._next_processing_time > 0 and self._no_of_processed > 0 and self._no_of_processed < self._no_of_raw and self._is_loaded == True and self._next_processing_time < time.time() and self.retries < 30:
+        elif self._next_processing_time > 0 and self._no_of_processed > 0 and self._no_of_processed < self._no_of_raw and self._is_loaded == True and self._next_processing_time < time.time() and self.retries < 60:
             # time to submit a new one after an unscheduled shutdown mid-processing
             # space the workflows a little bit in case of failure
             log.info("IMPORTANT: SESSION LOADED - TRYING TO RESUME")
@@ -547,7 +519,7 @@ class Session:
             #self.retries = 0
             #log.info("IMPORTANT-2: RETRIES RESET {}".format(self.retries))
             
-        elif self._state == self._STATE_INCOMPLETE_OR_EMPTY and self.retries == 30:
+        elif self._state == self._STATE_INCOMPLETE_OR_EMPTY and self.retries == 60:
             log.info("Marking as failed")
             self._next_processing_time = 0
             self._state = self._STATE_PROCESSING_FAILURE
@@ -652,12 +624,12 @@ class Session:
             log.info("self._file_list_to_process: len {}".format(len(self._file_list_to_process)))
             log.info("self._sent_for_processing BEFOR: len {}".format(len(self._sent_for_processing)))
             #mark as incomplete if no files are found
-            if len(self._file_list_to_process)==0 and self.retries <=30:
+            if len(self._file_list_to_process)==0 and self.retries <=60:
                 self._state = self._STATE_INCOMPLETE_OR_EMPTY
                 self.retries+=1
-                log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS FAILURE. Next try in 120s".format(6-self.retries))
+                log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS FAILURE. Next try in 120s".format(61-self.retries))
                 return False
-            elif len(self._file_list_to_process)==0 and self.retries > 30:
+            elif len(self._file_list_to_process)==0 and self.retries > 60:
                 log.info("Marking as failed")
                 self._next_processing_time = 0
                 self._state = self._STATE_PROCESSING_FAILURE
