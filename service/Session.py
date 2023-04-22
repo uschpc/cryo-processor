@@ -6,6 +6,7 @@ import pprint
 import shutil
 import time
 import glob
+import subprocess
 
 from Pegasus.api import *
 
@@ -63,19 +64,26 @@ class Session:
         self._state = self._STATE_UNKNOWN
         # defaults to get us started
         self.apix = None
-        self.fmdose = None
+        
         self.kev = None
-        self.superresolution = False
+        self.superresolution = True
         self.rawgainref = None
         self.rawdefectsmap = None
         self.basename_prefix = 'FoilHole'
         self.basename_suffix = 'fractions'
-        self.basename_extension = 'tiff'
+        self.basename_extension = None
         self.throw=0
         self.trunc=0
         self.raw_location = ""
         self.possible_raw_files = ""
         self.particle_size = 0
+        
+        #fmdose: was dose per frame, now we will try to guess if it is per image or per frame
+        self.fmdose = None
+        self.dose_per_img = None
+        self.dose = None
+        self.image_probed = False
+        
         #handling files for processing moved here
         self._gainref_done = False
         self._gain_ref_fn = []
@@ -110,6 +118,8 @@ class Session:
             "next_processing_time": self._next_processing_time,
             "apix": self.apix,
             "fmdose": self.fmdose,
+            "dose_per_img": self.dose_per_img,
+            "dose": self.dose,
             "kev": self.kev,
             "superresolution": self.superresolution,
             "rawgainref": self.rawgainref,
@@ -128,9 +138,15 @@ class Session:
         self._next_processing_time = session_data["next_processing_time"]
         self._is_loaded = True
         self.apix = session_data["apix"]
-        self.fmdose = session_data["fmdose"]
+        try: self.fmdose = session_data["fmdose"]
+        except: self.fmdose = None
+        try: self.dose_per_img = session_data["dose_per_img"]
+        except: self.dose_per_img = None
+        try: self.dose = session_data["dose"]
+        except self.dose = None
         self.kev = session_data["kev"]
-        self.superresolution = session_data["superresolution"]
+        try: self.superresolution = session_data["superresolution"]
+        except: self.superresolution = True
         self.rawgainref = session_data["rawgainref"]
         self.rawdefectsmap = session_data["rawdefectsmap"]
         self.basename_prefix = session_data["basename_prefix"]
@@ -140,6 +156,8 @@ class Session:
         self.trunc = session_data["trunc"]
         self.particle_size = session_data["particle_size"]
         self.retries = session_data["retries"]
+        try: self.no_of_frames = session_data["no_of_frames"]
+        except: self.no_of_frames = None
         #try to guess how many files were proceesed
         self._no_of_processed = self.count_processed_files()
         self._sent_for_processing = [os.path.basename(x).replace('_DW.mrc','') for x in self._processed_files_list]
@@ -155,11 +173,93 @@ class Session:
         log.info("session loaded")
 
 
+    def probe_image(self, fname):
+        import subprocess
+        log.info(40*"z")
+        log.info("Start image probing")
+        probe_img_cmd = '''
+        export IMOD_DIR=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3
+        export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3/bin:$PATH
+        header -size %s
+        '''%fname
+        img_data=subprocess.check_output(probe_img_cmd, shell=True).split()
+        img_size=[int(img_data[0]),int(img_data[1])]
+        no_of_frames=int(img_data[2])
+        self.img_size=img_size
+        log.info("img_probe self.img_size {}".format(self.img_size))
+        self.no_of_frames=no_of_frames
+        log.info("img_probe self.no_of_frames {}".format(self.no_of_frames))
+        self.get_upsampling_factor(img_size)
+        log.info("img_probe self.get_upsampling_factor {}".format(self.upsampling_factor))
+        log.info("end image probing")
+        log.info(40*"Z")
+        return self.img_size, self.no_of_frames
+        
+        
+    def get_upsampling_factor(self,img_size):
+        img_width=img_size[0]
+        #k3 5760x4092
+        if img_width==5760:
+            upsampling_factor = 1
+        elif img_width==11520:
+            upsampling_factor = 2
+        elif img_width==23040:
+            upsampling_factor = 4
+        #f4 4096x4096
+        elif img_width==4096:
+            upsampling_factor = 1
+        elif img_width==8192:
+            upsampling_factor = 2
+        elif img_width==16384:
+            upsampling_factor = 4
+        #whatever. it is ok to have it here
+        else:
+            upsampling_factor = 1
+        self.upsampling_factor=upsampling_factor
+        return upsampling_factor
+        
+    def get_electron_doses(self, fname):
+        log.info(40*"x")
+        self.probe_image(fname)
+        self.eer_rendered_frames=self._config.getint("params", "eer_rendered_frames")
+        if self.dose < 2:
+            fmdose=float(self.dose)
+            if self.no_of_frames <= 65:
+                #not eer
+                dose_per_img=fmdose*self.no_of_frames
+                dose_per_eer_frame=0
+            else:
+                #eer
+                dose_per_img=fmdose*self.eer_rendered_frames
+                dose_per_eer_frame=float(dose_per_img)/self.no_of_frames
+        else:
+            dose_per_img=self.dose
+            if self.no_of_frames > 65:
+                #eer
+                fmdose=self.eer_rendered_frames/float(self.dose)
+                dose_per_eer_frame=float(self.dose)/self.no_of_frames
+            else:
+                #not eer
+                fmdose=float(self.dose)/self.no_of_frames
+                dose_per_eer_frame=0
+        self.fmdose=fmdose
+        self.dose_per_img=dose_per_img
+        self.dose_per_eer_frame=dose_per_eer_frame
+        log.info(40*"X")
+        
+        return self.dose, self.fmdose, self.dose_per_eer_frame
+
     def count_raw_files(self):
+        log.info(40*"U")
         if self.raw_location != "" and self.possible_raw_files != "":
             log.info("using raw_location dir %s and %s as regex"%(self.raw_location,self.possible_raw_files))
             self._file_list = self._find_files(self.raw_location[0], self.raw_location[1])
             log.info("No. of raw files in (shortcut) %i"%len(self._file_list))
+            if self.image_probed == False:
+                #the line below should probe the image
+                log.info(40*"W")
+                self.get_electron_doses(self._file_list[0])
+                self.image_probed = True
             return len(self._file_list)
         else:
             try:
@@ -178,6 +278,7 @@ class Session:
                             self.basename_prefix=os.path.basename(flist[0]).split('_')[0]
                             self.basename_suffix=os.path.basename(flist[0]).split('_')[-1].split('.')[0]
                             self.basename_extension=os.path.basename(flist[0]).split('_')[-1].split('.')[-1]
+                            log.info("GGGGGGGGGGGGGGGGGGG self.basename_extension %s"%self.basename_extension)
                             self.raw_location = raw_location
                             self.possible_raw_files = possible_raw_files
                             log.info("RAW files are in %s"%os.path.join(raw_location[0],raw_location[1]))
@@ -188,10 +289,14 @@ class Session:
                     break
                 #log.info("RAW files are in %s"%os.path.join(os.path.join(self._session_dir, "raw")))
                 #log.info("No. of raw files %i"%len(self._file_list))
+                if self.image_probed == False:
+                    log.info(40*"V")
+                    self.get_electron_doses(self._file_list[0])
+                    self.image_probed = True
                 return len(self._file_list)
             except Exception as e:
                 log.info(e)
-                log.info("There is an issue with determining raw_location")
+                log.info("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\nThere is an issue with determining raw_location")
                 return 0
       
 
@@ -221,20 +326,22 @@ class Session:
         return response
 
     
-    def start_processing(self, apix, fmdose, kev, superresolution, **data):
+    #def start_processing(self, apix, dose, kev, superresolution, **data):
+    def start_processing(self, apix, dose, kev, **data):
         self.apix = apix # pixel size
-        self.fmdose = fmdose # dose in e-/A^2 per frame
+        self.dose = dose
         self.kev = kev # voltage
-        self.superresolution = superresolution # bool
-        log.info("apix: %s"%self.apix)
-        log.info("fmdose: %s"%self.fmdose)
+        self.superresolution = True # bool
+        log.info("self.apix: %s"%self.apix)
+        log.info("self.dose: %s"%self.dose)
+        #log.info("no_of_frames: %s"%self.no_of_frames)
+        #log.info("fmdose: %s"%self.fmdose)
         log.info("kev: %s"%self.kev)
-        log.info("superresolution: %s"%self.superresolution)
+        #log.info("superresolution: %s"%self.superresolution)
         #default - will not produce optimal results, but will prevent from failing
         if self.apix == None: self.apix = 0.813
-        if self.fmdose == None: self.fmdose = 1.224
         if self.kev == None: self.kev = 300
-        if self.superresolution == None: self.superresolution = False
+        #if self.superresolution == None: self.superresolution = False
         #self.rawgainref = data.get(rawgainref, default=None)
         try: self.rawgainref = data[rawgainref] # ls like regex to pickup raw gain ref file
         except: self.rawgainref = None
@@ -315,8 +422,9 @@ class Session:
 
 
     def _update_processing(self):
-
+        #the line below should also probe the image
         self._no_of_raw = self.count_raw_files()
+        #
         self._no_of_processed = self.count_processed_files()
         
         self._percent = 0
@@ -388,13 +496,19 @@ class Session:
                     # return False
 
         # end condition
-        if (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0):
+        if (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0) and self.Wretries == 10:
             self._next_processing_time = 0
             self._state = self._STATE_PROCESSING_COMPLETE
             return
- 
+        elif (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0) and self.retries < 10:
+            self._next_processing_time = time.time() + 120
+            #self._state = self._STATE_PROCESSING_COMPLETE
+            log.info("IMPORTANT: DATASET PROCESSING ALMOST COMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS COMPLETED. Next try in 120s".format(11-self.retries))
+            self.retries+=1
+            return
+            
         # time to submit a new one? 
-        if self._next_processing_time > 0 and self._next_processing_time < time.time() and self.retries < 30:
+        if self._next_processing_time > 0 and self._next_processing_time < time.time() and self.retries < 60:
             # space the workflows a little bit in case of failure
             log.info("IMPORTANT: SESSION SENT FOR PROCESSING")
             log.info("self._next_processing_time {}".format(self._next_processing_time))
@@ -404,7 +518,7 @@ class Session:
             #log.info("IMPORTANT-1: RETRIES RESET {}".format(self.retries))
             
             
-        elif self._next_processing_time > 0 and self._no_of_processed > 0 and self._no_of_processed < self._no_of_raw and self._is_loaded == True and self._next_processing_time < time.time() and self.retries < 30:
+        elif self._next_processing_time > 0 and self._no_of_processed > 0 and self._no_of_processed < self._no_of_raw and self._is_loaded == True and self._next_processing_time < time.time() and self.retries < 60:
             # time to submit a new one after an unscheduled shutdown mid-processing
             # space the workflows a little bit in case of failure
             log.info("IMPORTANT: SESSION LOADED - TRYING TO RESUME")
@@ -416,7 +530,7 @@ class Session:
             #self.retries = 0
             #log.info("IMPORTANT-2: RETRIES RESET {}".format(self.retries))
             
-        elif self._state == self._STATE_INCOMPLETE_OR_EMPTY and self.retries == 30:
+        elif self._state == self._STATE_INCOMPLETE_OR_EMPTY and self.retries == 60:
             log.info("Marking as failed")
             self._next_processing_time = 0
             self._state = self._STATE_PROCESSING_FAILURE
@@ -521,12 +635,12 @@ class Session:
             log.info("self._file_list_to_process: len {}".format(len(self._file_list_to_process)))
             log.info("self._sent_for_processing BEFOR: len {}".format(len(self._sent_for_processing)))
             #mark as incomplete if no files are found
-            if len(self._file_list_to_process)==0 and self.retries <=30:
+            if len(self._file_list_to_process)==0 and self.retries <=60:
                 self._state = self._STATE_INCOMPLETE_OR_EMPTY
                 self.retries+=1
-                log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS FAILURE. Next try in 120s".format(6-self.retries))
+                log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS FAILURE. Next try in 120s".format(61-self.retries))
                 return False
-            elif len(self._file_list_to_process)==0 and self.retries > 30:
+            elif len(self._file_list_to_process)==0 and self.retries > 60:
                 log.info("Marking as failed")
                 self._next_processing_time = 0
                 self._state = self._STATE_PROCESSING_FAILURE
@@ -557,6 +671,7 @@ class Session:
                                     no_of_files_to_proc_in_cycle=self._config.getint("params", "no_of_files_to_proc_in_cycle"),
                                     pgss_stgt_clusters=str(self._config.getint("params", "pegasus_stageout_clusters", fallback=str(self._config.getint("params", "no_of_files_to_proc_in_cycle")/10))),
                                     no_of_gpus=self._config.getint("params", "no_of_gpus"),
+                                    eer_rendered_frames=self._config.getint("params", "eer_rendered_frames"),
                                     )
         try:
             #do final check on required params

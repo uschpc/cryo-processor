@@ -218,17 +218,9 @@ async def start_processing(project_id: str,
                            user: str,
                            session_id: str, 
                            apix: float,
-                           fmdose: float,
+                           dose: float,
                            kev: int,
-                           # rawgainref: str,
-                           # rawdefectsmap: str,
-                           # basename_prefix: str,
-                           # basename_suffix: str,
-                           # basename_extension: str,
-                           # throw: int,
-                           # trunc: int,
-                           # particle_size: int,
-                           superresolution: bool,
+                           #superresolution: bool,
                            api_key: APIKey = Depends(get_api_key)
                            ):
 
@@ -244,17 +236,9 @@ async def start_processing(project_id: str,
 
     if not s.is_processing():
         s.start_processing(apix = apix,
-            fmdose = fmdose,
+            dose = dose,
             kev = kev,
-            # rawgainref = rawgainref,
-            # rawdefectsmap = rawdefectsmap,
-            # basename_prefix = basename_prefix,
-            # basename_suffix = basename_suffix,
-            # basename_extension = basename_extension,
-            # throw = throw,
-            # trunc = trunc,
-            # particle_size = particle_size,
-            superresolution = superresolution,
+            #superresolution = superresolution,
             )
 
     return {"result": "ok"}
@@ -265,17 +249,9 @@ async def resume_processing(project_id: str,
                            user: str,
                            session_id: str, 
                            apix: float,
-                           fmdose: float,
+                           dose: float,
                            kev: int,
-                           # rawgainref: str,
-                           # rawdefectsmap: str,
-                           # basename_prefix: str,
-                           # basename_suffix: str,
-                           # basename_extension: str,
-                           # throw: int,
-                           # trunc: int,
-                           # particle_size: int,
-                           superresolution: bool,
+                           #superresolution: bool,
                            api_key: APIKey = Depends(get_api_key)
                            ):
 
@@ -291,17 +267,9 @@ async def resume_processing(project_id: str,
 
     if not s.is_processing():
         s.start_processing(apix = apix,
-            fmdose = fmdose,
+            dose = dose,
             kev = kev,
-            # rawgainref = rawgainref,
-            # rawdefectsmap = rawdefectsmap,
-            # basename_prefix = basename_prefix,
-            # basename_suffix = basename_suffix,
-            # basename_extension = basename_extension,
-            # throw = throw,
-            # trunc = trunc,
-            # particle_size = particle_size,
-            superresolution = superresolution,
+            #superresolution = superresolution,
             )
 
     return {"result": "ok"}

@@ -51,7 +51,7 @@ class PipelineWorkflow:
     def __init__(self, base_dir, session_dir, inputs_dir, outputs_dir, debug=True, partition="debug", \
                     account="osinski_703", glite_arguments="--gres=gpu:p100:2", \
                     maxjobs=100, debug_maxjobs=10, cluster_size=10, \
-                    no_of_files_to_proc_in_cycle=100, pgss_stgt_clusters="10", no_of_gpus=2):
+                    no_of_files_to_proc_in_cycle=100, pgss_stgt_clusters="10", no_of_gpus=2, eer_rendered_frames=40):
         self.wf_name = "motioncor2"
         self.debug = debug
         logger.info("PipelineWorkflow init")
@@ -76,6 +76,7 @@ class PipelineWorkflow:
         self.cluster_size = cluster_size
         self.no_of_files_to_proc_in_cycle = no_of_files_to_proc_in_cycle
         self.no_of_gpus = no_of_gpus
+        self.eer_rendered_frames = eer_rendered_frames
         if self.debug:
             logger.info("sbase_dir {}".format(self.base_dir))
             logger.info("session_dir {}".format(self.session_dir))
@@ -90,6 +91,7 @@ class PipelineWorkflow:
             logger.info("debug_maxjobs {}".format(self.debug_maxjobs))
             logger.info("cluster_size {}".format(self.cluster_size))
             logger.info("no_of_files_to_proc_in_cycle {}".format(self.no_of_files_to_proc_in_cycle))
+            logger.info("eer_rendered_frames {}".format(self.eer_rendered_frames))
         self.no_of_processed = 0
         self.no_of_raw = 0
         self.gainref_done = False
@@ -114,6 +116,7 @@ class PipelineWorkflow:
         self.props["pegasus.stageout.clusters"] = self.pgss_stgt_clusters
         #self.props["pegasus.transfer.refiner"] = "Bundle"
         self.props["pegasus.transfer.refiner"] = "BalancedCluster"
+        self.props["pegasus.integrity.checking"] = "nosymlink"
         # debug queue means we can not put too many jobs in the queue
         # Help Pegasus developers by sharing performance data (optional)
         self.props["pegasus.monitord.encoding"] = "json"
@@ -159,8 +162,9 @@ class PipelineWorkflow:
             exec_site.add_profiles(Namespace.PEGASUS, key="queue", value=self.partition)
         else:
             exec_site.add_profiles(Namespace.PEGASUS, key="queue", value=self.partition)
+        
         exec_site.add_pegasus_profile( cores="1",
-                                        runtime="600",
+                                        runtime="3600",
                                         memory="4096",
                                         glite_arguments=self.glite_arguments
         )
@@ -252,19 +256,6 @@ class PipelineWorkflow:
         #).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size)
         
         # fourth - let's do the Motioncor2
-        
-        eer2tiff = Transformation(
-            "eer2tiff",
-            site=exec_site_name,
-            pfn=os.path.join(self.base_dir, "workflow/scripts/eer2tiff_wrapper.sh"),
-            is_stageable=False
-        )
-        eer2tiff.add_pegasus_profile( cores="1",
-                                        runtime="600",
-                                        memory="4096",
-                                        glite_arguments=self.glite_arguments
-        ).add_profiles(Namespace.PEGASUS, key="job.aggregator.arguments", value="-n auto")
-        ##).add_profiles(Namespace.PEGASUS, key="clusters.size", value=self.cluster_size).add_profiles(Namespace.PEGASUS, key="job.aggregator.arguments", value="-n auto")
         
         #single GPU
         motionCor2 = Transformation(
@@ -829,22 +820,24 @@ class PipelineWorkflow:
         try:
             self.basename_extension=self._file_list_to_process[0].split('.')[-1]
             self.basename_suffix=self._file_list_to_process[0].split('.')[-2].split('_')[-1]
+            #logger.info("self.basename_suffix1 - {}".format(self.basename_suffix))
+            #logger.info("self.basename_extension1 - {}".format(self.basename_extension))
         except:
             logger.info("Currently processing {} files. Processed list length is {}. Failed to get basename extension and suffix - using tiff and fractions".format(len(self._file_list_to_process), len(self._processed_files_list)))
-            self.basename_extension="tiff"
-            self.basename_suffix="fractions"
+            raise
 
         #prepare for labelling to cluster more jobs (fastcounter tells how many images (and all jobs per image) to bundle in a cluster se;f.cluster_size) (slowcounter is the varying part of the label)
         fastcounter=0
         slowcounter=0
         
-        #remove zero-bytte files from processing
+        #remove zero-byte files from processing
         nzlist=[x for x in self._file_list_to_process if os.stat(x).st_size != 0]
         
         #prep list of self.no_of_gpus elem
         list_of_lists_of_files_to_process=split_into_n(nzlist, self.no_of_gpus)
         #prepare jobs
         logger.info("no_of_gpus bef loop {}".format(self.no_of_gpus))
+        logger.info("image extension - {}".format(self.basename_extension))
         for element in list_of_lists_of_files_to_process:
             if fastcounter % self.cluster_size == 0:
                 slowcounter+=1
@@ -886,6 +879,7 @@ class PipelineWorkflow:
                 else:
                     logger.info("Unknown image extension - {}".format(self.basename_extension))
                     sys.exit(1)
+                
                 if len(Gain_Ref_SR_name) != 0:
                     #case where we have gain reference file and superresolution
                     if self.superresolution == True:
@@ -902,7 +896,8 @@ class PipelineWorkflow:
                         if self.throw!=0 and self.trunc!=0:
                             motionCor_job = Job("MotionCor2_dual_gtt")
                             motionCor_job.add_args(\
-                                            mc2_in, self.kev, self.apix, self.fmdose, gff, self.throw, self.trunc,\
+                                            mc2_in, self.kev, self.apix, self.fmdose, gff, self.throw, self.trunc, \
+                                            self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
                                             "./{}".format(fraction_file_name0), 
                                             mrc_file0, \
                                             "./{}".format(mc2_stderr_file_name0), \
@@ -917,6 +912,7 @@ class PipelineWorkflow:
                             motionCor_job = Job("MotionCor2_dual_g")
                             motionCor_job.add_args(\
                                             mc2_in, self.kev, self.apix, self.fmdose, gff,\
+                                            self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
                                             "./{}".format(mc2_stderr_file_name0), \
@@ -932,6 +928,7 @@ class PipelineWorkflow:
                         motionCor_job = Job("MotionCor2_dual")
                         motionCor_job.add_args(\
                                             mc2_in, self.kev, self.apix, self.fmdose,\
+                                            self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
                                             "./{}".format(mc2_stderr_file_name0), \
@@ -947,6 +944,7 @@ class PipelineWorkflow:
                         motionCor_job = Job("MotionCor2_dual_tt")
                         motionCor_job.add_args(\
                                             mc2_in, self.kev, self.apix, self.fmdose, self.throw, self.trunc,\
+                                            self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
                                             "./{}".format(mc2_stderr_file_name0), \
@@ -961,6 +959,7 @@ class PipelineWorkflow:
                         motionCor_job = Job("MotionCor2_dual")
                         motionCor_job.add_args(\
                                             mc2_in, self.kev, self.apix, self.fmdose,\
+                                            self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
                                             "./{}".format(mc2_stderr_file_name0), \
@@ -1100,9 +1099,7 @@ class PipelineWorkflow:
                                 )
                 slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                 self.wf.add_jobs(slack_notify_job)
-                self.no_of_processed+=1
-
-                #fastcounter+=1
+                self.no_of_processed+=2
                 
             elif lenelement==4:
                 fraction_file_path0 = element[0]
@@ -1169,6 +1166,7 @@ class PipelineWorkflow:
                 else:
                     logger.info("Unknown image extension - {}".format(self.basename_extension))
                     sys.exit(1)
+                #logger.info("image extension - {}".format(self.basename_extension))
                 if len(Gain_Ref_SR_name) != 0:
                     #case where we have gain reference file and superresolution
                     if self.superresolution == True:
@@ -1186,6 +1184,7 @@ class PipelineWorkflow:
                             motionCor_job = Job("MotionCor2_quad_gtt")
                             motionCor_job.add_args(\
                                             mc2_in, self.kev, self.apix, self.fmdose, gff, self.throw, self.trunc,\
+                                            self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
                                             "./{}".format(fraction_file_name0), 
                                             mrc_file0, \
                                             "./{}".format(mc2_stderr_file_name0), \
@@ -1208,6 +1207,7 @@ class PipelineWorkflow:
                             motionCor_job = Job("MotionCor2_quad_g")
                             motionCor_job.add_args(\
                                             mc2_in, self.kev, self.apix, self.fmdose, gff,\
+                                            self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
                                             "./{}".format(mc2_stderr_file_name0), \
@@ -1227,10 +1227,11 @@ class PipelineWorkflow:
                                             )
                         motionCor_job.add_inputs(gff)
                     else:
-                        #do bare mc
+                        #do bare mc in case something went wrong
                         motionCor_job = Job("MotionCor2_quad")
                         motionCor_job.add_args(\
                                             mc2_in, self.kev, self.apix, self.fmdose,\
+                                            self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
                                             "./{}".format(mc2_stderr_file_name0), \
@@ -1249,11 +1250,12 @@ class PipelineWorkflow:
                                             "./{}".format(mc2_stdout_file_name3), \
                                             )
                 else:
-                    #case where we do not have gain referencee file
+                    #case where we do not have gain reference file
                     if self.throw!=0 and self.trunc!=0:
                         motionCor_job = Job("MotionCor2_quad_tt")
                         motionCor_job.add_args(\
                                             mc2_in, self.kev, self.apix, self.fmdose, self.throw, self.trunc,\
+                                            self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
                                             "./{}".format(mc2_stderr_file_name0), \
@@ -1272,10 +1274,11 @@ class PipelineWorkflow:
                                             "./{}".format(mc2_stdout_file_name3), \
                                             )
                     else:
-                        #do bare mc (just in case as a fallback)
+                        #do bare mc when no gain reference
                         motionCor_job = Job("MotionCor2_quad")
                         motionCor_job.add_args(\
                                             mc2_in, self.kev, self.apix, self.fmdose,\
+                                            self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
                                             "./{}".format(fraction_file_name0), \
                                             mrc_file0, \
                                             "./{}".format(mc2_stderr_file_name0), \
@@ -1507,11 +1510,10 @@ class PipelineWorkflow:
                                 )
                 slack_notify_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                 self.wf.add_jobs(slack_notify_job)
-                self.no_of_processed+=1
+                self.no_of_processed+=4
 
-                #fastcounter+=1
             else:
-                #logger.info("Element {}".format(element))
+                logger.info("Element {}".format(element))
                 for fraction_file_path in element:
                     #skip loop if one of the files is zero bytes; will get pulled in the next round
                     if os.stat(fraction_file_path).st_size == 0: pass
@@ -1536,6 +1538,7 @@ class PipelineWorkflow:
                     else:
                         logger.info("Unknown image extension - {}".format(self.basename_extension))
                         sys.exit(1)
+                    #logger.info("image extension - {}".format(self.basename_extension))
                     if len(Gain_Ref_SR_name) != 0:
                         #case where we have gain reference file and superresolution
                         if self.superresolution == True:
@@ -1553,6 +1556,7 @@ class PipelineWorkflow:
                                 motionCor_job = Job("MotionCor2_gtt")
                                 motionCor_job.add_args(\
                                                 mc2_in, self.kev, self.apix, self.fmdose, gff, self.throw, self.trunc,\
+                                                self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
                                                 "./{}".format(fraction_file_name), 
                                                 mrc_file, \
                                                 "./{}".format(mc2_stderr_file_name), \
@@ -1563,6 +1567,7 @@ class PipelineWorkflow:
                                 motionCor_job = Job("MotionCor2_g")
                                 motionCor_job.add_args(\
                                                 mc2_in, self.kev, self.apix, self.fmdose, gff,\
+                                                self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
                                                 "./{}".format(fraction_file_name), \
                                                 mrc_file, \
                                                 "./{}".format(mc2_stderr_file_name), \
@@ -1570,10 +1575,11 @@ class PipelineWorkflow:
                                                 )
                             motionCor_job.add_inputs(gff)
                         else:
-                            #do bare mc
+                            #do bare mc (just in case as a fallback)
                             motionCor_job = Job("MotionCor2")
                             motionCor_job.add_args(\
                                                 mc2_in, self.kev, self.apix, self.fmdose,\
+                                                self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
                                                 "./{}".format(fraction_file_name), \
                                                 mrc_file, \
                                                 "./{}".format(mc2_stderr_file_name), \
@@ -1585,16 +1591,21 @@ class PipelineWorkflow:
                             motionCor_job = Job("MotionCor2_tt")
                             motionCor_job.add_args(\
                                                 mc2_in, self.kev, self.apix, self.fmdose, self.throw, self.trunc,\
+                                                self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
                                                 "./{}".format(fraction_file_name), \
                                                 mrc_file, \
                                                 "./{}".format(mc2_stderr_file_name), \
                                                 "./{}".format(mc2_stdout_file_name), \
                                                 )
                         else:
-                            #do bare mc (just in case as a fallback)
+                            #do bare mc - no gaiin referencee
                             motionCor_job = Job("MotionCor2")
+                            logger.info("mc2_in {} self.kev {} self.apix {} self.fmdose {} self.eer_rendered_frames {}".format(mc2_in, self.kev, self.apix, self.fmdose, self.eer_rendered_frames))
+                            logger.info("self.no_of_frames {} self.eer_divisor {} self.upsampling_factor {} self.dose_per_eer_frame {} self.eer_fmintfilepath {} fraction_file_name {}".format(self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, "./{}".format(fraction_file_name)))
+                            logger.info("mrc_file0 {} mc2_stderr_file_name0 {} mc2_stdout_file_name0 {}".format(mrc_file, "./{}".format(mc2_stderr_file_name), "./{}".format(mc2_stdout_file_name)))
                             motionCor_job.add_args(\
                                                 mc2_in, self.kev, self.apix, self.fmdose,\
+                                                self.eer_rendered_frames, self.no_of_frames, self.eer_divisor, self.upsampling_factor, self.dose_per_eer_frame, self.eer_fmintfilepath, \
                                                 "./{}".format(fraction_file_name), \
                                                 mrc_file, \
                                                 "./{}".format(mc2_stderr_file_name), \
@@ -1686,6 +1697,11 @@ class PipelineWorkflow:
         self.apix = datum.apix
         self.fmdose = datum.fmdose
         self.kev = datum.kev
+        self.no_of_frames=datum.no_of_frames
+        self.eer_divisor=self.no_of_frames/self.eer_rendered_frames
+        self.eer_fmintfilepath="/dev/shm/FmIntFile.txt"
+        self.dose_per_eer_frame=datum.dose_per_eer_frame
+        self.upsampling_factor=datum.upsampling_factor
         self._gainref_done = datum._gainref_done
         #make it go even if gain ref not found
         try: self._gain_ref_fn = datum._gain_ref_fn
@@ -1719,7 +1735,8 @@ class PipelineWorkflow:
         except: pass
         try: self.trunc=datum.trunc
         except: pass
-        self.superresolution = datum.superresolution
+        #self.superresolution = datum.superresolution
+        self.superresolution = True
 
     # --- Submit Workflow -----------------------------------------------------
     def submit_workflow(self):
