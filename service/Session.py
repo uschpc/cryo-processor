@@ -143,7 +143,7 @@ class Session:
         try: self.dose_per_img = session_data["dose_per_img"]
         except: self.dose_per_img = None
         try: self.dose = session_data["dose"]
-        except self.dose = None
+        except: self.dose = None
         self.kev = session_data["kev"]
         try: self.superresolution = session_data["superresolution"]
         except: self.superresolution = True
