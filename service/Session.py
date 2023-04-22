@@ -138,11 +138,15 @@ class Session:
         self._next_processing_time = session_data["next_processing_time"]
         self._is_loaded = True
         self.apix = session_data["apix"]
-        self.fmdose = session_data["fmdose"]
-        self.dose_per_img = session_data["dose_per_img"]
-        self.dose = session_data["dose"]
+        try: self.fmdose = session_data["fmdose"]
+        except: self.fmdose = None
+        try: self.dose_per_img = session_data["dose_per_img"]
+        except: self.dose_per_img = None
+        try: self.dose = session_data["dose"]
+        except self.dose = None
         self.kev = session_data["kev"]
-        self.superresolution = session_data["superresolution"]
+        try: self.superresolution = session_data["superresolution"]
+        except: self.superresolution = True
         self.rawgainref = session_data["rawgainref"]
         self.rawdefectsmap = session_data["rawdefectsmap"]
         self.basename_prefix = session_data["basename_prefix"]
@@ -152,7 +156,8 @@ class Session:
         self.trunc = session_data["trunc"]
         self.particle_size = session_data["particle_size"]
         self.retries = session_data["retries"]
-        self.no_of_frames = session_data["no_of_frames"]
+        try: self.no_of_frames = session_data["no_of_frames"]
+        except: self.no_of_frames = None
         #try to guess how many files were proceesed
         self._no_of_processed = self.count_processed_files()
         self._sent_for_processing = [os.path.basename(x).replace('_DW.mrc','') for x in self._processed_files_list]
@@ -491,11 +496,17 @@ class Session:
                     # return False
 
         # end condition
-        if (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0):
+        if (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0) and self.Wretries == 10:
             self._next_processing_time = 0
             self._state = self._STATE_PROCESSING_COMPLETE
             return
- 
+        elif (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0) and self.retries < 10:
+            self._next_processing_time = time.time() + 120
+            #self._state = self._STATE_PROCESSING_COMPLETE
+            log.info("IMPORTANT: DATASET PROCESSING ALMOST COMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS COMPLETED. Next try in 120s".format(11-self.retries))
+            self.retries+=1
+            return
+            
         # time to submit a new one? 
         if self._next_processing_time > 0 and self._next_processing_time < time.time() and self.retries < 60:
             # space the workflows a little bit in case of failure
