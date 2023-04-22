@@ -496,7 +496,7 @@ class Session:
                     # return False
 
         # end condition
-        if (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0) and self.Wretries == 10:
+        if (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0) and self.retries == 10:
             self._next_processing_time = 0
             self._state = self._STATE_PROCESSING_COMPLETE
             return
