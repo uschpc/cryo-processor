@@ -222,6 +222,9 @@ class Session:
         log.info(40*"x")
         self.probe_image(fname)
         self.eer_rendered_frames=self._config.getint("params", "eer_rendered_frames")
+        if self.dose == None: self.dose = 0
+        if self.fmdose == None: self.fmdose = 0
+        if self.dose_per_img == None: self.dose_per_img = 0
         if self.dose < 2:
             fmdose=float(self.dose)
             if self.no_of_frames <= 65:
