@@ -499,14 +499,14 @@ class Session:
                     # return False
 
         # end condition
-        if (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0) and self.retries == 10:
+        if (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0) and self.retries == 60:
             self._next_processing_time = 0
             self._state = self._STATE_PROCESSING_COMPLETE
             return
-        elif (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0) and self.retries < 10:
+        elif (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0) and self.retries < 60:
             self._next_processing_time = time.time() + 120
             #self._state = self._STATE_PROCESSING_COMPLETE
-            log.info("IMPORTANT: DATASET PROCESSING ALMOST COMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS COMPLETED. Next try in 120s".format(11-self.retries))
+            log.info("IMPORTANT: DATASET PROCESSING ALMOST COMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS COMPLETED. Next try in 120s".format(61-self.retries))
             self.retries+=1
             return
             
