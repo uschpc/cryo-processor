@@ -499,19 +499,19 @@ class Session:
                     # return False
 
         # end condition
-        if (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0) and self.retries == 60:
+        if (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0) and self.retries == 90:
             self._next_processing_time = 0
             self._state = self._STATE_PROCESSING_COMPLETE
             return
-        elif (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0) and self.retries < 60:
+        elif (self._no_of_processed == self._no_of_raw) and (self._no_of_processed != 0) and self.retries < 90:
             self._next_processing_time = time.time() + 120
             #self._state = self._STATE_PROCESSING_COMPLETE
-            log.info("IMPORTANT: DATASET PROCESSING ALMOST COMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS COMPLETED. Next try in 120s".format(61-self.retries))
+            log.info("IMPORTANT: DATASET PROCESSING ALMOST COMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS COMPLETED. Next try in 120s".format(91-self.retries))
             self.retries+=1
             return
             
         # time to submit a new one? 
-        if self._next_processing_time > 0 and self._next_processing_time < time.time() and self.retries < 60:
+        if self._next_processing_time > 0 and self._next_processing_time < time.time() and self.retries < 90:
             # space the workflows a little bit in case of failure
             log.info("IMPORTANT: SESSION SENT FOR PROCESSING")
             log.info("self._next_processing_time {}".format(self._next_processing_time))
@@ -521,7 +521,7 @@ class Session:
             #log.info("IMPORTANT-1: RETRIES RESET {}".format(self.retries))
             
             
-        elif self._next_processing_time > 0 and self._no_of_processed > 0 and self._no_of_processed < self._no_of_raw and self._is_loaded == True and self._next_processing_time < time.time() and self.retries < 60:
+        elif self._next_processing_time > 0 and self._no_of_processed > 0 and self._no_of_processed < self._no_of_raw and self._is_loaded == True and self._next_processing_time < time.time() and self.retries < 90:
             # time to submit a new one after an unscheduled shutdown mid-processing
             # space the workflows a little bit in case of failure
             log.info("IMPORTANT: SESSION LOADED - TRYING TO RESUME")
@@ -533,7 +533,7 @@ class Session:
             #self.retries = 0
             #log.info("IMPORTANT-2: RETRIES RESET {}".format(self.retries))
             
-        elif self._state == self._STATE_INCOMPLETE_OR_EMPTY and self.retries == 60:
+        elif self._state == self._STATE_INCOMPLETE_OR_EMPTY and self.retries == 90:
             log.info("Marking as failed")
             self._next_processing_time = 0
             self._state = self._STATE_PROCESSING_FAILURE
@@ -638,12 +638,12 @@ class Session:
             log.info("self._file_list_to_process: len {}".format(len(self._file_list_to_process)))
             log.info("self._sent_for_processing BEFOR: len {}".format(len(self._sent_for_processing)))
             #mark as incomplete if no files are found
-            if len(self._file_list_to_process)==0 and self.retries <=60:
+            if len(self._file_list_to_process)==0 and self.retries <=90:
                 self._state = self._STATE_INCOMPLETE_OR_EMPTY
                 self.retries+=1
-                log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS FAILURE. Next try in 120s".format(61-self.retries))
+                log.info("IMPORTANT: FILES NOT FOUND. DATASET EMPTY OR INCOMPLETE. WILL TRY {} MORE TIME(S) BEFORE MARKING AS FAILURE. Next try in 120s".format(91-self.retries))
                 return False
-            elif len(self._file_list_to_process)==0 and self.retries > 60:
+            elif len(self._file_list_to_process)==0 and self.retries > 90:
                 log.info("Marking as failed")
                 self._next_processing_time = 0
                 self._state = self._STATE_PROCESSING_FAILURE
