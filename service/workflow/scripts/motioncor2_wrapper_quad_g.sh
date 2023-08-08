@@ -64,7 +64,7 @@ file3_stdout=${27}
 
 
 #create fmintfile
-echo "$no_of_frames $eer_divisor $dose_per_eer_frame" > $eer_fmintfilepath
+echo "${no_of_frames} ${eer_divisor} ${dose_per_eer_frame}" > ${eer_fmintfilepath}
 
 
 if [ "$mcin" == "InTiff" ] ; then
