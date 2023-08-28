@@ -1,5 +1,4 @@
 #!/bin/bash
-#!/bin/bash
 img_file_path0=${1}
 slack_notify_out_fn0=${2}
 img_file_path1=${3}

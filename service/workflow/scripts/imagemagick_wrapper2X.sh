@@ -14,6 +14,10 @@ export XDG_DATA_DIRS=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/pango-1.41.0-ts3
 export XDG_DATA_DIRS=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/shared-mime-info-1.9-sttvs5aj7qp4w7rawclgis7t45f5cuit/share:$XDG_DATA_DIRS
 export XDG_DATA_DIRS=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/gtkplus-3.20.10-dukwopcup426l3mgedykk7w4kyuh4af4/share:$XDG_DATA_DIRS
 
+
+export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/libtiff-4.0.10-ird6lyk2kk7c5aumxivzass4hfiv3bwb/bin:$PATH
+export LD_LIBRARY_PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/libtiff-4.0.10-ird6lyk2kk7c5aumxivzass4hfiv3bwb/lib:$LD_LIBRARY_PATH
+
 export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/python-3.6.8-273lxvvtkjyasslzvmxufcdzgwgubbun/bin:$PATH
 export MANPATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/python-3.6.8-273lxvvtkjyasslzvmxufcdzgwgubbun/share/man:$MANPATH
 export LD_LIBRARY_PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/python-3.6.8-273lxvvtkjyasslzvmxufcdzgwgubbun/lib:$LD_LIBRARY_PATH

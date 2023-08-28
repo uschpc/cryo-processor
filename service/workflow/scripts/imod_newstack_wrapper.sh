@@ -16,6 +16,9 @@ export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3/bin:$PATH
 export MANPATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3/man:$MANPATH
 export LD_LIBRARY_PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3/qtlib:$LD_LIBRARY_PATH
+export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/libtiff-4.0.10-ird6lyk2kk7c5aumxivzass4hfiv3bwb/bin:$PATH
+export LD_LIBRARY_PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/libtiff-4.0.10-ird6lyk2kk7c5aumxivzass4hfiv3bwb/lib:$LD_LIBRARY_PATH
+
 
 newstack "$@"
 

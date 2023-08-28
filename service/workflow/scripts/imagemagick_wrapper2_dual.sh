@@ -23,6 +23,9 @@ export PKG_CONFIG_PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/python-3.6.8-2
 export CMAKE_PREFIX_PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/python-3.6.8-273lxvvtkjyasslzvmxufcdzgwgubbun/:$CMAKE_PREFIX_PATH
 export CPATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/python-3.6.8-273lxvvtkjyasslzvmxufcdzgwgubbun/include/python3.6m:$CPATH
 export PYTHON_ROOT=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/python-3.6.8-273lxvvtkjyasslzvmxufcdzgwgubbun
+export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/libtiff-4.0.10-ird6lyk2kk7c5aumxivzass4hfiv3bwb/bin:$PATH
+export LD_LIBRARY_PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/libtiff-4.0.10-ird6lyk2kk7c5aumxivzass4hfiv3bwb/lib:$LD_LIBRARY_PATH
+
 
 PROGNAME=`type $0 | awk '{print $3}'`  # search for executable on path
 PROGDIR=`dirname $PROGNAME`            # extract directory of program

@@ -62,6 +62,8 @@ export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/relion-3.1.1_c11.1-1-k40/
 export LD_LIBRARY_PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/relion-3.1.1_c11.1-1-k40/lib:$LD_LIBRARY_PATH
 export CMAKE_PREFIX_PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/relion-3.1.1_c11.1-1-k40/:$CMAKE_PREFIX_PATH
 export RELION_ROOT=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/relion-3.1.1_c11.1-1-k40
+export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/libtiff-4.0.10-ird6lyk2kk7c5aumxivzass4hfiv3bwb/bin:$PATH
+export LD_LIBRARY_PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/libtiff-4.0.10-ird6lyk2kk7c5aumxivzass4hfiv3bwb/lib:$LD_LIBRARY_PATH
 
 relion_autopick "$@"
 
