@@ -885,12 +885,14 @@ class PipelineWorkflow:
                     if self.superresolution == True:
                         if FlipY or Gain_Ref:
                             if str(self.kev) == "300": gff=FlipY_SR
-                            elif str(self.kev) == "200": gff=Gain_Ref_SR
+                            elif str(self.kev) == "200": gff=FlipY_SR
+                            #elif str(self.kev) == "200": gff=Gain_Ref_SR
                             else: gff=None
                     else:
                         if FlipY or Gain_Ref:
                             if str(self.kev) == "300": gff=FlipY
-                            elif str(self.kev) == "200": gff=Gain_Ref
+                            elif str(self.kev) == "200": gff=FlipY
+                            #elif str(self.kev) == "200": gff=Gain_Ref
                             else: gff=None
                     if gff!=None:
                         if self.throw!=0 and self.trunc!=0:
