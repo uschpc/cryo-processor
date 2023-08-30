@@ -49,6 +49,7 @@ class Session:
 
 
     def __init__(self, config, project_id, user, session_id):
+        self.debug=False
         self._config = config
         self._project_id = project_id
         self._user = user
@@ -664,7 +665,7 @@ class Session:
                                     self._session_dir,
                                     self.rawdatadirs,
                                     self._processed_dir,
-                                    debug=self._config.getboolean("general", "debug"),
+                                    self.debug=self._config.getboolean("general", "debug"),
                                     glite_arguments=self._config.get("params", "glite_arguments"),
                                     maxjobs=self._config.get("params", "maxjobs"),
                                     debug_maxjobs=self._config.get("params", "debug_maxjobs"),
