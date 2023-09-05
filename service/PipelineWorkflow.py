@@ -48,7 +48,7 @@ class PipelineWorkflow:
 
 
     # --- Init ----------------------------------------------------------------
-    def __init__(self, base_dir, session_dir, inputs_dir, outputs_dir, debug=True, partition="debug", \
+    def __init__(self, base_dir, session_dir, inputs_dir, outputs_dir, debug=False, partition="debug", \
                     account="osinski_703", glite_arguments="--gres=gpu:p100:2", \
                     maxjobs=100, debug_maxjobs=10, cluster_size=10, \
                     no_of_files_to_proc_in_cycle=100, pgss_stgt_clusters="10", no_of_gpus=2, eer_rendered_frames=40):
@@ -885,14 +885,14 @@ class PipelineWorkflow:
                     if self.superresolution == True:
                         if FlipY or Gain_Ref:
                             if str(self.kev) == "300": gff=FlipY_SR
-                            elif str(self.kev) == "200": gff=FlipY_SR
-                            #elif str(self.kev) == "200": gff=Gain_Ref_SR
+                            #elif str(self.kev) == "200": gff=FlipY_SR
+                            elif str(self.kev) == "200": gff=Gain_Ref_SR
                             else: gff=None
                     else:
                         if FlipY or Gain_Ref:
                             if str(self.kev) == "300": gff=FlipY
-                            elif str(self.kev) == "200": gff=FlipY
-                            #elif str(self.kev) == "200": gff=Gain_Ref
+                            #elif str(self.kev) == "200": gff=FlipY
+                            elif str(self.kev) == "200": gff=Gain_Ref
                             else: gff=None
                     if gff!=None:
                         if self.throw!=0 and self.trunc!=0:
@@ -977,10 +977,16 @@ class PipelineWorkflow:
                 motionCor_job.add_outputs(mrc_file1, stage_out=False, register_replica=False)
                 motionCor_job.add_outputs(dw_file0, stage_out=True, register_replica=False)
                 motionCor_job.add_outputs(dw_file1, stage_out=True, register_replica=False)
-                motionCor_job.add_outputs(mc2_stdout0, stage_out=True, register_replica=False)
-                motionCor_job.add_outputs(mc2_stdout1, stage_out=True, register_replica=False)
-                motionCor_job.add_outputs(mc2_stderr0, stage_out=True, register_replica=False)
-                motionCor_job.add_outputs(mc2_stderr1, stage_out=True, register_replica=False)
+                if self.debug:
+                    motionCor_job.add_outputs(mc2_stdout0, stage_out=True, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stdout1, stage_out=True, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stderr0, stage_out=True, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stderr1, stage_out=True, register_replica=False)
+                else:
+                    motionCor_job.add_outputs(mc2_stdout0, stage_out=False, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stdout1, stage_out=False, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stderr0, stage_out=False, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stderr1, stage_out=False, register_replica=False)
                 motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                 self.wf.add_jobs(motionCor_job)
 
@@ -1008,16 +1014,26 @@ class PipelineWorkflow:
                     )
                 gctf_job.add_inputs(mrc_file0)
                 gctf_job.add_inputs(mrc_file1)
-                gctf_job.add_outputs(ctf_star_file0, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(ctf_star_file1, stage_out=True, register_replica=False)
                 gctf_job.add_outputs(ctf_file0, stage_out=True, register_replica=False)
                 gctf_job.add_outputs(ctf_file1, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_log_file0, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_log_file1, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_stdout0, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_stdout1, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_stderr0, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_stderr1, stage_out=True, register_replica=False)
+                if self.debug:
+                    gctf_job.add_outputs(ctf_star_file0, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(ctf_star_file1, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_log_file0, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_log_file1, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_stdout0, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_stdout1, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_stderr0, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_stderr1, stage_out=True, register_replica=False)
+                else:
+                    gctf_job.add_outputs(ctf_star_file0, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(ctf_star_file1, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_log_file0, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_log_file1, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_stdout0, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_stdout1, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_stderr0, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_stderr1, stage_out=False, register_replica=False)
                 gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                 self.wf.add_jobs(gctf_job)
 
@@ -1029,8 +1045,12 @@ class PipelineWorkflow:
                 e2proc2d_job1 = Job("e2proc2d_dual")
                 e2proc2d_job1.add_inputs(dw_file0)
                 e2proc2d_job1.add_inputs(dw_file1)
-                e2proc2d_job1.add_outputs(dw_jpg_file0, stage_out=True, register_replica=False)
-                e2proc2d_job1.add_outputs(dw_jpg_file1, stage_out=True, register_replica=False)
+                if self.debug:
+                    e2proc2d_job1.add_outputs(dw_jpg_file0, stage_out=True, register_replica=False)
+                    e2proc2d_job1.add_outputs(dw_jpg_file1, stage_out=True, register_replica=False)
+                else:
+                    e2proc2d_job1.add_outputs(dw_jpg_file0, stage_out=False, register_replica=False)
+                    e2proc2d_job1.add_outputs(dw_jpg_file1, stage_out=False, register_replica=False)
                 e2proc2d_job1.add_args(\
                                     dw_file0, dw_jpg_file0, \
                                     dw_file1, dw_jpg_file1, \
@@ -1044,8 +1064,12 @@ class PipelineWorkflow:
                 magick_resize = Job("magick_dual")
                 magick_resize.add_inputs(dw_jpg_file0)
                 magick_resize.add_inputs(dw_jpg_file1)
-                magick_resize.add_outputs(magick_jpg_file0, stage_out=True, register_replica=False)
-                magick_resize.add_outputs(magick_jpg_file1, stage_out=True, register_replica=False)
+                if self.debug:
+                    magick_resize.add_outputs(magick_jpg_file0, stage_out=True, register_replica=False)
+                    magick_resize.add_outputs(magick_jpg_file1, stage_out=True, register_replica=False)
+                else:
+                    magick_resize.add_outputs(magick_jpg_file0, stage_out=False, register_replica=False)
+                    magick_resize.add_outputs(magick_jpg_file1, stage_out=False, register_replica=False)
                 magick_resize.add_args(\
                                     dw_jpg_file0, magick_jpg_file0, \
                                     dw_jpg_file1, magick_jpg_file1,\
@@ -1059,8 +1083,12 @@ class PipelineWorkflow:
                 e2proc2d_job2 = Job("e2proc2d2_dual")
                 e2proc2d_job2.add_inputs(ctf_file0)
                 e2proc2d_job2.add_inputs(ctf_file1)
-                e2proc2d_job2.add_outputs(jpg_ctf_file0, stage_out=True, register_replica=False)
-                e2proc2d_job2.add_outputs(jpg_ctf_file1, stage_out=True, register_replica=False)
+                if self.debug:
+                    e2proc2d_job2.add_outputs(jpg_ctf_file0, stage_out=True, register_replica=False)
+                    e2proc2d_job2.add_outputs(jpg_ctf_file1, stage_out=True, register_replica=False)
+                else:
+                    e2proc2d_job2.add_outputs(jpg_ctf_file0, stage_out=False, register_replica=False)
+                    e2proc2d_job2.add_outputs(jpg_ctf_file1, stage_out=False, register_replica=False)
                 e2proc2d_job2.add_args(\
                                     ctf_file0, jpg_ctf_file0, \
                                     ctf_file1, jpg_ctf_file1, \
@@ -1093,8 +1121,12 @@ class PipelineWorkflow:
                 slack_notify_job = Job("slack_notify_dual")
                 slack_notify_job.add_inputs(magick_combined_jpg_file0)
                 slack_notify_job.add_inputs(magick_combined_jpg_file1)
-                slack_notify_job.add_outputs(slack_notify_out0, stage_out=True, register_replica=False)
-                slack_notify_job.add_outputs(slack_notify_out1, stage_out=True, register_replica=False)
+                if self.debug:
+                    slack_notify_job.add_outputs(slack_notify_out0, stage_out=True, register_replica=False)
+                    slack_notify_job.add_outputs(slack_notify_out1, stage_out=True, register_replica=False)
+                else:
+                    slack_notify_job.add_outputs(slack_notify_out0, stage_out=False, register_replica=False)
+                    slack_notify_job.add_outputs(slack_notify_out1, stage_out=False, register_replica=False)
                 slack_notify_job.add_args(\
                                 os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn0), slack_notify_out0, \
                                 os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn1), slack_notify_out1, \
@@ -1310,14 +1342,24 @@ class PipelineWorkflow:
                 motionCor_job.add_outputs(dw_file1, stage_out=True, register_replica=False)
                 motionCor_job.add_outputs(dw_file2, stage_out=True, register_replica=False)
                 motionCor_job.add_outputs(dw_file3, stage_out=True, register_replica=False)
-                motionCor_job.add_outputs(mc2_stdout0, stage_out=True, register_replica=False)
-                motionCor_job.add_outputs(mc2_stdout1, stage_out=True, register_replica=False)
-                motionCor_job.add_outputs(mc2_stdout2, stage_out=True, register_replica=False)
-                motionCor_job.add_outputs(mc2_stdout3, stage_out=True, register_replica=False)
-                motionCor_job.add_outputs(mc2_stderr0, stage_out=True, register_replica=False)
-                motionCor_job.add_outputs(mc2_stderr1, stage_out=True, register_replica=False)
-                motionCor_job.add_outputs(mc2_stderr2, stage_out=True, register_replica=False)
-                motionCor_job.add_outputs(mc2_stderr3, stage_out=True, register_replica=False)
+                if self.debug:
+                    motionCor_job.add_outputs(mc2_stdout0, stage_out=True, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stdout1, stage_out=True, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stdout2, stage_out=True, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stdout3, stage_out=True, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stderr0, stage_out=True, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stderr1, stage_out=True, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stderr2, stage_out=True, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stderr3, stage_out=True, register_replica=False)
+                else:
+                    motionCor_job.add_outputs(mc2_stdout0, stage_out=False, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stdout1, stage_out=False, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stdout2, stage_out=False, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stdout3, stage_out=False, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stderr0, stage_out=False, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stderr1, stage_out=False, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stderr2, stage_out=False, register_replica=False)
+                    motionCor_job.add_outputs(mc2_stderr3, stage_out=False, register_replica=False)
                 motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                 self.wf.add_jobs(motionCor_job)
 
@@ -1365,26 +1407,44 @@ class PipelineWorkflow:
                 gctf_job.add_inputs(mrc_file1)
                 gctf_job.add_inputs(mrc_file2)
                 gctf_job.add_inputs(mrc_file3)
-                gctf_job.add_outputs(ctf_star_file0, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(ctf_star_file1, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(ctf_star_file2, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(ctf_star_file3, stage_out=True, register_replica=False)
                 gctf_job.add_outputs(ctf_file0, stage_out=True, register_replica=False)
                 gctf_job.add_outputs(ctf_file1, stage_out=True, register_replica=False)
                 gctf_job.add_outputs(ctf_file2, stage_out=True, register_replica=False)
                 gctf_job.add_outputs(ctf_file3, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_log_file0, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_log_file1, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_log_file2, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_log_file3, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_stdout0, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_stdout1, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_stdout2, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_stdout3, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_stderr0, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_stderr1, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_stderr2, stage_out=True, register_replica=False)
-                gctf_job.add_outputs(gctf_stderr3, stage_out=True, register_replica=False)
+                if self.debug:
+                    gctf_job.add_outputs(ctf_star_file0, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(ctf_star_file1, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(ctf_star_file2, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(ctf_star_file3, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_log_file0, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_log_file1, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_log_file2, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_log_file3, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_stdout0, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_stdout1, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_stdout2, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_stdout3, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_stderr0, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_stderr1, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_stderr2, stage_out=True, register_replica=False)
+                    gctf_job.add_outputs(gctf_stderr3, stage_out=True, register_replica=False)
+                else:
+                    gctf_job.add_outputs(ctf_star_file0, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(ctf_star_file1, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(ctf_star_file2, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(ctf_star_file3, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_log_file0, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_log_file1, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_log_file2, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_log_file3, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_stdout0, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_stdout1, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_stdout2, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_stdout3, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_stderr0, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_stderr1, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_stderr2, stage_out=False, register_replica=False)
+                    gctf_job.add_outputs(gctf_stderr3, stage_out=False, register_replica=False)
                 gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}".format(slowcounter))
                 self.wf.add_jobs(gctf_job)
 
@@ -1402,10 +1462,16 @@ class PipelineWorkflow:
                 e2proc2d_job1.add_inputs(dw_file1)
                 e2proc2d_job1.add_inputs(dw_file2)
                 e2proc2d_job1.add_inputs(dw_file3)
-                e2proc2d_job1.add_outputs(dw_jpg_file0, stage_out=True, register_replica=False)
-                e2proc2d_job1.add_outputs(dw_jpg_file1, stage_out=True, register_replica=False)
-                e2proc2d_job1.add_outputs(dw_jpg_file2, stage_out=True, register_replica=False)
-                e2proc2d_job1.add_outputs(dw_jpg_file3, stage_out=True, register_replica=False)
+                if self.debug:
+                    e2proc2d_job1.add_outputs(dw_jpg_file0, stage_out=True, register_replica=False)
+                    e2proc2d_job1.add_outputs(dw_jpg_file1, stage_out=True, register_replica=False)
+                    e2proc2d_job1.add_outputs(dw_jpg_file2, stage_out=True, register_replica=False)
+                    e2proc2d_job1.add_outputs(dw_jpg_file3, stage_out=True, register_replica=False)
+                else:
+                    e2proc2d_job1.add_outputs(dw_jpg_file0, stage_out=False, register_replica=False)
+                    e2proc2d_job1.add_outputs(dw_jpg_file1, stage_out=False, register_replica=False)
+                    e2proc2d_job1.add_outputs(dw_jpg_file2, stage_out=False, register_replica=False)
+                    e2proc2d_job1.add_outputs(dw_jpg_file3, stage_out=False, register_replica=False)
                 e2proc2d_job1.add_args(\
                                     dw_file0, dw_jpg_file0, \
                                     dw_file1, dw_jpg_file1, \
@@ -1425,10 +1491,16 @@ class PipelineWorkflow:
                 magick_resize.add_inputs(dw_jpg_file1)
                 magick_resize.add_inputs(dw_jpg_file2)
                 magick_resize.add_inputs(dw_jpg_file3)
-                magick_resize.add_outputs(magick_jpg_file0, stage_out=True, register_replica=False)
-                magick_resize.add_outputs(magick_jpg_file1, stage_out=True, register_replica=False)
-                magick_resize.add_outputs(magick_jpg_file2, stage_out=True, register_replica=False)
-                magick_resize.add_outputs(magick_jpg_file3, stage_out=True, register_replica=False)
+                if self.debug:
+                    magick_resize.add_outputs(magick_jpg_file0, stage_out=True, register_replica=False)
+                    magick_resize.add_outputs(magick_jpg_file1, stage_out=True, register_replica=False)
+                    magick_resize.add_outputs(magick_jpg_file2, stage_out=True, register_replica=False)
+                    magick_resize.add_outputs(magick_jpg_file3, stage_out=True, register_replica=False)
+                else:
+                    magick_resize.add_outputs(magick_jpg_file0, stage_out=False, register_replica=False)
+                    magick_resize.add_outputs(magick_jpg_file1, stage_out=False, register_replica=False)
+                    magick_resize.add_outputs(magick_jpg_file2, stage_out=False, register_replica=False)
+                    magick_resize.add_outputs(magick_jpg_file3, stage_out=False, register_replica=False)
                 magick_resize.add_args(\
                                     dw_jpg_file0, magick_jpg_file0, \
                                     dw_jpg_file1, magick_jpg_file1, \
@@ -1448,10 +1520,16 @@ class PipelineWorkflow:
                 e2proc2d_job2.add_inputs(ctf_file1)
                 e2proc2d_job2.add_inputs(ctf_file2)
                 e2proc2d_job2.add_inputs(ctf_file3)
-                e2proc2d_job2.add_outputs(jpg_ctf_file0, stage_out=True, register_replica=False)
-                e2proc2d_job2.add_outputs(jpg_ctf_file1, stage_out=True, register_replica=False)
-                e2proc2d_job2.add_outputs(jpg_ctf_file2, stage_out=True, register_replica=False)
-                e2proc2d_job2.add_outputs(jpg_ctf_file3, stage_out=True, register_replica=False)
+                if self.debug:
+                    e2proc2d_job2.add_outputs(jpg_ctf_file0, stage_out=True, register_replica=False)
+                    e2proc2d_job2.add_outputs(jpg_ctf_file1, stage_out=True, register_replica=False)
+                    e2proc2d_job2.add_outputs(jpg_ctf_file2, stage_out=True, register_replica=False)
+                    e2proc2d_job2.add_outputs(jpg_ctf_file3, stage_out=True, register_replica=False)
+                else:
+                    e2proc2d_job2.add_outputs(jpg_ctf_file0, stage_out=False, register_replica=False)
+                    e2proc2d_job2.add_outputs(jpg_ctf_file1, stage_out=False, register_replica=False)
+                    e2proc2d_job2.add_outputs(jpg_ctf_file2, stage_out=False, register_replica=False)
+                    e2proc2d_job2.add_outputs(jpg_ctf_file3, stage_out=False, register_replica=False)
                 e2proc2d_job2.add_args(\
                                     ctf_file0, jpg_ctf_file0, \
                                     ctf_file1, jpg_ctf_file1, \
@@ -1500,10 +1578,16 @@ class PipelineWorkflow:
                 slack_notify_job.add_inputs(magick_combined_jpg_file1)
                 slack_notify_job.add_inputs(magick_combined_jpg_file2)
                 slack_notify_job.add_inputs(magick_combined_jpg_file3)
-                slack_notify_job.add_outputs(slack_notify_out0, stage_out=True, register_replica=False)
-                slack_notify_job.add_outputs(slack_notify_out1, stage_out=True, register_replica=False)
-                slack_notify_job.add_outputs(slack_notify_out2, stage_out=True, register_replica=False)
-                slack_notify_job.add_outputs(slack_notify_out3, stage_out=True, register_replica=False)
+                if self.debug:
+                    slack_notify_job.add_outputs(slack_notify_out0, stage_out=True, register_replica=False)
+                    slack_notify_job.add_outputs(slack_notify_out1, stage_out=True, register_replica=False)
+                    slack_notify_job.add_outputs(slack_notify_out2, stage_out=True, register_replica=False)
+                    slack_notify_job.add_outputs(slack_notify_out3, stage_out=True, register_replica=False)
+                else:
+                    slack_notify_job.add_outputs(slack_notify_out0, stage_out=False, register_replica=False)
+                    slack_notify_job.add_outputs(slack_notify_out1, stage_out=False, register_replica=False)
+                    slack_notify_job.add_outputs(slack_notify_out2, stage_out=False, register_replica=False)
+                    slack_notify_job.add_outputs(slack_notify_out3, stage_out=False, register_replica=False)
                 slack_notify_job.add_args(\
                                 os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn0), slack_notify_out0, \
                                 os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn1), slack_notify_out1, \
@@ -1616,8 +1700,12 @@ class PipelineWorkflow:
                     motionCor_job.add_inputs(fraction_file)
                     motionCor_job.add_outputs(mrc_file, stage_out=False, register_replica=False)
                     motionCor_job.add_outputs(dw_file, stage_out=True, register_replica=False)
-                    motionCor_job.add_outputs(mc2_stdout, stage_out=True, register_replica=False)
-                    motionCor_job.add_outputs(mc2_stderr, stage_out=True, register_replica=False)
+                    if self.debug:
+                        motionCor_job.add_outputs(mc2_stdout, stage_out=True, register_replica=False)
+                        motionCor_job.add_outputs(mc2_stderr, stage_out=True, register_replica=False)
+                    else:
+                        motionCor_job.add_outputs(mc2_stdout, stage_out=False, register_replica=False)
+                        motionCor_job.add_outputs(mc2_stderr, stage_out=False, register_replica=False)
                     motionCor_job.add_profiles(Namespace.PEGASUS, "label", "1-{}-x".format(slowcounter))
                     self.wf.add_jobs(motionCor_job)
                     
@@ -1635,11 +1723,17 @@ class PipelineWorkflow:
                         ctf_star_file, mrc_file, gctf_stdout, gctf_stderr,\
                         )
                     gctf_job.add_inputs(mrc_file)
-                    gctf_job.add_outputs(ctf_star_file, stage_out=True, register_replica=False)
                     gctf_job.add_outputs(ctf_file, stage_out=True, register_replica=False)
-                    gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
-                    gctf_job.add_outputs(gctf_stdout, stage_out=True, register_replica=False)
-                    gctf_job.add_outputs(gctf_stderr, stage_out=True, register_replica=False)
+                    if self.debug:
+                        gctf_job.add_outputs(ctf_star_file, stage_out=True, register_replica=False)
+                        gctf_job.add_outputs(gctf_log_file, stage_out=True, register_replica=False)
+                        gctf_job.add_outputs(gctf_stdout, stage_out=True, register_replica=False)
+                        gctf_job.add_outputs(gctf_stderr, stage_out=True, register_replica=False)
+                    else:
+                        gctf_job.add_outputs(ctf_star_file, stage_out=False, register_replica=False)
+                        gctf_job.add_outputs(gctf_log_file, stage_out=False, register_replica=False)
+                        gctf_job.add_outputs(gctf_stdout, stage_out=False, register_replica=False)
+                        gctf_job.add_outputs(gctf_stderr, stage_out=False, register_replica=False)
                     gctf_job.add_profiles(Namespace.PEGASUS, "label", "1-{}-x".format(slowcounter))
                     self.wf.add_jobs(gctf_job)
                     # e2proc2d - motion-corrected to jpg, then resize to 20% size
@@ -1647,7 +1741,10 @@ class PipelineWorkflow:
                     dw_jpg_file = File(dw_jpg_name)
                     e2proc2d_job1 = Job("e2proc2d")            
                     e2proc2d_job1.add_inputs(dw_file)
-                    e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
+                    if self.debug:
+                        e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=True, register_replica=False)
+                    else:
+                        e2proc2d_job1.add_outputs(dw_jpg_file, stage_out=False, register_replica=False)
                     e2proc2d_job1.add_args(dw_file, dw_jpg_file)
                     e2proc2d_job1.add_profiles(Namespace.PEGASUS, "label", "1-{}-x".format(slowcounter))           
                     self.wf.add_jobs(e2proc2d_job1)
@@ -1655,7 +1752,10 @@ class PipelineWorkflow:
                     magick_jpg_file = File(dw_jpg_name.replace("_DW_fs.jpg",".jpg"))
                     magick_resize = Job("magick")
                     magick_resize.add_inputs(dw_jpg_file)
-                    magick_resize.add_outputs(magick_jpg_file, stage_out=True, register_replica=False)
+                    if self.debug:
+                        magick_resize.add_outputs(magick_jpg_file, stage_out=True, register_replica=False)
+                    else:
+                        magick_resize.add_outputs(magick_jpg_file, stage_out=False, register_replica=False)
                     magick_resize.add_args(dw_jpg_file, magick_jpg_file)
                     magick_resize.add_profiles(Namespace.PEGASUS, "label", "1-{}-x".format(slowcounter))
                     self.wf.add_jobs(magick_resize)
@@ -1663,7 +1763,10 @@ class PipelineWorkflow:
                     jpg_ctf_file = File(mrc_file_name.replace(".mrc","_ctf.jpg"))
                     e2proc2d_job2 = Job("e2proc2d2")            
                     e2proc2d_job2.add_inputs(ctf_file)
-                    e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True, register_replica=False)
+                    if self.debug:
+                        e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=True, register_replica=False)
+                    else:
+                        e2proc2d_job2.add_outputs(jpg_ctf_file, stage_out=False, register_replica=False)
                     e2proc2d_job2.add_args(ctf_file, jpg_ctf_file)
                     e2proc2d_job2.add_profiles(Namespace.PEGASUS, "label", "1-{}-x".format(slowcounter))
                     self.wf.add_jobs(e2proc2d_job2)
@@ -1685,7 +1788,10 @@ class PipelineWorkflow:
                     slack_notify_out=File(mrc_file_name.replace(".mrc","_slack_msg.txt"))
                     slack_notify_job = Job("slack_notify")
                     slack_notify_job.add_inputs(magick_combined_jpg_file)
-                    slack_notify_job.add_outputs(slack_notify_out, stage_out=True, register_replica=False)
+                    if self.debug:
+                        slack_notify_job.add_outputs(slack_notify_out, stage_out=True, register_replica=False)
+                    else:
+                        slack_notify_job.add_outputs(slack_notify_out, stage_out=False, register_replica=False)
                     slack_notify_job.add_args(\
                                 os.path.join(os.path.join(self.shared_scratch_dir, self.wf_name), magick_combined_jpg_fn), slack_notify_out, \
                                 )
