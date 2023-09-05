@@ -6,6 +6,10 @@ set -e
 cd $(dirname $0)
 
 module purge
+# . "/spack/conda/miniconda3/4.12.0/etc/profile.d/conda.sh"
+# conda activate /home1/cryoemadmin/software/cryo-processor-progs
+# export LD_LIBRARY_PATH=/home1/cryoemadmin/software/cryo-processor-progs/lib:$LD_LIBRARY_PATH
+
 module load usc/8.3.0
 module load python/3.6.8
 module load openjdk/11.0.2
@@ -15,7 +19,6 @@ if [ ! -e venv ]; then
     . venv/bin/activate
     python3 -m pip install --upgrade pip
     python3 -m pip install -r requirements.txt
-
 fi
 
 . venv/bin/activate
