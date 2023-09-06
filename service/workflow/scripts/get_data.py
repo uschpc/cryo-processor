@@ -21,7 +21,10 @@ def get_reso(strdata):
         
         
 def get_avg_shifts(strdata):
-    all_shifts=re.findall('\.\.\.\.\.\.\s+Frame\s+\(.*?\)\s+shift:\s+(.*?\..*?)\s+(.*?\..*?)\n',strdata)
+    #older than mc 1.6.4
+    #all_shifts=re.findall('\.\.\.\.\.\.\s+Frame\s+\(.*?\)\s+shift:\s+(.*?\..*?)\s+(.*?\..*?)\n',strdata)
+    #mc 1.6.4+
+    all_shifts=re.findall('\s+?\d+\s+?(-?\d+?\.\d+?)\s+?(-?\d+?\.\d+?)\n',strdata)
     if all_shifts != []:
         shifts_1=[float(x[0]) for x in all_shifts]
         shifts_2=[float(x[1]) for x in all_shifts]
