@@ -149,7 +149,7 @@ class PipelineWorkflow:
             Site(exec_site_name)
             .add_profiles(Namespace.CONDOR, key="grid_resource", value="batch slurm")
             .add_profiles(Namespace.PEGASUS, key="style", value="glite")
-            .add_profiles(Namespace.PEGASUS, key="project", value=self.account)
+            .add_profiles(Namespace.PEGASUS, key="project", value="osinski_703")
             .add_profiles(Namespace.PEGASUS, key="auxillary.local", value=True)
             .add_profiles(Namespace.ENV, key="PEGASUS_HOME", value=os.environ["PEGASUS_HOME"])
             .add_directories(
