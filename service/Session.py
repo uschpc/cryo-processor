@@ -26,7 +26,7 @@ class Session:
     # USC netid
     _user = None
     
-    # session as the directory is named under /cryoem1/test/cryo-pegasus-test/[project_id]/sessions/[user]/[session_id]
+    # session as the directory is named under /cryoem2/[project_id]/sessions/[user]/[session_id]
     _session_id = None
  
     # list of potenatial states for tracking

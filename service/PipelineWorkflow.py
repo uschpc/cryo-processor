@@ -142,7 +142,8 @@ class PipelineWorkflow:
             Directory(Directory.LOCAL_STORAGE, local_storage_dir).add_file_servers(
                 FileServer("file://" + local_storage_dir, Operation.ALL)
             ),
-        )
+        ).add_profiles(Namespace.PEGASUS, key="project", value="osinski_703")
+        
         shared_scratch_dir = os.path.join(self.wf_dir, "scratch")
         self.shared_scratch_dir = shared_scratch_dir
         exec_site = (
