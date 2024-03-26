@@ -48,8 +48,8 @@ class PipelineWorkflow:
 
 
     # --- Init ----------------------------------------------------------------
-    def __init__(self, base_dir, session_dir, inputs_dir, outputs_dir, debug=False, partition="debug", \
-                    account="osinski_703", glite_arguments="--gres=gpu:p100:2", \
+    def __init__(self, base_dir, session_dir, inputs_dir, outputs_dir, debug=False, partition="cryoem", \
+                    account="osinski_703", glite_arguments="--gres=gpu:p100:2 --qos=osinski_high", \
                     maxjobs=100, debug_maxjobs=10, cluster_size=10, \
                     no_of_files_to_proc_in_cycle=100, pgss_stgt_clusters="10", no_of_gpus=2, eer_rendered_frames=40):
         self.wf_name = "motioncor2"
@@ -148,7 +148,7 @@ class PipelineWorkflow:
         self.shared_scratch_dir = shared_scratch_dir
         exec_site = (
             Site(exec_site_name)
-            .add_profiles(Namespace.CONDOR, key="grid_resource", value="batch slurm")
+            .add_profiles(Namespace.CONDOR, key="grid_resource", value="batch slurm", key="project", value="osinski_703")
             .add_profiles(Namespace.PEGASUS, key="style", value="glite")
             .add_profiles(Namespace.PEGASUS, key="project", value="osinski_703")
             .add_profiles(Namespace.PEGASUS, key="auxillary.local", value=True)
@@ -382,7 +382,7 @@ class PipelineWorkflow:
             pfn=os.path.join(self.base_dir, "workflow/scripts/slack_notifyX.sh"),
             is_stageable=False
         )
-        slack_notify.add_pegasus_profile( cores="1",
+        slack_notify.add_pegasus_profile(cores="1",
                                         runtime="300",
                                         memory="2048",
                                         glite_arguments=self.glite_arguments
