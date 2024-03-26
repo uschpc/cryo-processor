@@ -148,7 +148,7 @@ class PipelineWorkflow:
         self.shared_scratch_dir = shared_scratch_dir
         exec_site = (
             Site(exec_site_name)
-            .add_profiles(Namespace.CONDOR, key="grid_resource", value="batch slurm", key="project", value="osinski_703")
+            .add_profiles(Namespace.CONDOR, key="grid_resource", value="batch slurm")
             .add_profiles(Namespace.PEGASUS, key="style", value="glite")
             .add_profiles(Namespace.PEGASUS, key="project", value="osinski_703")
             .add_profiles(Namespace.PEGASUS, key="auxillary.local", value=True)
