@@ -2,7 +2,7 @@
 
 module purge
 module load usc
-module load python
+module load python/3.12.8
 module load openjdk
 . venv/bin/activate
 #. "/spack/conda/miniconda3/4.12.0/etc/profile.d/conda.sh"
