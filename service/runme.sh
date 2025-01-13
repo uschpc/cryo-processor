@@ -10,9 +10,9 @@ module purge
 # conda activate /home1/cryoemadmin/software/cryo-processor-progs
 # export LD_LIBRARY_PATH=/home1/cryoemadmin/software/cryo-processor-progs/lib:$LD_LIBRARY_PATH
 
-module load usc/8.3.0
-module load python/3.6.8
-module load openjdk/11.0.2
+module load usc
+module load python
+module load openjdk
 
 if [ ! -e venv ]; then
     python3 -m venv venv

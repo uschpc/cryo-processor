@@ -1,9 +1,9 @@
 #!/bin/bash
 
 module purge
-module load usc/8.3.0
-module load python/3.6.8
-module load openjdk/11.0.2
+module load usc
+module load python
+module load openjdk
 . venv/bin/activate
 #. "/spack/conda/miniconda3/4.12.0/etc/profile.d/conda.sh"
 #conda activate /home1/cryoemadmin/software/cryo-processor-progs
