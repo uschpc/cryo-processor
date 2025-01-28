@@ -22,7 +22,7 @@ export LD_LIBRARY_PATH=${HOME}/software/cryo-processor-progs/lib:$LD_LIBRARY_PAT
 
 #. venv/bin/activate
 
-export PEGASUS_HOME=/home1/cryoemadmin/software/pegasus-5.0.1dev
+export PEGASUS_HOME=/home1/cryoemadmin/software/pegasus-5.0.9
 export PATH=$PEGASUS_HOME/bin:$PATH
 export PYTHONPATH=$(pegasus-config --python)
 export LANG=en_US.UTF-8
