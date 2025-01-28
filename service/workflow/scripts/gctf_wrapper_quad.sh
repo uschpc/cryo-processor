@@ -1,9 +1,9 @@
 #!/bin/bash
 . "/apps/conda/miniforge3/24.3.0/etc/profile.d/conda.sh"
-conda activate /home1/cryoemadmin/software/cryo-processor-progs
-export LD_LIBRARY_PATH=/home1/cryoemadmin/software/cryo-processor-progs/lib:$LD_LIBRARY_PATH
+conda activate ${HOME}/software/cryo-processor-progs
+export LD_LIBRARY_PATH=${HOME}/software/cryo-processor-progs/lib:$LD_LIBRARY_PATH
 #provide old cuda libs for gctf to work with newer cuda on a40
-export LD_LIBRARY_PATH=/home1/cryoemadmin/software/gctf_libs_from_c10.1.243_to_work_with_c11.2.0_on_a40:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=${HOME}/software/gctf_libs_from_c10.1.243_to_work_with_c11.2.0_on_a40:$LD_LIBRARY_PATH
 
 #debug
 #ldd `which gctf`

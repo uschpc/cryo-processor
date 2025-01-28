@@ -179,8 +179,8 @@ class Session:
         log.info(40*"z")
         log.info("Start image probing")
         probe_img_cmd = '''
-        export IMOD_DIR=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3
-        export PATH=/spack/apps/linux-centos7-x86_64/gcc-8.3.0/imod-4.12.3/bin:$PATH
+        export IMOD_DIR=${HOME}/software/cryo-processor-progs/IMOD
+        export PATH=${HOME}/software/cryo-processor-progs/IMOD/bin:$PATH
         header -size %s
         '''%fname
         img_data=subprocess.check_output(probe_img_cmd, shell=True).split()
